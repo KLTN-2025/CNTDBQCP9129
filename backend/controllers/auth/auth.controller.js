@@ -108,7 +108,7 @@ export const resetPassword = async (req, res) => {
 
     // Tìm user trong database
     const user = await User.findById(decoded.id);
-    if (!user) return res.status(404).json({ message: "Không tìm thấy user" });
+    if (!user) return res.status(404).json({ message: "email không tồn tại" });
 
     // Mã hóa mật khẩu mới
     const hashedPassword = await bcrypt.hash(newPassword, 10);
