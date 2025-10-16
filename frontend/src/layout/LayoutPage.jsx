@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import NavbarHeader from "../components/navbar/NavbarHeader";
-import HomeBanner from "../page/home/HomeBanner";
 import Sidebar from "../components/sidebar/Sidebar";
-const LayoutPage = () => {
+const LayoutPage = ({children}) => {
   const [isOpenSidebar, setIsOpenSidebar] = useState(false);
   return (
     <div className="w-full flex flex-col">
@@ -26,8 +25,8 @@ const LayoutPage = () => {
       >
         <Sidebar />
       </div>
-      <div className="w-full">
-        <HomeBanner />
+      <div className="w-full pt-8">
+        {children}
       </div>
     </div>
   );

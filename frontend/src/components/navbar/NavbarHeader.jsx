@@ -18,7 +18,7 @@ const NavbarHeader = ({isOpenSidebar, setIsOpenSidebar}) => {
         </div>
         <img
           src="/logo_coffee.png"
-          className="w-28 h-26 max-lg:w-16 max-lg:h-14 rounded-full object-cover cursor-pointer"
+          className="w-28 h-26 max-lg:w-16 max-lg:h-14 rounded-full object-cover cursor-pointer select-none"
           alt="logo coffee go"
         />
         <div className="flex items-center justify-end font-bold gap-x-12 max-xl:gap-x-3 w-full max-lg:hidden">
