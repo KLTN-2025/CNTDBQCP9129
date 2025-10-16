@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 
 const Menu = () => {
   return (
     <div>
-      Thực đơn
+      <span className="hover:text-red-700 cursor-pointer">THỰC ĐƠN</span>
     </div>
-  )
-}
+  );
+};
 
-export default Menu
+export default Menu;
