@@ -23,8 +23,7 @@ const userSchema = new mongoose.Schema(
       enum: ["customer", "manager", "admin"],
       default: "customer",
     },
-    bookingHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: "Booking" }],
-  },
+  },  
   {
     timestamps: true,
   }
