@@ -8,8 +8,9 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const login = useAuthStore(state => state.login)
+  const login = useAuthStore((state) => state.login);
   const handleLogin = async (e) => {
+    if(!email || !password) return
     e.preventDefault();
     setError("");
     const res = await authApi.loginUser(email, password);
@@ -31,7 +32,7 @@ const LoginPage = () => {
         </h1>
         <p className="text-center text-sm text-gray-500 mb-6">
           Bạn chưa có tài khoản?{" "}
-          <Link to='/account/register'>
+          <Link to="/account/register">
             <span className="underline text-red-600 hover:text-red-700 cursor-pointer">
               Đăng ký tại đây
             </span>
@@ -68,9 +69,11 @@ const LoginPage = () => {
           </div>
 
           <div className="flex items-center justify-between text-sm text-gray-600">
-            <span className="hover:underline cursor-pointer text-red-600">
-              Quên mật khẩu?
-            </span>
+            <Link to='/account/forgot-password'>
+              <span className="hover:underline cursor-pointer text-red-600">
+                Quên mật khẩu?
+              </span>
+            </Link>
           </div>
 
           <button

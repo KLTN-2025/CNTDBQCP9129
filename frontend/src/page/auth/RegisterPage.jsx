@@ -9,6 +9,7 @@ const RegisterPage = () => {
   const [notification, setNotification] = useState("");
   const navigate = useNavigate()
   const handleRegister = async (e) => {
+    if(!email || !password || !name) return;
   e.preventDefault();
   setError("");
   setNotification("");

@@ -39,4 +39,27 @@ export const authApi = {
       throw error;
     }
   },
+  forgotPassword: async (email) => {
+    try {
+      const res = await axiosClient.post("/auth/forgot-password", {
+        email,
+      });
+      return res;
+    } catch (error) {
+      console.error("Lỗi quên mật khẩu:", error);
+      // Throw error để frontend xử lý bằng try-catch
+      throw error;
+    }
+  },
+  resetPassword: async (token, newPassword) => {
+    try {
+      const res = await axiosClient.post(`/auth/reset-password?token=${token}`, {
+        newPassword,
+      });
+      return res;
+    } catch (error) {
+      console.error("Lỗi reset password:", error);
+      throw error;
+    }
+  },
 };
