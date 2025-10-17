@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { authApi } from "../../api/authApi";
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
@@ -7,7 +7,6 @@ const RegisterPage = () => {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [notification, setNotification] = useState("");
-  const navigate = useNavigate()
   const handleRegister = async (e) => {
     if(!email || !password || !name) return;
   e.preventDefault();
@@ -22,19 +21,7 @@ const RegisterPage = () => {
     setError(error.response?.data?.message || "Có lỗi xảy ra");
   }
 };
-   useEffect(() => {
-    // hàm xử lý khi localStorage thay đổi
-    const handleStorageChange = (e) => {
-      if (e.key === "verified" && e.newValue === "true") {
-        localStorage.removeItem("verified"); 
-        navigate("/");
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [navigate]);
+
   return (
     <div className="w-full flex flex-col items-center justify-center bg-gray-50 pt-10">
       {!notification ? (
