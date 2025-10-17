@@ -10,11 +10,13 @@ import LoginPage from './page/auth/LoginPage';
 import RegisterPage from './page/auth/RegisterPage';
 import VerifyEmailPage from './page/auth/VerifyEmailPage';
 import useAuthStore from './store/authStore';
-
+import ForgotPassword from './page/auth/forgotPassword';
+import ResetPassword from './page/auth/ResetPassword';
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const logout = useAuthStore(state => state.logout)
+  const {logout, user} = useAuthStore();
+
   // Check token khi app load
   useEffect(() => {
     if (token) {
@@ -42,13 +44,15 @@ function App() {
     if (!token) return <Navigate to="/account/login" replace />;
     return children;
   };
-
+  
   return (
     <LayoutPage>
       <Routes>
         <Route path='/' element={<HomeBanner />} />
-        <Route path='/account/login' element={<LoginPage />} />
-        <Route path='/account/register' element={<RegisterPage />} />
+        <Route path='/account/login' element={user ? <Navigate to='/'/> : <LoginPage />} />
+        <Route path='/account/register' element={user ? <Navigate to='/'/> : <RegisterPage />} />
+        <Route path='/account/forgot-password' element={user ? <Navigate to='/'/> : <ForgotPassword />} />
+        <Route path='/account/reset-password' element={user ? <Navigate to='/'/> : <ResetPassword />} />
         <Route path='/verify-email' element={<VerifyEmailPage />} />
         <Route path='*' element={<Navigate to= "/"  />} />
       </Routes>

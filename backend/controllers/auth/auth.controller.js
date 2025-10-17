@@ -101,7 +101,7 @@ export const forgotPassword = async (req, res) => {
         pass: process.env.EMAIL_PASS,
       },
     });
-    const resetLink = `http://localhost:5000/reset-password?token=${resetToken}`;
+    const resetLink = `http://localhost:5173/account/reset-password?token=${resetToken}`;
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
