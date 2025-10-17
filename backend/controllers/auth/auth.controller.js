@@ -28,7 +28,7 @@ export const registerUser = async (req, res) => {
       },
     });
 
-    const verifyLink = `http://localhost:3000/verify-email?token=${verifyToken}`;
+    const verifyLink = `http://localhost:5173/verify-email?token=${verifyToken}`;
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -44,7 +44,7 @@ export const registerUser = async (req, res) => {
       await transporter.sendMail(mailOptions);
 
       res.status(200).json({
-        message: "Email xác thực đã được gửi. Vui lòng kiểm tra hộp thư của bạn.",
+        message: "Email xác thực đã được gửi. Vui lòng kiểm tra hộp thư của bạn!",
       });
   } catch (error) {
     res.status(400).json({ message: error.message });

@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { authApi } from "../../api/authApi";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../store/authStore";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const login = useAuthStore(state => state.login)
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -13,10 +16,11 @@ const LoginPage = () => {
     console.log(res);
     if (res.token) {
       localStorage.setItem("token", res.token);
-      localStorage.setItem('user', JSON.stringify(res.user));
+      localStorage.setItem("user", JSON.stringify(res.user));
+      login(res.user);
       navigate("/");
     } else {
-      setError(res.message)
+      setError(res.message);
     }
   };
   return (
@@ -27,12 +31,14 @@ const LoginPage = () => {
         </h1>
         <p className="text-center text-sm text-gray-500 mb-6">
           Bạn chưa có tài khoản?{" "}
-          <span className="underline text-red-600 hover:text-red-700 cursor-pointer">
-            Đăng ký tại đây
-          </span>
+          <Link to='/account/register'>
+            <span className="underline text-red-600 hover:text-red-700 cursor-pointer">
+              Đăng ký tại đây
+            </span>
+          </Link>
         </p>
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
-           {error ? <label className="text-red-700">{error}</label> : ""}
+          {error ? <label className="text-red-700">{error}</label> : ""}
           {/* Email */}
           <div>
             <label className="block font-medium mb-1 text-gray-700">
