@@ -9,11 +9,12 @@ import HomeBanner from './page/home/HomeBanner';
 import LoginPage from './page/auth/LoginPage';
 import RegisterPage from './page/auth/RegisterPage';
 import VerifyEmailPage from './page/auth/VerifyEmailPage';
+import useAuthStore from './store/authStore';
 
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-
+  const logout = useAuthStore(state => state.logout)
   // Check token khi app load
   useEffect(() => {
     if (token) {
@@ -23,11 +24,13 @@ function App() {
           // Token hết hạn
           localStorage.removeItem("token");
           localStorage.removeItem("user");
+          logout()
           navigate("/account/login");
         }
       } catch {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        logout();
         navigate("/account/login");
       }
     }
