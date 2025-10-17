@@ -12,7 +12,6 @@ const VerifyEmailPage = () => {
       try {
         const res = await authApi.verifyEmail(token);
         console.log(res.data.message);
-        localStorage.setItem("verified", "true");
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
         login(res.data.user);
