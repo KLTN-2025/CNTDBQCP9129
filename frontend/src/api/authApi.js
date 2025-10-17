@@ -16,4 +16,27 @@ export const authApi = {
       throw error;
     }
   },
+  registerUser: async (name, email, password) => {
+    try {
+      const res = await axiosClient.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+      return res; // có đầy đủ res.status, res.data
+    } catch (error) {
+      console.error("Lỗi đăng ký:", error);
+      // Throw error để frontend xử lý bằng try-catch
+      throw error;
+    }
+  },
+  verifyEmail: async (token) => {
+    try {
+      const res = await axiosClient.get(`/auth/verify-email?token=${token}`);
+      return res;
+    } catch (error) {
+      console.error("Lỗi xác thực:", error);
+      throw error;
+    }
+  },
 };
