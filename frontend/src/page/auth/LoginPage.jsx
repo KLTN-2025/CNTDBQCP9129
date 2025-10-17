@@ -1,8 +1,26 @@
-import React from "react";
-
+import { useState } from "react";
+import { authApi } from "../../api/authApi";
+import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    const res = await authApi.loginUser(email, password);
+    console.log(res);
+    if (res.token) {
+      localStorage.setItem("token", res.token);
+      localStorage.setItem('user', JSON.stringify(res.user));
+      navigate("/");
+    } else {
+      setError(res.message)
+    }
+  };
   return (
-    <div className="w-full  flex flex-col items-center justify-center bg-gray-50">
+    <div className="w-full  flex flex-col items-center justify-center bg-gray-50 pt-10">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
         <h1 className="text-2xl font-bold text-center mb-2 text-gray-800">
           ĐĂNG NHẬP TÀI KHOẢN
@@ -13,11 +31,8 @@ const LoginPage = () => {
             Đăng ký tại đây
           </span>
         </p>
-
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={(e) => e.preventDefault()}
-        >
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+           {error ? <label className="text-red-700">{error}</label> : ""}
           {/* Email */}
           <div>
             <label className="block font-medium mb-1 text-gray-700">
@@ -26,7 +41,9 @@ const LoginPage = () => {
             <input
               type="email"
               placeholder="Nhập email của bạn"
+              value={email}
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -37,19 +54,19 @@ const LoginPage = () => {
             </label>
             <input
               type="password"
+              value={password}
               placeholder="Nhập mật khẩu"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          {/* Nhớ tài khoản + Quên mật khẩu */}
           <div className="flex items-center justify-between text-sm text-gray-600">
             <span className="hover:underline cursor-pointer text-red-600">
               Quên mật khẩu?
             </span>
           </div>
 
-          {/* Nút đăng nhập */}
           <button
             type="submit"
             className="mt-2 bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer"
