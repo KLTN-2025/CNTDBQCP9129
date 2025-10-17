@@ -25,7 +25,7 @@ const LayoutPage = ({children}) => {
       >
         <Sidebar />
       </div>
-      <div className="w-full pt-8">
+      <div className="w-full">
         {children}
       </div>
     </div>
