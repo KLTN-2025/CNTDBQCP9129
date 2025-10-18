@@ -5,7 +5,7 @@ import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import {jwtDecode} from "jwt-decode";
 
 // Pages
-import HomeBanner from './page/home/HomeBanner';
+import HomePage from './page/home/HomePage';
 import LoginPage from './page/auth/LoginPage';
 import RegisterPage from './page/auth/RegisterPage';
 import VerifyEmailPage from './page/auth/VerifyEmailPage';
@@ -48,7 +48,7 @@ function App() {
   return (
     <LayoutPage>
       <Routes>
-        <Route path='/' element={<HomeBanner />} />
+        <Route path='/' element={<HomePage />} />
         <Route path='/account/login' element={user ? <Navigate to='/'/> : <LoginPage />} />
         <Route path='/account/register' element={user ? <Navigate to='/'/> : <RegisterPage />} />
         <Route path='/account/forgot-password' element={user ? <Navigate to='/'/> : <ForgotPassword />} />
