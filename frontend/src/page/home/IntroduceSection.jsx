@@ -1,6 +1,6 @@
 import React from "react";
 
-const AboutSection = () => {
+const IntroduceSection = () => {
   return (
     <div className="w-full px-20 pb-10 flex items-center gap-x-6 max-lg:flex-col max-lg:pt-10 max-lg:gap-y-8 max-sm:px-4">
       <div
@@ -37,4 +37,4 @@ const AboutSection = () => {
   );
 };
 
-export default AboutSection;
+export default IntroduceSection;

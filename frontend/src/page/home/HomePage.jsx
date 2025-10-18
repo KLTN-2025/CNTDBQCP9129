@@ -1,11 +1,13 @@
 import React from 'react'
 import Banner from './Banner'
-import AboutSection from './AboutSection'
+import IntroduceSection from './IntroduceSection'
+import ViewShopSection from './ViewShopSection'
 const HomePage = () => {
   return (
     <div className='w-full min-h-screen flex flex-col bg-secondaryColor '>
       <Banner/>
-      <AboutSection/>
+      <IntroduceSection/>
+      <ViewShopSection/>
     </div>
   )
 }
