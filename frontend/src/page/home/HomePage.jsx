@@ -1,14 +1,14 @@
 import React from 'react'
-import Banner from './Banner'
+import BannerSection from './BannerSection'
 import IntroduceSection from './IntroduceSection'
 import ViewShopSection from './ViewShopSection'
-import BestSeller from './BestSeller'
+import BestSellerSection from './BestSellerSection'
 const HomePage = () => {
   return (
     <div className='w-full min-h-screen flex flex-col bg-secondaryColor '>
-      <Banner/>
+      <BannerSection/>
       <IntroduceSection/>
-      <BestSeller/>
+      <BestSellerSection/>
       <ViewShopSection/>
     </div>
   )

@@ -1,6 +1,6 @@
 import React from "react";
 import Card from "../../components/Card";
-const BestSeller = () => {
+const BestSellerSection = () => {
   return (
     <div className="flex flex-col px-20 max-lg:px-4">
       <h2 className="font-bold text-2xl text-center">Món bán chạy</h2>
@@ -14,4 +14,4 @@ const BestSeller = () => {
   );
 };
 
-export default BestSeller;
+export default BestSellerSection;
