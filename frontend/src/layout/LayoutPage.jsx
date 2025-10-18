@@ -1,6 +1,7 @@
 import  { useState } from "react";
 import NavbarHeader from "../components/navbar/NavbarHeader";
 import Sidebar from "../components/sidebar/Sidebar";
+import Footer from "../components/Footer";
 const LayoutPage = ({children}) => {
   const [isOpenSidebar, setIsOpenSidebar] = useState(false);
   return (
@@ -25,8 +26,11 @@ const LayoutPage = ({children}) => {
       >
         <Sidebar />
       </div>
-      <div className="w-full">
+      <div className="w-full pb-20 bg-secondaryColor">
         {children}
+      </div>
+      <div>
+        <Footer/>
       </div>
     </div>
   );
