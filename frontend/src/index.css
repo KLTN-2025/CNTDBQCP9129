@@ -3,6 +3,9 @@
   --color-mainColor: #EAE7DE;
   --color-secondaryColor: #F5F3ED;
 }
+body {
+  overflow-x: hidden;
+}
 .container-card {
   width: 100%;
   min-width: 400px;
@@ -20,10 +23,7 @@
   box-shadow: 4px 3px 10px #bebebe,
              -4px -3px 10px #ffffff;
 }
-/* From Uiverse.io by Cornerstone-04 */ 
-/* From Uiverse.io by zjssun */ 
-/* From Uiverse.io by adamgiebl */ 
-/* From Uiverse.io by css.animate-buttons-io */ 
+
 .animate-button {
  position: relative;
  border: none;

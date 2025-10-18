@@ -4,7 +4,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-export default function CoffeeCarousel({ img1, img2, img3 }) {
+export default function Carousel({ img1, img2, img3 }) {
   console.log(img1)
   return (
     <Swiper
