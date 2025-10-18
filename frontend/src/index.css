@@ -3,3 +3,12 @@
   --color-mainColor: #EAE7DE;
   --color-secondaryColor: #F5F3ED;
 }
+.container-card {
+  width: 100%;
+  min-width: 400px;
+  height: 400px;
+  border-radius: 30px;
+  background: #e0e0e0;
+  box-shadow: 15px 15px 30px #bebebe,
+             -15px -15px 30px #ffffff;
+}
