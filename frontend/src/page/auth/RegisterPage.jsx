@@ -7,20 +7,24 @@ const RegisterPage = () => {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [notification, setNotification] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const handleRegister = async (e) => {
-    if(!email || !password || !name) return;
-  e.preventDefault();
-  setError("");
-  setNotification("");
-  try {
-    const res = await authApi.registerUser(name, email, password);
-    console.log("res: ", res.data);
-    setNotification(res.data.message);
-  } catch (error) {
-    console.log("error: ", error);
-    setError(error.response?.data?.message || "Có lỗi xảy ra");
-  }
-};
+    e.preventDefault();
+    if (!email || !password || !name || isLoading) return;
+    setIsLoading(true);
+    setError("");
+    setNotification("");
+    try {
+      const res = await authApi.registerUser(name, email, password);
+      console.log("res: ", res.data);
+      setNotification(res.data.message);
+    } catch (error) {
+      console.log("error: ", error);
+      setError(error.response?.data?.message || "Có lỗi xảy ra");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="w-full flex flex-col items-center justify-center bg-gray-50 pt-10">
@@ -84,9 +88,17 @@ const RegisterPage = () => {
             </div>
             <button
               type="submit"
-              className="mt-2 bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer"
+              className="mt-2 bg-red-600  flex justify-center text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer"
             >
-              Đăng ký
+              {isLoading ? (
+                <img
+                  className="object-cover w-7 h-7 rounded-full"
+                  src="/loading.gif"
+                  alt="đang tải"
+                />
+              ) : (
+                <p>Đăng ký</p>
+              )}
             </button>
           </form>
         </div>

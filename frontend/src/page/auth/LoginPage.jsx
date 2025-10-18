@@ -8,13 +8,19 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
-  const handleLogin = async (e) => {
-    if(!email || !password) return
-    e.preventDefault();
-    setError("");
+const handleLogin = async (e) => {
+  e.preventDefault();
+  if (!email || !password || isLoading) return;
+  
+  setError("");
+  setIsLoading(true); // bật loading
+
+  try {
     const res = await authApi.loginUser(email, password);
     console.log(res);
+
     if (res.token) {
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
@@ -23,7 +29,13 @@ const LoginPage = () => {
     } else {
       setError(res.message);
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setError("Đăng nhập thất bại. Vui lòng thử lại!");
+  } finally {
+    setIsLoading(false); // tắt loading
+  }
+};
   return (
     <div className="w-full  flex flex-col items-center justify-center bg-gray-50 pt-10">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
@@ -78,9 +90,18 @@ const LoginPage = () => {
 
           <button
             type="submit"
-            className="mt-2 bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer"
+            className="mt-2 bg-red-600 flex justify-center text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer"
           >
-            Đăng nhập
+             {isLoading ? (
+                <img
+                  className="object-cover w-7 h-7 rounded-full"
+                  src="/loading.gif"
+                  alt="đang tải"
+                />
+              ) : (
+                <p>Đăng nhập</p>
+              )}
+            
           </button>
         </form>
       </div>
