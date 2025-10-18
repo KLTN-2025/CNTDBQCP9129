@@ -5,10 +5,12 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [notification, setNotification] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const handleRegister = async (e) => {
-    if (!email) return;
     e.preventDefault();
+    if (!email || isLoading) return;
     setError("");
+    setIsLoading(true);
     setNotification("");
     try {
       const res = await authApi.forgotPassword(email);
@@ -17,6 +19,8 @@ const ForgotPassword = () => {
     } catch (error) {
       console.log("error: ", error);
       setError(error.response?.data?.message || "Có lỗi xảy ra");
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -51,9 +55,17 @@ const ForgotPassword = () => {
             </div>
             <button
               type="submit"
-              className="mt-2 bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer"
+              className="mt-2 bg-red-600 flex justify-center text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer"
             >
-              Lấy lại mật khẩu
+              {isLoading ? (
+                <img
+                  className="object-cover w-7 h-7 rounded-full"
+                  src="/loading.gif"
+                  alt="đang tải"
+                />
+              ) : (
+                <p>Lấy lại mật khẩu</p>
+              )}
             </button>
           </form>
           <Link to="/account/login">
