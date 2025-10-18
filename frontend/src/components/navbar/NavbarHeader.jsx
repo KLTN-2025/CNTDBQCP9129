@@ -9,7 +9,7 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import { Link } from "react-router-dom";
 const NavbarHeader = ({ isOpenSidebar, setIsOpenSidebar }) => {
   return (
-    <div className="w-full bg-mainColor max-lg:py-2 py-4 flex whitespace-nowrap relative shadow-mainColor shadow-md">
+    <div className="w-full bg-blue-100 max-lg:py-2 py-4 flex whitespace-nowrap relative shadow-blue-100 shadow-md">
       <div className="flex gap-x-5 items-center max-lg:justify-center max-lg:relative w-full xl:px-30 px-10">
         <div className="flex flex-items-center font-bold gap-x-10 max-lg:hidden w-full">
           <AboutMe />
@@ -19,7 +19,7 @@ const NavbarHeader = ({ isOpenSidebar, setIsOpenSidebar }) => {
         </div>
         <Link to="/" className="w-full flex items-center justify-center">
           <img
-            src="/logo_coffee.png"
+            src="/logo-coffee-go.jpg"
             className="w-28 h-26 max-lg:w-16 max-lg:h-14 rounded-full shrink-0 object-cover cursor-pointer select-none"
             alt="logo coffee go"
           />

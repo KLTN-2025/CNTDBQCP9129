@@ -1,4 +1,3 @@
-import React from 'react'
 import BannerSection from './BannerSection'
 import IntroduceSection from './IntroduceSection'
 import ViewShopSection from './ViewShopSection'
