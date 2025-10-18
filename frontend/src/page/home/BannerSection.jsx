@@ -1,6 +1,6 @@
 import React from "react";
 import "animate.css";
-const Banner = () => {
+const BannerSection = () => {
   return (
     <div className="w-full pb-10">
       <img
@@ -12,4 +12,4 @@ const Banner = () => {
   );
 };
 
-export default Banner;
+export default BannerSection;
