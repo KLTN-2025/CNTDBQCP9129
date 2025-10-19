@@ -28,7 +28,7 @@ export const registerUser = async (req, res) => {
       },
     });
 
-    const verifyLink = `http://localhost:5173/verify-email?token=${verifyToken}`;
+    const verifyLink = `http://localhost:5173/account/verify-email?token=${verifyToken}`;
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
