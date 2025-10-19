@@ -24,7 +24,7 @@ const ForgotPassword = () => {
     }
   };
   return (
-    <div className="w-full flex flex-col items-center justify-center bg-gray-50 pt-10">
+    <div className="w-full flex flex-col items-center justify-center pt-10">
       {!notification ? (
         <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
           <h1 className="text-2xl font-bold text-center mb-2 text-gray-800">
@@ -39,7 +39,7 @@ const ForgotPassword = () => {
             </Link>
           </p>
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
-            {error ? <label className="text-red-700">{error}</label> : ""}
+            <label className={`text-red-700 ${error ? "opacity-100" : "opacity-0"} h-8`}>{error}</label>
             {/* Email */}
             <div>
               <label className="block font-medium mb-1 text-gray-700">
@@ -55,7 +55,7 @@ const ForgotPassword = () => {
             </div>
             <button
               type="submit"
-              className="mt-2 bg-red-600 flex justify-center text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition-all cursor-pointer"
+              className="mt-2 bg-red-600 flex justify-center text-white py-2 rounded-lg font-semibold h-10 hover:bg-red-700 transition-all cursor-pointer"
             >
               {isLoading ? (
                 <img

@@ -25,7 +25,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center bg-gray-50 pt-10">
+    <div className="w-full flex flex-col items-center justify-center bg-secondaryColor pt-10">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
         <h1 className="text-2xl font-bold text-center mb-2 text-gray-800">
           Nhập mật khẩu mới
