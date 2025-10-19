@@ -1,21 +1,21 @@
-import './App.css';
-import LayoutPage from './layout/LayoutPage';
+import "./App.css";
+import LayoutPage from "./layout/LayoutPage";
 import { useEffect } from "react";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 // Pages
-import HomePage from './page/home/HomePage';
-import LoginPage from './page/auth/LoginPage';
-import RegisterPage from './page/auth/RegisterPage';
-import VerifyEmailPage from './page/auth/VerifyEmailPage';
-import useAuthStore from './store/authStore';
-import ForgotPassword from './page/auth/forgotPassword';
-import ResetPassword from './page/auth/ResetPassword';
+import HomePage from "./page/home/HomePage";
+import LoginPage from "./page/auth/LoginPage";
+import RegisterPage from "./page/auth/RegisterPage";
+import VerifyEmailPage from "./page/auth/VerifyEmailPage";
+import useAuthStore from "./store/authStore";
+import ForgotPassword from "./page/auth/forgotPassword";
+import ResetPassword from "./page/auth/ResetPassword";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const {logout, user} = useAuthStore();
+  const { logout, user } = useAuthStore();
 
   // Check token khi app load
   useEffect(() => {
@@ -26,7 +26,7 @@ function App() {
           // Token hết hạn
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          logout()
+          logout();
           navigate("/account/login");
         }
       } catch {
@@ -44,17 +44,34 @@ function App() {
     if (!token) return <Navigate to="/account/login" replace />;
     return children;
   };
-  
+
   return (
     <LayoutPage>
       <Routes>
-        <Route path='/' element={<HomePage />} />
-        <Route path='/account/login' element={user ? <Navigate to='/'/> : <LoginPage />} />
-        <Route path='/account/register' element={user ? <Navigate to='/'/> : <RegisterPage />} />
-        <Route path='/account/forgot-password' element={user ? <Navigate to='/'/> : <ForgotPassword />} />
-        <Route path='/account/reset-password' element={user ? <Navigate to='/'/> : <ResetPassword />} />
-        <Route path='/verify-email' element={<VerifyEmailPage />} />
-        <Route path='*' element={<Navigate to= "/"  />} />
+        {/* home route */}
+        <Route path="/" element={<HomePage />} />
+
+        {/* auth route */}
+        <Route path="/account">
+          <Route
+            path="login"
+            element={user ? <Navigate to="/" /> : <LoginPage />}
+          />
+          <Route
+            path="register"
+            element={user ? <Navigate to="/" /> : <RegisterPage />}
+          />
+          <Route
+            path="forgot-password"
+            element={user ? <Navigate to="/" /> : <ForgotPassword />}
+          />
+          <Route
+            path="reset-password"
+            element={user ? <Navigate to="/" /> : <ResetPassword />}
+          />
+          <Route path="verify-email" element={<VerifyEmailPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </LayoutPage>
   );
