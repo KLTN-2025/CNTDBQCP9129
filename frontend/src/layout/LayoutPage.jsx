@@ -26,7 +26,7 @@ const LayoutPage = ({children}) => {
       >
         <Sidebar />
       </div>
-      <div className="w-full pb-20 bg-secondaryColor">
+      <div className="w-full pb-20">
         {children}
       </div>
       <div>
