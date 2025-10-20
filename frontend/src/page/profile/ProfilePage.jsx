@@ -9,7 +9,7 @@ const ProfilePage = () => {
   const isRootProfile = activePath === "/profile"; 
   const user = useAuthStore(state => state.user);
   return (
-    <div className="flex px-20 pt-10 gap-x-10 mx-auto max-lg:flex-col max-lg:gap-y-10">
+    <div className="flex px-20 pt-10 gap-x-10 max-lg:px-4 mx-auto max-lg:flex-col max-lg:gap-y-10">
       <div className="w-1/4 max-lg:w-full bg-gray-200 rounded-md p-4">
        <Breadcrumbs/>
       <h1 className="text-xl">TRANG TÀI KHOẢN</h1>
@@ -55,7 +55,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Nội dung bên phải */}
-      <div className="flex-1 p-6 bg-gray-200 rounded-md">
+      <div className="flex-1 px-6 pb-6 bg-gray-200 rounded-md">
         {isRootProfile ? <UserInfo user={user}/> : <Outlet />}
       </div>
     </div>
