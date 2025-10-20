@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 const UserLogin = () => {
   const { user, logout } = useAuthStore();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -14,9 +14,12 @@ const UserLogin = () => {
     <div className="flex items-center gap-x-4">
       <FaRegUserCircle className="text-3xl text-red-700" />
       <div className="flex flex-col font-normal">
-        <button className="text-sm hover:text-red-700 cursor-pointer font-semibold">
-          Tài khoản
-        </button>
+        <Link to="/profile">
+          <button className="text-sm hover:text-red-700 cursor-pointer font-semibold">
+            Tài khoản
+          </button>
+        </Link>
+
         {!user ? (
           <Link to="/account/login">
             <button className="text-xs hover:text-red-700 cursor-pointer">
