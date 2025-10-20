@@ -24,7 +24,7 @@ const LayoutPage = ({ children }) => {
       >
         <Sidebar />
       </div>
-      <div className="w-full pb-20">{children}</div>
+      <div className="w-full pb-20 min-h-screen">{children}</div>
       <div>
         <Footer />
       </div>
