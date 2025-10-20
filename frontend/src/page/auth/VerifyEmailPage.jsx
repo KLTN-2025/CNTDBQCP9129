@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { authApi } from "../../api/authApi";
 import useAuthStore from "../../store/authStore";
+import ErrorPage from "../../error/ErrorPage";
 const VerifyEmailPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -24,10 +25,7 @@ const VerifyEmailPage = () => {
     if (token) verify();
   }, [token, navigate]);
 
-  return <div className="w-full flex flex-col items-center pt-10 h-screen">
-    <img src="/error.gif" alt="hỏng" className="w-50 h-40 object-cover" />
-    <p className="text-center">Liên kết này đã bị hỏng. <Link to='/'><span className="text-red-600">Quay lại trang chủ</span></Link></p>
-  </div>;
+  return <ErrorPage/>
 };
 
 export default VerifyEmailPage;

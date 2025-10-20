@@ -12,6 +12,10 @@ import VerifyEmailPage from "./page/auth/VerifyEmailPage";
 import useAuthStore from "./store/authStore";
 import ForgotPassword from "./page/auth/forgotPassword";
 import ResetPassword from "./page/auth/ResetPassword";
+import ErrorPage from "./error/ErrorPage";
+import ProfilePage from "./page/profile/ProfilePage";
+import ChangePassword from "./page/profile/ChangePassword";
+import OrderHistory from "./page/profile/OrderHistory";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -44,7 +48,8 @@ function App() {
     if (!token) return <Navigate to="/account/login" replace />;
     return children;
   };
-
+  console.log(user);
+  
   return (
     <LayoutPage>
       <Routes>
@@ -71,7 +76,13 @@ function App() {
           />
           <Route path="verify-email" element={<VerifyEmailPage />} />
         </Route>
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* profile route */}
+        <Route path="/profile"  element={!user ? <Navigate to="/account/login" /> : <ProfilePage />}>
+          <Route path="orders" element={<OrderHistory/>} />
+          <Route path="change-password" element={<ChangePassword />} />
+        </Route>
+
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </LayoutPage>
   );
