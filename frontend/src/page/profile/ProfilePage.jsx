@@ -55,7 +55,7 @@ const ProfilePage = () => {
       </div>
 
       {/* Nội dung bên phải */}
-      <div className="flex-1 px-6 pb-6 bg-gray-200 rounded-md">
+      <div className="flex-1 pt-2 px-6 pb-6 bg-gray-200 rounded-md">
         {isRootProfile ? <UserInfo user={user}/> : <Outlet />}
       </div>
     </div>
