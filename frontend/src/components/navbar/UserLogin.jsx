@@ -12,23 +12,23 @@ const UserLogin = () => {
   };
   return (
     <div className="flex items-center gap-x-4">
-      <FaRegUserCircle className="text-3xl text-red-700" />
+      <FaRegUserCircle className="text-3xl text-green-700" />
       <div className="flex flex-col font-normal">
         <Link to="/profile">
-          <button className="text-sm hover:text-red-700 cursor-pointer font-semibold">
+          <button className="text-sm hover:text-green-700 cursor-pointer font-semibold">
             Tài khoản
           </button>
         </Link>
 
         {!user ? (
           <Link to="/account/login">
-            <button className="text-xs hover:text-red-700 cursor-pointer">
+            <button className="text-xs hover:text-green-700 cursor-pointer">
               Đăng nhập
             </button>
           </Link>
         ) : (
           <button
-            className="text-xs hover:text-red-700 cursor-pointer"
+            className="text-xs hover:text-green-700 cursor-pointer"
             onClick={handleLogout}
           >
             Đăng xuất

@@ -3,7 +3,7 @@ import React from 'react'
 const BookingItem = () => {
   return (
     <div>
-      <span className='hover:text-red-700 cursor-pointer'>ĐẶT MÓN</span>
+      <span className='hover:text-green-700 cursor-pointer'>ĐẶT MÓN</span>
     </div>
   )
 }
