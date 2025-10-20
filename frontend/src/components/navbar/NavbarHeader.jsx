@@ -19,8 +19,8 @@ const NavbarHeader = ({ isOpenSidebar, setIsOpenSidebar }) => {
         </div>
         <Link to="/" className="w-full flex items-center justify-center">
           <img
-            src="/logo-coffee-go.jpg"
-            className="w-28 h-26 max-lg:w-16 max-lg:h-14 rounded-full shrink-0 object-cover cursor-pointer select-none"
+            src="/logo-coffee.png"
+            className="w-30 h-26 max-lg:w-16 max-lg:h-14 rounded-full shrink-0 object-cover cursor-pointer select-none "
             alt="logo coffee go"
           />
         </Link>
