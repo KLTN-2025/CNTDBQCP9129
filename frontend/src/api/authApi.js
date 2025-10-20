@@ -53,12 +53,36 @@ export const authApi = {
   },
   resetPassword: async (token, newPassword) => {
     try {
-      const res = await axiosClient.post(`/auth/reset-password?token=${token}`, {
-        newPassword,
-      });
+      const res = await axiosClient.post(
+        `/auth/reset-password?token=${token}`,
+        {
+          newPassword,
+        }
+      );
       return res;
     } catch (error) {
       console.error("Lỗi reset password:", error);
+      throw error;
+    }
+  },
+  changePassword: async (oldPassword, newPassword) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axiosClient.put(
+        "/auth/change-password",
+        { oldPassword, newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Lỗi đổi mật khẩu:", error);
+      if (error.response && error.response.data) {
+        return error.response.data;
+      }
       throw error;
     }
   },

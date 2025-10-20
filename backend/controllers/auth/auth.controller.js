@@ -177,4 +177,27 @@ export const verifyEmail = async (req, res) => {
     res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
   }
 };
+export const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id; // lấy từ token
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
+
+    // So sánh mật khẩu cũ
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Mật khẩu cũ không đúng" });
+
+    // Hash mật khẩu mới và lưu lại
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Đổi mật khẩu thành công!" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
 
