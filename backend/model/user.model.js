@@ -15,9 +15,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    avatar: {
-      type: String,
-    },
     role: {
       type: String,
       enum: ["customer", "manager", "admin"],
