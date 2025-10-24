@@ -17,3 +17,10 @@ export const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Token hết hạn hoặc không hợp lệ" });
   }
 };
+export const isAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    return res.status(403).json({ message: "Bạn không có quyền admin!" });
+  }
+};
