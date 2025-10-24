@@ -3,6 +3,7 @@ import LayoutPage from "./layout/LayoutPage";
 import { useEffect } from "react";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { ToastContainer } from "react-toastify";
 
 // Pages
 import HomePage from "./page/home/HomePage";
@@ -57,6 +58,15 @@ function App() {
   
   return (
     <LayoutPage>
+          <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnHover
+          theme="dark"
+        />
       <Routes>
         {/* home route */}
         <Route path="/" element={<HomePage />} />

@@ -1,29 +1,68 @@
-import React, { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Plus, Search, Edit2, Trash2 } from "lucide-react";
+import blogCategoryApi from "../../api/blogCategoryApi";
+import { formatDateVN } from "../../utils/formatDateVN";
+import ModalCreateBlogCategory from "../../components/modal/ModalCreateBlogCategory";
+import { toast } from "react-toastify";
+import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 
 export default function BlogCategory() {
-  // const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [isOpenModalCreateCategory, setIsOpenModalCreateCategory] = useState(false);
+  const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
+  const [deleteCategoryId, setDeleteCategoryId] = useState(null);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await blogCategoryApi.getAll();
+        setCategories(data);
+      } catch (err) {
+        console.error("Lỗi lấy danh mục:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleUpdateCategory = (category) => {
+    // TODO: mở modal update nếu cần
+    console.log("Update category:", category);
+  };
+
+  const handleDeleteCategory = async (id) => {
+    try {
+      await blogCategoryApi.delete(id);
+      setCategories((prev) => prev.filter((cat) => cat._id !== id));
+      toast.success("Xóa danh mục thành công!");
+    } catch (err) {
+      console.error("Xóa thất bại:", err);
+      toast.error(err.message || "Có lỗi xảy ra, vui lòng thử lại");
+    } finally {
+      setIsOpenConfirmDelete(false);
+      setDeleteCategoryId(null);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
-      Header
       <div className="p-6 border-b border-gray-200">
-        ádsad
-        {/* <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Quản lý danh mục</h2>
             <p className="text-gray-600 mt-1">Quản lý các danh mục bài viết trên website</p>
           </div>
           <button
-            onClick={() => handleOpenModal()}
-            className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            onClick={() => setIsOpenModalCreateCategory(true)}
+            className="flex items-center space-x-2 bg-green-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             <span>Thêm danh mục</span>
           </button>
-        </div> */}
+        </div>
 
         {/* Search */}
-        {/* <div className="relative">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
@@ -32,78 +71,75 @@ export default function BlogCategory() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           />
-        </div> */}
+        </div>
       </div>
 
       {/* Table */}
-      {/* <div className="overflow-x-auto">
+      <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên danh mục</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mô tả</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày tạo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredCategories.map((category) => (
-              <tr key={category.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#{category.id}</td>
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">{category.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-600">{category.description}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <button
-                    onClick={() => toggleStatus(category.id)}
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      category.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {category.status === 'active' ? (
-                      <>
-                        <Eye className="w-3 h-3 mr-1" /> Hiển thị
-                      </>
-                    ) : (
-                      <>
-                        <EyeOff className="w-3 h-3 mr-1" /> Ẩn
-                      </>
-                    )}
-                  </button>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-600">{category.createdAt}</td>
-                <td className="px-6 py-4 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => handleOpenModal(category)}
-                      className="text-blue-600 hover:text-blue-800 transition-colors"
-                      title="Chỉnh sửa"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(category.id)}
-                      className="text-red-600 hover:text-red-800 transition-colors"
-                      title="Xóa"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {categories
+              .filter((category) => category.name.toLowerCase().includes(searchTerm.toLowerCase()))
+              .map((category, index) => (
+                <tr key={category._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">#{category._id}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{index + 1}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{category.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{formatDateVN(category.createdAt)}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <div className="flex items-center space-x-6">
+                      <button
+                        onClick={() => handleUpdateCategory(category)}
+                        className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                        title="Chỉnh sửa"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDeleteCategoryId(category._id);
+                          setIsOpenConfirmDelete(true);
+                        }}
+                        className="text-red-600 hover:text-red-800 transition-colors cursor-pointer"
+                        title="Xóa"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
-      </div> */}
-{/* 
-      {filteredCategories.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
-          Không tìm thấy danh mục nào
-        </div>
-      )} */}
+      </div>
+
+      {/* Modal thêm danh mục */}
+      {isOpenModalCreateCategory && (
+        <ModalCreateBlogCategory
+          isOpenModalCreateCategory={isOpenModalCreateCategory}
+          setIsOpenModalCreateCategory={setIsOpenModalCreateCategory}
+          setCategories={setCategories}
+        />
+      )}
+
+      {/* Modal xác nhận xóa */}
+      {isOpenConfirmDelete && (
+        <ModalConfirmDelete
+          content="Bạn có chắc chắn muốn xóa danh mục này?"
+          isOpenConfirmDelete={isOpenConfirmDelete}
+          setIsOpenConfirmDelete={setIsOpenConfirmDelete}
+          onConfirm={() => handleDeleteCategory(deleteCategoryId)}
+        />
+      )}
     </div>
   );
 }
