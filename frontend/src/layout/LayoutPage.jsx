@@ -4,13 +4,17 @@ import Sidebar from "../components/sidebar/Sidebar";
 import Footer from "../components/Footer";
 const LayoutPage = ({ children }) => {
   const [isOpenSidebar, setIsOpenSidebar] = useState(false);
+  const isAdminRoute = location.pathname.startsWith("/admin");
   return (
     <div className="w-full flex flex-col mx-auto">
-      <NavbarHeader
-        isOpenSidebar={isOpenSidebar}
-        setIsOpenSidebar={setIsOpenSidebar}
-      />
-      {isOpenSidebar && (
+      {!isAdminRoute && (
+        <NavbarHeader
+          isOpenSidebar={isOpenSidebar}
+          setIsOpenSidebar={setIsOpenSidebar}
+        />
+      )}
+
+      {isOpenSidebar && !isAdminRoute && (
         <div
           className="fixed inset-0 bg-black opacity-70 z-40 lg:hidden"
           onClick={() => setIsOpenSidebar(false)}
@@ -25,9 +29,11 @@ const LayoutPage = ({ children }) => {
         <Sidebar />
       </div>
       <div className="w-full pb-20 min-h-screen">{children}</div>
-      <div>
-        <Footer />
-      </div>
+      {!isAdminRoute && (
+        <div>
+          <Footer />
+        </div>
+      )}
     </div>
   );
 };
