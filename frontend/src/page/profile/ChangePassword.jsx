@@ -8,6 +8,7 @@ const ChangePassword = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState('');
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
   const handleChangePassword = async (e) => {
@@ -26,7 +27,8 @@ const ChangePassword = () => {
       const res = await authApi.changePassword(oldPassword, newPassword);
 
       if (res.message === "Đổi mật khẩu thành công!") {
-        setError("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+        setNotification("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+        setError("");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
 
@@ -50,9 +52,9 @@ const ChangePassword = () => {
         className="flex flex-col gap-4 pt-4"
       >
         <label
-          className={`text-red-700 ${error ? "opacity-100" : "opacity-0"} h-8`}
+          className={` ${error ? "opacity-100 text-red-700" : "opacity-100 text-green-700"} h-8`}
         >
-          {error}
+          {error || notification}
         </label>
         {/* Mật khẩu */}
         <div className="flex gap-x-6 items-center">
