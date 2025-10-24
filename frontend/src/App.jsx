@@ -16,6 +16,11 @@ import ErrorPage from "./error/ErrorPage";
 import ProfilePage from "./page/profile/ProfilePage";
 import ChangePassword from "./page/profile/ChangePassword";
 import OrderHistory from "./page/profile/OrderHistory";
+import LayoutAdmin from "./layout/LayoutAdmin";
+// admin page
+import BlogCategory from "./page/admin/BlogCategory";
+import Users from "./page/admin/Users";
+import Blogs from "./page/admin/Blogs";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -80,6 +85,12 @@ function App() {
         <Route path="/profile"  element={!user ? <Navigate to="/account/login" /> : <ProfilePage />}>
           <Route path="orders" element={<OrderHistory/>} />
           <Route path="change-password" element={<ChangePassword />} />
+        </Route>
+        {/* admin route */}
+        <Route path="/admin"  element={!user ? <Navigate to="/account/login" /> : <LayoutAdmin />}>
+          <Route path="users" element={<Users/>} />
+          <Route path="blog-category" element={<BlogCategory/>} />
+          <Route path="blogs" element={<Blogs/>} />
         </Route>
 
         <Route path="*" element={<ErrorPage />} />
