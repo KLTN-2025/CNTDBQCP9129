@@ -2,12 +2,15 @@
   "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^5.7.0",
     "mongoose": "^6.10.0",
+    "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^7.0.9"
   },
   "devDependencies": {
