@@ -3,8 +3,23 @@ import Blog from '../../model/blog.model';
 // Tạo blog mới
 export const createBlog = async (req, res) => {
   try {
-    const { title, content, categoryId } = req.body;
-    const blog = new Blog({ title, content, categoryId });
+    const { title, categoryId, content } = req.body;
+
+    // Lấy URL ảnh chính thức từ Cloudinary (HTTPS)
+    const images = req.files?.map(file => file.secure_url) || [];
+
+    // Kiểm tra dữ liệu bắt buộc
+    if (!title || !categoryId || images.length === 0 || !content) {
+      return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
+    }
+
+    const blog = new Blog({
+      title,
+      categoryId,
+      images,
+      content,
+    });
+
     await blog.save();
     res.status(201).json(blog);
   } catch (err) {
@@ -12,6 +27,7 @@ export const createBlog = async (req, res) => {
     res.status(500).json({ message: "Tạo blog thất bại" });
   }
 };
+
 
 // Lấy tất cả blog
 export const getAllBlogs = async (req, res) => {
