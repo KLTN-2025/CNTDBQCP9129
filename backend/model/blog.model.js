@@ -37,7 +37,7 @@ const blogSchema = new mongoose.Schema(
 // 🧠 Tự động tạo slug từ title
 blogSchema.pre("save", function (next) {
   if (this.isModified("title")) {
-    this.slug = slugify(this.title, { lower: true, strict: true });
+    this.slug = slugify(this.title, { lower: true, strict: true, locale: "vi" });
   }
   next();
 });

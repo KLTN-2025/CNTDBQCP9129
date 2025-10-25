@@ -21,7 +21,7 @@ const blogCategorySchema = new mongoose.Schema(
 // 🧠 Tự động tạo slug từ name mỗi khi tạo hoặc sửa name
 blogCategorySchema.pre("save", function (next) {
   if (this.isModified("name")) {
-    this.slug = slugify(this.name, { lower: true, strict: true });
+    this.slug = slugify(this.name, { lower: true, strict: true, locale: "vi" });
   }
   next();
 });
