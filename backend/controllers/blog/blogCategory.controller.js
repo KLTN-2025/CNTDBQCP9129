@@ -1,3 +1,4 @@
+import slugify from "slugify";
 import BlogCategory from "../../model/blogCategory.model.js";
 
 // Lấy tất cả category
@@ -14,12 +15,15 @@ export const getAllCategories = async (req, res) => {
 export const createCategory = async (req, res) => {
   try {
     const { name } = req.body;
-    const existing = await BlogCategory.findOne({ name });
+    const slug = slugify(name, { lower: true, strict: true });
+
+    const existing = await BlogCategory.findOne({ slug });
     if (existing)
-      return res.status(400).json({ message: "Tên danh mục đã tồn tại" });
+      return res.status(400).json({ message: "danh mục đã tồn tại" });
 
     const newCategory = new BlogCategory({ name });
     await newCategory.save();
+
     res.status(201).json(newCategory);
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error });
@@ -31,14 +35,17 @@ export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
-    const updated = await BlogCategory.findByIdAndUpdate(
-      id,
-      { name },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ message: "Không tìm thấy danh mục" });
-    res.status(200).json(updated);
+
+    const category = await BlogCategory.findById(id);
+    if (!category)
+      return res.status(404).json({ message: "Không tìm thấy danh mục" });
+
+    category.name = name; // thay đổi name
+    await category.save(); // save lại => middleware pre('save') chạy => slug được tạo lại
+
+    res.status(200).json(category);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Lỗi server", error });
   }
 };
