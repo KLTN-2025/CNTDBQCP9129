@@ -1,5 +1,4 @@
 import Modal from "react-modal";
-import { motion } from "framer-motion";
 import { useState } from "react";
 import blogCategoryApi from "../../../api/blogCategoryApi";
 import { toast } from "react-toastify";
@@ -10,7 +9,6 @@ const ModalCreateBlogCategory = ({isOpenModalCreateCategory, setIsOpenModalCreat
       toast.error("Tên danh mục không được để trống");
       return;
     }
-
     try {
       const newCategory = await blogCategoryApi.create({ name: newNameCategory });
       if (newCategory && newCategory._id && newCategory.name) {
@@ -53,7 +51,7 @@ const ModalCreateBlogCategory = ({isOpenModalCreateCategory, setIsOpenModalCreat
         },
       }}
     >
-      <motion.div className="bg-color-dash overflow-hidden rounded-md w-full flex flex-col select-none">
+      <div className="bg-color-dash overflow-hidden rounded-md w-full flex flex-col select-none">
         <div className="w-full bg-color-dash py-3 px-4 relative border-b-1 border-b-gray-400">
           <p className="font-bold text-xl">Thêm danh mục mới</p>
         </div>
@@ -75,7 +73,7 @@ const ModalCreateBlogCategory = ({isOpenModalCreateCategory, setIsOpenModalCreat
             onClick={handleCreateCategory}
            >Thêm mới</button>
         </div>
-      </motion.div>
+      </div>
     </Modal>
   );
 };
