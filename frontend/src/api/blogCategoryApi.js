@@ -22,7 +22,6 @@ const blogCategoryApi = {
       const res = await axiosClient.post("/blog-categories", data);
       return res.data; // trả về category vừa tạo
     } catch (error) {
-      console.error("Lỗi tạo danh mục:", error);
       if (error.response && error.response.data) {
         return error.response.data;
       }
@@ -36,7 +35,6 @@ const blogCategoryApi = {
       const res = await axiosClient.put(`/blog-categories/${id}`, data);
       return res.data; // trả về category đã cập nhật
     } catch (error) {
-      console.error("Lỗi cập nhật danh mục:", error);
       if (error.response && error.response.data) {
         return error.response.data;
       }
@@ -50,7 +48,6 @@ const blogCategoryApi = {
       const res = await axiosClient.delete(`/blog-categories/${id}`);
       return res.data; 
     } catch (error) {
-      console.error("Lỗi xóa danh mục:", error);
       if (error.response && error.response.data) {
         return error.response.data;
       }

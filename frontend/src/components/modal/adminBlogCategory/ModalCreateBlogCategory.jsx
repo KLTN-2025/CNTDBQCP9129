@@ -1,7 +1,7 @@
 import Modal from "react-modal";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import blogCategoryApi from "../../api/blogCategoryApi";
+import blogCategoryApi from "../../../api/blogCategoryApi";
 import { toast } from "react-toastify";
 const ModalCreateBlogCategory = ({isOpenModalCreateCategory, setIsOpenModalCreateCategory, setCategories}) => {
   const [newNameCategory, setNewNameCategory] = useState('');
