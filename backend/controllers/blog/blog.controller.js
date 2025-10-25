@@ -1,26 +1,20 @@
-import Blog from '../../model/blog.model';
-
+import Blog from "../../model/blog.model.js";
+import BlogCategory from "../../model/blogCategory.model.js"
 // Tạo blog mới
 export const createBlog = async (req, res) => {
   try {
-    const { title, categoryId, content } = req.body;
+    const { title, categoryId, content, images } = req.body;
 
-    // Lấy URL ảnh chính thức từ Cloudinary (HTTPS)
-    const images = req.files?.map(file => file.secure_url) || [];
-
-    // Kiểm tra dữ liệu bắt buộc
-    if (!title || !categoryId || images.length === 0 || !content) {
+    if (!title || !categoryId || !content || !images?.length) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
-
-    const blog = new Blog({
-      title,
-      categoryId,
-      images,
-      content,
-    });
-
+    const existingBlog = await Blog.findOne({ title });
+    if (existingBlog) {
+      return res.status(400).json({ message: "Tiêu đề blog đã tồn tại" });
+    }
+    const blog = new Blog({ title, categoryId, content, images });
     await blog.save();
+
     res.status(201).json(blog);
   } catch (err) {
     console.error(err);
@@ -28,11 +22,12 @@ export const createBlog = async (req, res) => {
   }
 };
 
-
 // Lấy tất cả blog
 export const getAllBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find().populate("categoryId", "name").sort({ createdAt: -1 });
+    const blogs = await Blog.find()
+      .populate("categoryId", "name")
+      .sort({ createdAt: -1 });
     res.json(blogs);
   } catch (err) {
     console.error(err);
@@ -43,25 +38,70 @@ export const getAllBlogs = async (req, res) => {
 // Lấy blog theo slug
 export const getBlogBySlug = async (req, res) => {
   try {
-    const blog = await Blog.findOne({ slug: req.params.slug }).populate("categoryId", "name");
-    if (!blog) return res.status(404).json({ message: "Không tìm thấy blog" });
+    const { slugCategory, slug } = req.params;
+
+    // Tìm category theo slugCategory
+    const category = await BlogCategory.findOne({ slug: slugCategory });
+    if (!category) {
+      return res.status(404).json({ message: "Không tìm thấy danh mục" });
+    }
+
+    // Tìm blog theo slug và categoryId
+    const blog = await Blog.findOne({ slug, categoryId: category._id }).populate(
+      "categoryId",
+      "name"
+    );
+
+    if (!blog) {
+      return res.status(404).json({ message: "Không tìm thấy blog" });
+    }
+
     res.json(blog);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Lấy blog thất bại" });
   }
 };
+// lấy blog theo danh mục
+export const getBlogsByCategory = async (req, res) => {
+  try {
+    const { slugCategory } = req.params; // lấy slug từ URL
+    console.log(slugCategory);
+    if (!slugCategory) {
+      return res.status(400).json({ message: "Thiếu slug danh mục" });
+    }
 
+    // Tìm category theo slug
+    const category = await BlogCategory.findOne({ slug: slugCategory });
+    console.log(category);
+    if (!category) {
+      return res.status(404).json({ message: "Không tìm thấy danh mục" });
+    }
+
+    // Lấy blog theo categoryId
+    const blogs = await Blog.find({ categoryId: category._id })
+      .populate("categoryId", "name")
+      .sort({ createdAt: -1 });
+
+    res.json(blogs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lấy blog theo danh mục thất bại" });
+  }
+};
 // Cập nhật blog theo ID
 export const updateBlog = async (req, res) => {
   try {
-    const { title, content, categoryId } = req.body;
+    const { title, content, categoryId, images } = req.body; 
+
     const blog = await Blog.findByIdAndUpdate(
       req.params.id,
-      { title, content, categoryId },
+      { title, content, categoryId, images }, 
       { new: true, runValidators: true }
     );
+
     if (!blog) return res.status(404).json({ message: "Không tìm thấy blog" });
+
     res.json(blog);
   } catch (err) {
     console.error(err);
