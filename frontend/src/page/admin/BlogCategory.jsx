@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import blogCategoryApi from "../../api/blogCategoryApi";
 import { formatDateVN } from "../../utils/formatDateVN";
-import ModalCreateBlogCategory from "../../components/modal/ModalCreateBlogCategory";
+import ModalCreateBlogCategory from "../../components/modal/adminBlogCategory/ModalCreateBlogCategory";
 import { toast } from "react-toastify";
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 

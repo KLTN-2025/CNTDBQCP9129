@@ -6,7 +6,7 @@ const ModalConfirmDelete = ({
   content,
   isOpenConfirmDelete,
   setIsOpenConfirmDelete,
-  onConfirm, // nhận callback khi xác nhận xóa
+  onConfirm, 
 }) => {
   return (
     <Modal
@@ -44,13 +44,11 @@ const ModalConfirmDelete = ({
         <div className="w-full border-b-2 py-4 text-center px-4">
           <p className="font-bold">{content}</p>
         </div>
-
-        {/* Nút Xác nhận */}
         <div
           onClick={onConfirm}
           className="w-full py-3 text-center cursor-pointer hover:bg-color-note font-semibold text-red-500"
         >
-          Xác nhận
+          Xóa
         </div>
 
         {/* Nút Hủy */}
