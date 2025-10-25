@@ -28,26 +28,47 @@ const ModalPreviewBlog = ({
           padding: 0,
           border: "none",
           background: "white",
-           overflow: "auto",
+          overflow: "auto",
           borderRadius: "0.5rem",
           width: "100%",
           maxWidth: "800px",
-          minHeight: "80vh"
+          maxHeight: "calc(100vh - 10rem)",
         },
       }}
     >
-      <div
-        className="bg-color-dash rounded-2xl w-full flex flex-col items-center gap-y-2 p-4 select-none"
-      >
+      <div className="bg-color-dash rounded-2xl w-full flex flex-col items-center gap-y-2 p-4 select-none">
         <h1 className="text-xl font-bold">{dataBlog.title}</h1>
         <div className="flex flex-col w-full items-center">
-          <img src="/view-shop1.png" className="w-full object-center h-[300px]" alt="ảnh chính"/>
-          <div className="max-w-md flex flex-col">
-            <p className="font-medium text-yellow-500">{dataBlog.content.intro.highlight}</p>
-            <p>{dataBlog.content.intro.text}</p>
-            <img src="/view-shop2.png" alt="ảnh phụ"/>
-            <p className="font-medium text-yellow-500">{dataBlog.content.body.highlight}</p>
-            <p>{dataBlog.content.body.text}</p>
+          <img
+            src="/view-shop1.png"
+            className="w-full object-center h-[300px]"
+            alt="ảnh chính"
+          />
+          <div className="max-w-md flex flex-col gap-y-4 mt-2">
+            {/*Mở bài*/}
+            <div>
+              <p className="font-medium text-yellow-500">
+                {dataBlog.content.intro.highlight}
+              </p>
+              <p>{dataBlog.content.intro.text}</p>
+            </div>
+            {/*Thân bài*/}
+            <div>
+              <img src="/view-shop2.png" alt="ảnh phụ" />
+              <p className="font-medium text-yellow-500">
+                {dataBlog.content.body.highlight}
+              </p>
+              <p>{dataBlog.content.body.text}</p>
+            </div>
+            {/*Kết bài*/}
+
+            <div>
+              <img src="/view-shop2.png" alt="ảnh phụ" />
+              <p className="font-medium text-yellow-500">
+                {dataBlog.content.conclusion.highlight}
+              </p>
+              <p>{dataBlog.content.conclusion.text}</p>
+            </div>
           </div>
         </div>
       </div>
