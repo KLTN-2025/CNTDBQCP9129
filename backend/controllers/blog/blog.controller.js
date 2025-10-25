@@ -65,7 +65,7 @@ export const getBlogBySlug = async (req, res) => {
 // lấy blog theo danh mục
 export const getBlogsByCategory = async (req, res) => {
   try {
-    const { slugCategory } = req.params; // lấy slug từ URL
+    const { slugCategory } = req.params; 
     console.log(slugCategory);
     if (!slugCategory) {
       return res.status(400).json({ message: "Thiếu slug danh mục" });

@@ -1,4 +1,5 @@
 import Modal from "react-modal";
+import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 const ModalUpdateBlogCategory = ({
   isOpenModalUpdateCategory,
   setIsOpenModalUpdateCategory,
@@ -6,6 +7,7 @@ const ModalUpdateBlogCategory = ({
   setUpdateCategoryName,
   onConfirm,
 }) => {
+  useLockBodyScroll(isOpenModalUpdateCategory);
   return (
     <Modal
       appElement={document.getElementById("root")}

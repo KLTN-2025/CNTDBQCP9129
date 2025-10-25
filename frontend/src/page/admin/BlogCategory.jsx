@@ -14,7 +14,8 @@ export default function BlogCategory() {
     useState(false);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
   const [deleteCategoryId, setDeleteCategoryId] = useState(null);
-  const [isOpenModalUpdateCategory, setIsOpenModalUpdateCategory] = useState(false);
+  const [isOpenModalUpdateCategory, setIsOpenModalUpdateCategory] =
+    useState(false);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
   const [updateCategoryName, setUpdateCategoryName] = useState("");
   useEffect(() => {
@@ -23,27 +24,27 @@ export default function BlogCategory() {
         const data = await blogCategoryApi.getAll();
         setCategories(data);
       } catch (err) {
-        console.error("Lỗi lấy danh mục:", err);
+        toast.error("Lỗi lấy danh mục:", err);
       }
     };
     fetchCategories();
   }, []);
 
-const handleUpdateCategory = async (id, newName) => {
-  try {
-    await blogCategoryApi.update(id, { name: newName });
-    setCategories(prev =>
-      prev.map(cat => (cat._id === id ? { ...cat, name: newName } : cat))
-    );
-    toast.success("Cập nhật danh mục thành công!");
-    setIsOpenModalUpdateCategory(false);
-    setCurrentCategoryId(null);
-    setUpdateCategoryName("");
-  } catch (err) {
-    console.error("Cập nhật thất bại:", err);
-    toast.error("Cập nhật thất bại, vui lòng thử lại");
-  }
-};
+  const handleUpdateCategory = async (id, newName) => {
+    try {
+      await blogCategoryApi.update(id, { name: newName });
+      setCategories((prev) =>
+        prev.map((cat) => (cat._id === id ? { ...cat, name: newName } : cat))
+      );
+      toast.success("Cập nhật danh mục thành công!");
+      setIsOpenModalUpdateCategory(false);
+      setCurrentCategoryId(null);
+      setUpdateCategoryName("");
+    } catch (err) {
+      console.error("Cập nhật thất bại:", err);
+      toast.error("Cập nhật thất bại, vui lòng thử lại");
+    }
+  };
 
   const handleDeleteCategory = async (id) => {
     try {
@@ -51,7 +52,6 @@ const handleUpdateCategory = async (id, newName) => {
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
       toast.success("Xóa danh mục thành công!");
     } catch (err) {
-      console.error("Xóa thất bại:", err);
       toast.error(err.message || "Có lỗi xảy ra, vui lòng thử lại");
     } finally {
       setIsOpenConfirmDelete(false);
@@ -99,13 +99,13 @@ const handleUpdateCategory = async (id, newName) => {
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 STT
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Tên danh mục
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Slug
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Ngày tạo
@@ -122,14 +122,14 @@ const handleUpdateCategory = async (id, newName) => {
               )
               .map((category, index) => (
                 <tr key={category._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    #{category._id}
-                  </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
                     {category.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {category.slug}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {formatDateVN(category.createdAt)}
@@ -189,7 +189,9 @@ const handleUpdateCategory = async (id, newName) => {
           setIsOpenModalUpdateCategory={setIsOpenModalUpdateCategory}
           updateCategoryName={updateCategoryName}
           setUpdateCategoryName={setUpdateCategoryName}
-          onConfirm={() => handleUpdateCategory(currentCategoryId, updateCategoryName)}
+          onConfirm={() =>
+            handleUpdateCategory(currentCategoryId, updateCategoryName)
+          }
         />
       )}
     </div>
