@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "react-modal";
-import { motion } from "framer-motion";
+import useLockBodyScroll from "../../hooks/useLockBodyScroll";
 
 const ModalConfirmDelete = ({
   content,
@@ -8,6 +8,7 @@ const ModalConfirmDelete = ({
   setIsOpenConfirmDelete,
   onConfirm, 
 }) => {
+  useLockBodyScroll(isOpenConfirmDelete);
   return (
     <Modal
       appElement={document.getElementById("root")}
@@ -36,7 +37,7 @@ const ModalConfirmDelete = ({
         },
       }}
     >
-      <motion.div
+      <div
         transition={{ duration: 0.2 }}
         className="bg-color-dash overflow-hidden rounded-2xl w-full flex flex-col items-center gap-y-2 select-none"
       >
@@ -58,7 +59,7 @@ const ModalConfirmDelete = ({
         >
           Hủy
         </div>
-      </motion.div>
+      </div>
     </Modal>
   );
 };

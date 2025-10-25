@@ -2,7 +2,9 @@ import Modal from "react-modal";
 import { useState } from "react";
 import blogCategoryApi from "../../../api/blogCategoryApi";
 import { toast } from "react-toastify";
+import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 const ModalCreateBlogCategory = ({isOpenModalCreateCategory, setIsOpenModalCreateCategory, setCategories}) => {
+  useLockBodyScroll(isOpenModalCreateCategory);
   const [newNameCategory, setNewNameCategory] = useState('');
  const handleCreateCategory = async () => {
     if (!newNameCategory.trim()) {
