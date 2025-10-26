@@ -22,6 +22,7 @@ import LayoutAdmin from "./layout/LayoutAdmin";
 import BlogCategory from "./page/admin/BlogCategory";
 import Users from "./page/admin/Users";
 import Blogs from "./page/admin/Blogs";
+import { ParallaxProvider } from "react-scroll-parallax";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -55,10 +56,11 @@ function App() {
     return children;
   };
   console.log(user);
-  
+
   return (
-    <LayoutPage>
-          <ToastContainer
+    <ParallaxProvider>
+      <LayoutPage>
+        <ToastContainer
           position="top-right"
           autoClose={2000}
           hideProgressBar={false}
@@ -67,45 +69,52 @@ function App() {
           pauseOnHover
           theme="dark"
         />
-      <Routes>
-        {/* home route */}
-        <Route path="/" element={<HomePage />} />
+        <Routes>
+          {/* home route */}
+          <Route path="/" element={<HomePage />} />
 
-        {/* auth route */}
-        <Route path="/account">
+          {/* auth route */}
+          <Route path="/account">
+            <Route
+              path="login"
+              element={user ? <Navigate to="/" /> : <LoginPage />}
+            />
+            <Route
+              path="register"
+              element={user ? <Navigate to="/" /> : <RegisterPage />}
+            />
+            <Route
+              path="forgot-password"
+              element={user ? <Navigate to="/" /> : <ForgotPassword />}
+            />
+            <Route
+              path="reset-password"
+              element={user ? <Navigate to="/" /> : <ResetPassword />}
+            />
+            <Route path="verify-email" element={<VerifyEmailPage />} />
+          </Route>
+          {/* profile route */}
           <Route
-            path="login"
-            element={user ? <Navigate to="/" /> : <LoginPage />}
-          />
+            path="/profile"
+            element={!user ? <Navigate to="/account/login" /> : <ProfilePage />}
+          >
+            <Route path="orders" element={<OrderHistory />} />
+            <Route path="change-password" element={<ChangePassword />} />
+          </Route>
+          {/* admin route */}
           <Route
-            path="register"
-            element={user ? <Navigate to="/" /> : <RegisterPage />}
-          />
-          <Route
-            path="forgot-password"
-            element={user ? <Navigate to="/" /> : <ForgotPassword />}
-          />
-          <Route
-            path="reset-password"
-            element={user ? <Navigate to="/" /> : <ResetPassword />}
-          />
-          <Route path="verify-email" element={<VerifyEmailPage />} />
-        </Route>
-        {/* profile route */}
-        <Route path="/profile"  element={!user ? <Navigate to="/account/login" /> : <ProfilePage />}>
-          <Route path="orders" element={<OrderHistory/>} />
-          <Route path="change-password" element={<ChangePassword />} />
-        </Route>
-        {/* admin route */}
-        <Route path="/admin"  element={!user ? <Navigate to="/account/login" /> : <LayoutAdmin />}>
-          <Route path="users" element={<Users/>} />
-          <Route path="blog-category" element={<BlogCategory/>} />
-          <Route path="blogs" element={<Blogs/>} />
-        </Route>
+            path="/admin"
+            element={!user ? <Navigate to="/account/login" /> : <LayoutAdmin />}
+          >
+            <Route path="users" element={<Users />} />
+            <Route path="blog-category" element={<BlogCategory />} />
+            <Route path="blogs" element={<Blogs />} />
+          </Route>
 
-        <Route path="*" element={<ErrorPage />} />
-      </Routes>
-    </LayoutPage>
+          <Route path="*" element={<ErrorPage />} />
+        </Routes>
+      </LayoutPage>
+    </ParallaxProvider>
   );
 }
 
