@@ -6,14 +6,18 @@ import blogApi from "../../api/blogAPI";
 import { AiOutlineEye } from "react-icons/ai";
 import ModalPreviewBlog from "../../components/modal/blog/ModalPreviewBlog";
 import ModalCreateBlog from "../../components/modal/blog/ModalCreateBlog";
+import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 export default function BlogCategory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [allBlogs, setAllBlogs] = useState([]);
   const [isOpenModalPreviewBlog, setIsOpenModalPreviewBlog] = useState(false);
   const [dataBlog, setDataBlog] = useState(null);
   const [isOpenModalCreateBlog, setIsOpenModalCreateBlog] = useState(false);
+  const [blogId, setBlogId] = useState(null);
+  const [isOpenConfirmDelete, setIsOpenConfirmDelete] =
+    useState(false);
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchBlogs = async () => {
       try {
         const data = await blogApi.getAll();
         console.log("data", data);
@@ -23,8 +27,20 @@ export default function BlogCategory() {
         console.error("Lỗi lấy bài viết:", err);
       }
     };
-    fetchCategories();
-  }, [allBlogs]);
+    fetchBlogs();
+  }, []);
+  const handleRemoveBlog = async(id) => {
+    try {
+      await blogApi.delete(id);
+      setAllBlogs((prev) => prev.filter((blog) => blog._id !== id));
+      setIsOpenConfirmDelete(false);
+      toast.success('Xóa bài viết thành công');
+    } catch {
+      toast.error('Đã xảy ra lỗi hãy thử lại')
+    } finally {
+      setBlogId(null);
+    }
+  }
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200">
@@ -120,10 +136,10 @@ export default function BlogCategory() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        // onClick={() => {
-                        //   setDeleteCategoryId(category._id);
-                        //   setIsOpenConfirmDelete(true);
-                        // }}
+                        onClick={() => {
+                          setBlogId(blog._id);
+                          setIsOpenConfirmDelete(true);
+                        }}
                         className="text-red-600 hover:text-red-800 transition-colors cursor-pointer"
                         title="Xóa"
                       >
@@ -158,6 +174,14 @@ export default function BlogCategory() {
           isOpenModalCreateBlog={isOpenModalCreateBlog}
           setIsOpenModalCreateBlog={setIsOpenModalCreateBlog}
           setAllBlogs={setAllBlogs}
+        />
+      )}
+      {isOpenConfirmDelete && (
+        <ModalConfirmDelete
+          content={"Bạn có chắc chắn muốn xóa bài viết này không"}
+          isOpenConfirmDelete={isOpenConfirmDelete}
+          setIsOpenConfirmDelete={setIsOpenConfirmDelete}
+          onConfirm={() => handleRemoveBlog(blogId)}
         />
       )}
     </div>

@@ -16,7 +16,7 @@ const ModalCreateBlog = ({
   useLockBodyScroll(isOpenModalCreateBlog);
 
   const [categories, setCategories] = useState([]);
-  const [categoryId, setCategoryId] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState({_id: "", name: ""});
   const [title, setTitle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,7 +55,7 @@ const ModalCreateBlog = ({
     if(isLoading) return
     if (
       !title.trim() ||
-      !categoryId ||
+      !selectedCategory._id ||
       selectedFile.length === 0 ||
       !introHighlight.trim() ||
       !introText.trim() ||
@@ -72,7 +72,7 @@ const ModalCreateBlog = ({
       const imageURLs = await handleImageUpload(selectedFile);
       const dataBlog = {
         title,
-        categoryId,
+        categoryId: selectedCategory._id,
         images: imageURLs,
         content: {
           intro: {
@@ -92,7 +92,7 @@ const ModalCreateBlog = ({
       const newBlog = await blogApi.create(dataBlog);
       if(!newBlog.message){
         toast.success("Thêm bài viết thành công");
-        setAllBlogs((blogs) => [...blogs, newBlog]);
+        setAllBlogs((blogs) => [...blogs, {...newBlog, categoryId: selectedCategory}]);
         setIsOpenModalCreateBlog(false);
       }else {
         toast.error(newBlog.message || "Đã có lỗi xảy ra vui lòng thử lại");
@@ -153,8 +153,11 @@ const ModalCreateBlog = ({
           <label className="font-medium">Danh mục*</label>
           <select
             className="w-full border px-3 py-2 rounded"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
+            value={selectedCategory.id}
+            onChange={(e) => { 
+              const cate = categories.find((cat) => cat._id === e.target.value);
+              setSelectedCategory(cate || {_id: "", name: ""});
+            }}
           >
             <option value="">-- Chọn danh mục --</option>
             {categories.map((cat) => (
