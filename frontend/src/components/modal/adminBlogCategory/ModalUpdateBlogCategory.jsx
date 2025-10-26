@@ -62,7 +62,7 @@ const ModalUpdateBlogCategory = ({
             onClick={onConfirm}
             disabled={!updateCategoryName}
           >
-            Cập nhập
+            Cập nhật
           </button>
         </div>
       </div>

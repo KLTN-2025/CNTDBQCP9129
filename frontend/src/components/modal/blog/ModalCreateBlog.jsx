@@ -175,7 +175,7 @@ const ModalCreateBlog = ({
           <input
             type="file"
             onChange={handleImageChange}
-            className="mt-1 border-1"
+            className="mt-1 border-1 px-2 cursor-pointer rounded-xs"
           />
           <div
             className={`flex gap-2 mt-2 bg-gray-300 px-2 max-w-xs py-2 ${
@@ -255,13 +255,13 @@ const ModalCreateBlog = ({
         {/* Button */}
         <div className="flex gap-4 mt-4 w-full justify-end ">
           <button
-            className="w-full border px-2 py-2 rounded-md max-w-xs cursor-pointer"
+            className=" border px-4 py-2 rounded-md  cursor-pointer"
             onClick={() => setIsOpenModalCreateBlog(false)}
           >
             Hủy
           </button>
           <button
-            className="w-full bg-green-700 max-w-xs text-white px-2 py-2 rounded-md  flex justify-center items-center cursor-pointer"
+            className=" bg-green-700  text-white px-4 py-2 rounded-md  flex justify-center items-center cursor-pointer"
             onClick={handleSubmit}
           >
             {isLoading ? (

@@ -7,6 +7,8 @@ import { AiOutlineEye } from "react-icons/ai";
 import ModalPreviewBlog from "../../components/modal/blog/ModalPreviewBlog";
 import ModalCreateBlog from "../../components/modal/blog/ModalCreateBlog";
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
+import ModalUpdateBlog from "../../components/modal/blog/ModalUpdateBlog";
+
 export default function BlogCategory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [allBlogs, setAllBlogs] = useState([]);
@@ -14,8 +16,9 @@ export default function BlogCategory() {
   const [dataBlog, setDataBlog] = useState(null);
   const [isOpenModalCreateBlog, setIsOpenModalCreateBlog] = useState(false);
   const [blogId, setBlogId] = useState(null);
-  const [isOpenConfirmDelete, setIsOpenConfirmDelete] =
-    useState(false);
+  const [isOpenModalUpdateBlog, setIsOpenModalUpdateBlog] = useState(false);
+  const [blogToUpdate, setBlogToUpdate] = useState(null);
+  const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
@@ -29,18 +32,18 @@ export default function BlogCategory() {
     };
     fetchBlogs();
   }, []);
-  const handleRemoveBlog = async(id) => {
+  const handleRemoveBlog = async (id) => {
     try {
       await blogApi.delete(id);
       setAllBlogs((prev) => prev.filter((blog) => blog._id !== id));
       setIsOpenConfirmDelete(false);
-      toast.success('Xóa bài viết thành công');
+      toast.success("Xóa bài viết thành công");
     } catch {
-      toast.error('Đã xảy ra lỗi hãy thử lại')
+      toast.error("Đã xảy ra lỗi hãy thử lại");
     } finally {
       setBlogId(null);
     }
-  }
+  };
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200">
@@ -127,11 +130,10 @@ export default function BlogCategory() {
                       <button
                         className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
                         title="Chỉnh sửa"
-                        // onClick={() => {
-                        //   setIsOpenModalUpdateCategory(true);
-                        //   setCurrentCategoryId(category._id);
-                        //   setUpdateCategoryName(category.name);
-                        // }}
+                        onClick={() => {
+                          setBlogToUpdate(blog);
+                          setIsOpenModalUpdateBlog(true);
+                        }}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -182,6 +184,14 @@ export default function BlogCategory() {
           isOpenConfirmDelete={isOpenConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenConfirmDelete}
           onConfirm={() => handleRemoveBlog(blogId)}
+        />
+      )}
+      {isOpenModalUpdateBlog && (
+        <ModalUpdateBlog
+          isOpenModalUpdateBlog={isOpenModalUpdateBlog}
+          setIsOpenModalUpdateBlog={setIsOpenModalUpdateBlog}
+          blogData={blogToUpdate}
+          setAllBlogs={setAllBlogs}
         />
       )}
     </div>
