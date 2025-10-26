@@ -40,7 +40,7 @@ const ModalPreviewBlog = ({
         <h1 className="text-xl font-bold">{dataBlog.title}</h1>
         <div className="flex flex-col w-full items-center">
           <img
-            src="/view-shop1.png"
+            src={dataBlog.images[0]}
             className="w-full object-center h-[300px]"
             alt="ảnh chính"
           />
@@ -54,7 +54,9 @@ const ModalPreviewBlog = ({
             </div>
             {/*Thân bài*/}
             <div>
-              <img src="/view-shop2.png" alt="ảnh phụ" />
+              {dataBlog.images[1] && (
+                <img src={dataBlog.images[1]} alt="ảnh phụ" />
+              )}
               <p className="font-medium text-yellow-500">
                 {dataBlog.content.body.highlight}
               </p>
@@ -63,7 +65,9 @@ const ModalPreviewBlog = ({
             {/*Kết bài*/}
 
             <div>
-              <img src="/view-shop2.png" alt="ảnh phụ" />
+              {dataBlog.images[2] && (
+                <img src={dataBlog.images[2]} alt="ảnh phụ" />
+              )}
               <p className="font-medium text-yellow-500">
                 {dataBlog.content.conclusion.highlight}
               </p>
