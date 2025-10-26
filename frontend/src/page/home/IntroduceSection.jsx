@@ -1,10 +1,11 @@
 import React from "react";
+import { Parallax } from "react-scroll-parallax";
 
 const IntroduceSection = () => {
   return (
     <div className="w-full px-20 pb-10 flex items-center gap-x-6 max-lg:flex-col max-lg:pt-10 max-lg:gap-y-8 max-sm:px-4">
       <div
-        className="bg-cover bg-no-repeat flex justify-center items-center w-1/2 rounded-2xl overflow-hidden shadow-md max-lg:w-full"
+        className="bg-cover bg-no-repeat flex justify-center items-center w-1/2 relative rounded-2xl shadow-md max-lg:w-full"
         style={{ backgroundImage: `url('/bg-section1.jpg')` }}
       >
         <img
@@ -12,6 +13,16 @@ const IntroduceSection = () => {
           alt="cà phê Việt Nam"
           className="object-contain w-[220px] h-[500px] max-sm:w-[160px] max-sm:h-[160px]"
         />
+         <div className="absolute top-[10%] right-[5%] z-[20]">
+          <Parallax speed={10}>
+            <img src="/sticker-coffee.png" alt="sticker" className="w-16 max-md:w-10" />
+          </Parallax>
+        </div>
+         <div className="absolute top-[10%] left-[5%] z-[20]">
+          <Parallax speed={10}>
+            <img src="/sticker-coffee1.png" alt="sticker" className="w-16 max-md:w-10" />
+          </Parallax>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 w-1/2 rounded-2xl overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1">
