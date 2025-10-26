@@ -41,7 +41,6 @@ export default function BlogCategory() {
       setCurrentCategoryId(null);
       setUpdateCategoryName("");
     } catch (err) {
-      console.error("Cập nhật thất bại:", err);
       toast.error("Cập nhật thất bại, vui lòng thử lại");
     }
   };

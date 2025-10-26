@@ -5,11 +5,13 @@ import { formatDateVN } from "../../utils/formatDateVN";
 import blogApi from "../../api/blogAPI";
 import { AiOutlineEye } from "react-icons/ai";
 import ModalPreviewBlog from "../../components/modal/blog/ModalPreviewBlog";
+import ModalCreateBlog from "../../components/modal/blog/ModalCreateBlog";
 export default function BlogCategory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [allBlogs, setAllBlogs] = useState([]);
   const [isOpenModalPreviewBlog, setIsOpenModalPreviewBlog] = useState(false);
   const [dataBlog, setDataBlog] = useState(null);
+  const [isOpenModalCreateBlog, setIsOpenModalCreateBlog] = useState(false);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -22,7 +24,7 @@ export default function BlogCategory() {
       }
     };
     fetchCategories();
-  }, []);
+  }, [allBlogs]);
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200">
@@ -36,11 +38,11 @@ export default function BlogCategory() {
             </p>
           </div>
           <button
-            // onClick={() => setIsOpenModalCreateCategory(true)}
+            onClick={() => setIsOpenModalCreateBlog(true)}
             className="flex items-center space-x-2 bg-green-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
-            <span>Thêm danh mục</span>
+            <span>Thêm bài viết</span>
           </button>
         </div>
 
@@ -149,6 +151,13 @@ export default function BlogCategory() {
           isOpenModalPreviewBlog={isOpenModalPreviewBlog}
           setIsOpenModalPreviewBlog={setIsOpenModalPreviewBlog}
           dataBlog={dataBlog}
+        />
+      )}
+      {isOpenModalCreateBlog && (
+        <ModalCreateBlog
+          isOpenModalCreateBlog={isOpenModalCreateBlog}
+          setIsOpenModalCreateBlog={setIsOpenModalCreateBlog}
+          setAllBlogs={setAllBlogs}
         />
       )}
     </div>

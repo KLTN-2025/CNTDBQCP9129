@@ -11,6 +11,13 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
+    "@tiptap/extension-bold": "^3.8.0",
+    "@tiptap/extension-bullet-list": "^3.8.0",
+    "@tiptap/extension-italic": "^3.8.0",
+    "@tiptap/extension-ordered-list": "^3.8.0",
+    "@tiptap/extension-underline": "^3.8.0",
+    "@tiptap/react": "^3.8.0",
+    "@tiptap/starter-kit": "^3.8.0",
     "animate.css": "^4.1.1",
     "axios": "^1.12.2",
     "framer-motion": "^12.23.24",
