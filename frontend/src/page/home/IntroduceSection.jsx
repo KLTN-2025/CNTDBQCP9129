@@ -25,7 +25,7 @@ const IntroduceSection = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 w-1/2 rounded-2xl overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1">
+      <div className="grid grid-cols-1 w-1/2 rounded-2xl overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1 relative">
         <img
           src="/bg-section2.jpg"
           alt="cà phê Việt Nam"
@@ -41,6 +41,11 @@ const IntroduceSection = () => {
             vị cà phê Buôn Ma Thuột vừa mạnh mẽ, vừa thanh thoát, mang đậm bản
             sắc và tinh thần của núi rừng Tây Nguyên.
           </p>
+        </div>
+       <div className="absolute top-[10%] right-[5%] z-[20]">
+          <Parallax speed={10}>
+            <img src="/sticker-tea.png" alt="sticker" className="w-16 max-md:w-10" />
+          </Parallax>
         </div>
           <button className="w-full bg-blue-300 py-2 font-bold cursor-pointer">Thử ngay</button>
       </div>

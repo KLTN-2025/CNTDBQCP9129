@@ -22,6 +22,7 @@ export const createBlog = async (req, res) => {
   }
 };
 
+
 // Lấy tất cả blog
 export const getAllBlogs = async (req, res) => {
   try {
@@ -34,7 +35,15 @@ export const getAllBlogs = async (req, res) => {
     res.status(500).json({ message: "Lấy blog thất bại" });
   }
 };
-
+// Lấy 6 blog ngẫu nhiên
+export const getRandomBlogs = async (req, res) => {
+  try {
+    const blogs = await Blog.aggregate([{ $sample: { size: 6 } }]); 
+    res.status(200).json(blogs);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi lấy blog ngẫu nhiên", error });
+  }
+};
 // Lấy blog theo slug
 export const getBlogBySlug = async (req, res) => {
   try {

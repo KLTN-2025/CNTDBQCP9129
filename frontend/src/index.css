@@ -3,6 +3,12 @@
   --color-mainColor: #EAE7DE;
   --color-secondaryColor: #F5F3ED;
 }
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
 body {
   overflow-x: hidden;
 }
