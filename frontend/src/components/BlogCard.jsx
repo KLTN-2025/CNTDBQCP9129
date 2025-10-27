@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-const BlogCard = ({ blog, categorySlug }) => {
+const BlogCard = ({ blog, categorySlug}) => {
   console.log(blog);
   return (
     <div className="relative flex w-full flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
@@ -20,7 +20,7 @@ const BlogCard = ({ blog, categorySlug }) => {
         </p>
       </div>
       <div className="p-6 pt-0">
-        <Link to={`/blogs/${categorySlug}/${blog.slug}`}>
+        <Link to={`/blogs/${blog.categoryId.slug || categorySlug}/${blog.slug}`}>
           <button className="learn-more btn-read-more">
             <span className="circle" aria-hidden="true">
               <span className="icon arrow"></span>

@@ -1,6 +1,6 @@
 import slugify from "slugify";
 import BlogCategory from "../../model/blogCategory.model.js";
-
+import Blog from "../../model/blog.model.js";
 // Lấy tất cả category
 export const getAllCategories = async (req, res) => {
   try {
@@ -23,7 +23,6 @@ export const createCategory = async (req, res) => {
 
     const newCategory = new BlogCategory({ name });
     await newCategory.save();
-
     res.status(201).json(newCategory);
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error });
@@ -54,8 +53,15 @@ export const updateCategory = async (req, res) => {
 export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
+    const postCount = await Blog.countDocuments({ categoryId: id });
+    if (postCount > 0) {
+      return res.status(400).json({
+        message: `Không thể xóa danh mục vì đang chứa ${postCount} bài viết.`,
+      });
+    }
     const deleted = await BlogCategory.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ message: "Không tìm thấy danh mục" });
+    if (!deleted)
+      return res.status(404).json({ message: "Không tìm thấy danh mục" });
     res.status(200).json({ message: "Xóa thành công" });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error });

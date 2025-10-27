@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import blogApi from "../../api/blogAPI";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { formatDateVN } from "../../utils/formatDateVN";
 import BlogsRelatedSection from "./BlogsRelatedSection";
