@@ -1,126 +1,50 @@
-import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination, EffectCreative } from "swiper/modules";
+import { Navigation } from "swiper/modules";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "swiper/css";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/effect-creative";
+import BlogCard from "../BlogCard";
 
-export default function TravelSlider() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  
-  const imagesShop = [
-    {
-      images: ["/view-shop4.jpg"],
-    },
-    {
-      images: ["/view-shop4.jpg"],
-
-    },
-    {
-      images: ["/view-shop4.jpg"],
-    },
-    {
-      images: ["/view-shop4.jpg"],
-    }
-  ];
+export default function CarouselBlogRelated({ dataBlogRelated }) {
   return (
-    <div className="w-full min-h-screen  flex items-center justify-center p-4">
-      <div className="w-full max-w-7xl">
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-          <Swiper
-            modules={[Autoplay, Navigation, Pagination, EffectCreative]}
-            effect="creative"
-            creativeEffect={{
-              prev: {
-                translate: ["-120%", 0, -500],
-                rotate: [0, 0, -15],
-                opacity: 0
-              },
-              next: {
-                translate: ["120%", 0, -500],
-                rotate: [0, 0, 15],
-                opacity: 0
-              }
-            }}
-            slidesPerView={1}
-            loop={true}
-            speed={800}
-            autoplay={{ 
-              delay: 5000, 
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true
-            }}
-            navigation={{
-              nextEl: '.swiper-button-next-custom',
-              prevEl: '.swiper-button-prev-custom',
-            }}
-            pagination={{ 
-              clickable: true,
-              el: '.swiper-pagination-custom',
-              bulletClass: 'swiper-pagination-bullet-custom',
-              bulletActiveClass: 'swiper-pagination-bullet-active-custom'
-            }}
-            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="travel-slider"
-          >
-            {imagesShop.map((item, idx) => (
-              <SwiperSlide key={idx}>
-                <div className="relative w-full h-[70vh] md:h-[85vh]">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10"></div>
-                  
-                  <img
-                    src={item.images[0]}
-                    alt={item.title}
-                    className="w-full h-full object-cover transform transition-transform duration-[8000ms] hover:scale-110"
-                  />
-                  
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+    <div className="relative w-full mt-8 px-10">
+      <Swiper
+        modules={[Navigation]}
+        navigation={{
+          nextEl: ".swiper-button-next-custom",
+          prevEl: ".swiper-button-prev-custom",
+        }}
+        spaceBetween={20}
+        slidesPerView={4}
+        slidesPerGroup={1} // mỗi lần click chỉ trượt 1
+        slidesPerGroupSkip={0} // không bỏ qua slide nào
+        watchSlidesProgress={true} // giúp điều khiển mượt
+        loop={false}
+        slideToClickedSlide={false}
+        centeredSlides={false}
+        className="w-full"
+        breakpoints={{
+          1280: { slidesPerView: 4, slidesPerGroup: 1 },
+          1024: { slidesPerView: 3, slidesPerGroup: 1 },
+          768: { slidesPerView: 2, slidesPerGroup: 1 },
+          480: { slidesPerView: 1, slidesPerGroup: 1 },
+        }}
+      >
+        {dataBlogRelated.map((blog, index) => (
+          <SwiperSlide key={blog._id || index}>
+            <BlogCard blog={blog} />
+          </SwiperSlide>
+        ))}
+      </Swiper>
 
-          {/* Custom Navigation Buttons */}
-          <button className="swiper-button-prev-custom absolute left-6 top-1/2 -translate-y-1/2 z-30 w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
-            <svg className="w-6 h-6 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          
-          <button className="swiper-button-next-custom absolute right-6 top-1/2 -translate-y-1/2 z-30 w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
-            <svg className="w-6 h-6 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+      {/* Nút điều hướng custom */}
+      <button className="swiper-button-prev-custom cursor-pointer absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-800 shadow-md">
+        <FaChevronLeft />
+      </button>
 
-          {/* Custom Pagination */}
-          <div className="swiper-pagination-custom absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-3"></div>
-        </div>
-
-      </div>
-
-      <style>{`
-        .swiper-pagination-bullet-custom {
-          width: 12px;
-          height: 12px;
-          background: rgba(255, 255, 255, 0.5);
-          border-radius: 50%;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-        
-        .swiper-pagination-bullet-active-custom {
-          width: 40px;
-          height: 12px;
-          border-radius: 6px;
-          background: white;
-        }
-
-        .swiper-button-prev-custom:active,
-        .swiper-button-next-custom:active {
-          transform: translateY(-50%) scale(0.95);
-        }
-      `}</style>
+      <button className="swiper-button-next-custom absolute cursor-pointer right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-gray-800 shadow-md">
+        <FaChevronRight />
+      </button>
     </div>
   );
 }

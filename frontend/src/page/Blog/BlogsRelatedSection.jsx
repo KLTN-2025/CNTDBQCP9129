@@ -18,10 +18,10 @@ const BlogsRelatedSection = ({dataBlogId}) => {
     fetchBlogBySlug();
   }, []);
   return (
-    <div className="flex flex-col pt-20 gap-y-10">
-      <h2 className="font-bold text-2xl">BÀI VIẾT LIÊN QUAN</h2>
+    <>
+      <h2 className="font-bold text-2xl pt-14">BÀI VIẾT LIÊN QUAN</h2>
       <CarouselBlogRelated dataBlogRelated={dataBlogRelated}/>
-    </div>
+    </>
   );
 };
 

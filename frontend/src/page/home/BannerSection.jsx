@@ -3,9 +3,21 @@ import React from "react";
 import { Parallax } from "react-scroll-parallax";
 import Carousel from "../../components/carousel/Carousel";
 const BannerSection = () => {
+    const bannerImages = [
+    {
+      images: ["/banner.jpg"],
+    },
+    {
+      images: ["/banner2.jpg"],
+    },
+    {
+      images: ["/banner3.jpg"],
+    },
+  ];
   return (
       <div className="w-full pb-10 relative">
         <Carousel
+         images={bannerImages}
         />
         <div className="absolute top-[20%] right-[10%] z-[20]">
           <Parallax speed={10}>

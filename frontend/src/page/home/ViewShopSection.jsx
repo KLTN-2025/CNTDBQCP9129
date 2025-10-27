@@ -1,6 +1,29 @@
 import React from "react";
-import CarouselViewShop from "../../components/carousel/CarouselViewShop";
+import Carousel from "../../components/carousel/Carousel";
 const ViewShopSection = () => {
+  const viewShopImages = [
+    {
+      images: ["/view-shop5.jpg"],
+    },
+    {
+      images: ["/view-shop4.jpg"],
+    },
+    {
+      images: ["/view-shop7.jpg"],
+    },
+    {
+      images: ["/view-shop6.jpg"],
+    },
+    {
+      images: ["/view-shop8.jpg"],
+    },
+    {
+      images: ["/view-shop9.jpg"],
+    },
+    {
+      images: ["/view-shop10.jpg"],
+    },
+  ];
   return (
     <div className="w-full px-20 pb-10 flex items-center gap-x-6 max-lg:flex-col max-lg:pt-10 max-lg:gap-y-8 max-sm:px-4">
       <div className="flex flex-col gap-y-14">
@@ -19,7 +42,7 @@ const ViewShopSection = () => {
       </div>
 
       <div className="grid grid-cols-1 w-full rounded-2xl h-[500px] overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1">
-       <CarouselViewShop/>
+        <Carousel images={viewShopImages} />
       </div>
     </div>
   );
