@@ -1,7 +1,7 @@
 import UserLogin from "../navbar/UserLogin";
 import AboutMe from "../navbar/AboutMe";
 import Menu from "../navbar/Menu";
-import BookingItem from "../navbar/BookingItem";
+import News from "../navbar/News";
 import BookingTable from "../navbar/BookingTable";
 import Contact from "../navbar/Contact";
 import Cart from "../navbar/Cart";
@@ -21,7 +21,7 @@ const NavbarHeader = () => {
         <Menu />
       </div>
       <div className="w-full py-2 border-b-2 px-2 border-black cursor-pointer">
-        <BookingItem />
+        <News />
       </div>
       <div className="w-full py-2 border-b-2 px-2 border-black cursor-pointer">
         <BookingTable />

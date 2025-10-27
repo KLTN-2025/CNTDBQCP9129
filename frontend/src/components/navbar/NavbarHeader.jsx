@@ -1,5 +1,5 @@
 import Menu from "./Menu";
-import BookingItem from "./BookingItem";
+import News from "./News";
 import BookingTable from "./BookingTable";
 import UserLogin from "./UserLogin";
 import Cart from "./Cart";
@@ -14,7 +14,7 @@ const NavbarHeader = ({ isOpenSidebar, setIsOpenSidebar }) => {
         <div className="flex flex-items-center font-bold gap-x-10 max-lg:hidden w-full">
           <AboutMe />
           <Menu />
-          <BookingItem />
+          <News />
           <BookingTable />
         </div>
         <Link to="/" className="w-full flex items-center justify-center">

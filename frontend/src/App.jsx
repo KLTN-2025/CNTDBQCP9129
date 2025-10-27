@@ -25,6 +25,7 @@ import BlogCategory from "./page/admin/BlogCategory";
 import Users from "./page/admin/Users";
 import Blogs from "./page/admin/Blogs";
 import { ParallaxProvider } from "react-scroll-parallax";
+import NewsPage from "./page/news/NewsPage";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -113,6 +114,7 @@ function App() {
           {/* blog route */}
           <Route path="/blogs">
              <Route path=":categorySlug/:nameBlogSlug" element={<BlogDetailPage/>}/>
+             <Route path=":categorySlug/" element={<NewsPage/>}/>
           </Route>
           <Route path="*" element={<ErrorPage />} />
         </Routes>
