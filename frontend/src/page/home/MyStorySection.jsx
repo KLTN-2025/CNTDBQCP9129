@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import BlogCard from '../../components/BlogCard'
 import blogApi from '../../api/blogAPI';
+import { toast } from 'react-toastify';
 const MyStorySection = () => {
   const [randomBlogs, setRandomBlogs] = useState([]);
   useEffect(() => {
     const fetchRandomBlogs = async() => {
       try {
         const blogs = await blogApi.getRandom();
-        console.log(blogs);
         setRandomBlogs(blogs)
 
       } catch (error) {
-        console.log('Lỗi lấy bài viết random', error)
+        toast.error('Lỗi lấy bài viết random', error)
       }
     }
     fetchRandomBlogs()

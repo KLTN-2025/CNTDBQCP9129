@@ -98,7 +98,6 @@ const ModalCreateBlog = ({
         toast.error(newBlog.message || "Đã có lỗi xảy ra vui lòng thử lại");
       }
     } catch (error) {
-      console.log(error);
       toast.error("Đã có lỗi xảy ra khi thêm mới")
     } finally {
       setIsLoading(false);

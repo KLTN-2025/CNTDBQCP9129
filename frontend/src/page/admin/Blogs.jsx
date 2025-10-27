@@ -23,7 +23,6 @@ export default function BlogCategory() {
     const fetchBlogs = async () => {
       try {
         const data = await blogApi.getAll();
-        console.log("data", data);
 
         setAllBlogs(data);
       } catch (err) {

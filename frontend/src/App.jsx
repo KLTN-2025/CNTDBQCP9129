@@ -57,8 +57,6 @@ function App() {
     if (!token) return <Navigate to="/account/login" replace />;
     return children;
   };
-  console.log(user);
-
   return (
     <ParallaxProvider>
       <LayoutPage>

@@ -13,7 +13,6 @@ const ModalCreateBlogCategory = ({isOpenModalCreateCategory, setIsOpenModalCreat
     }
     try {
       const newCategory = await blogCategoryApi.create({ name: newNameCategory });
-      console.log(newCategory);
       if (newCategory && newCategory._id && newCategory.name) {
         setCategories(prev => [newCategory, ...prev]);
         toast.success('Thêm mới danh mục thành công!')
