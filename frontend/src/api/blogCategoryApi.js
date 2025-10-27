@@ -43,17 +43,10 @@ const blogCategoryApi = {
   },
 
   // Xóa danh mục (chỉ admin)
-  delete: async (id) => {
-    try {
+    delete: async (id) => {
       const res = await axiosClient.delete(`/blog-categories/${id}`);
-      return res.data; 
-    } catch (error) {
-      if (error.response && error.response.data) {
-        return error.response.data;
-      }
-      throw error;
-    }
-  },
+      return res.data;
+    },
 };
 
 export default blogCategoryApi;
