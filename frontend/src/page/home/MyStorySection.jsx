@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import Blog from '../../components/Blog'
+import BlogCard from '../../components/BlogCard'
 import blogApi from '../../api/blogAPI';
 const MyStorySection = () => {
   const [randomBlogs, setRandomBlogs] = useState([]);
@@ -22,7 +22,7 @@ const MyStorySection = () => {
       <div className='grid grid-cols-3 max-lg:grid-cols-1 gap-16 flex-1'>
         {randomBlogs.length > 0 && randomBlogs.map((blog) => (
           <div key={blog._id}>
-            <Blog blog={blog}/>
+            <BlogCard blog={blog}/>
           </div>
         ))}
       </div>

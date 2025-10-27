@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { formatDateVN } from "../../utils/formatDateVN";
+import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import blogApi from "../../api/blogAPI";
 import { AiOutlineEye } from "react-icons/ai";
 import ModalPreviewBlog from "../../components/modal/blog/ModalPreviewBlog";
@@ -123,7 +123,7 @@ export default function BlogCategory() {
                     {blog.content.intro.text}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {formatDateVN(blog.createdAt)}
+                    {formatDatetimeVN(blog.createdAt)}
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-3">

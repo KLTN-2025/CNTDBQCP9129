@@ -18,6 +18,8 @@ import ProfilePage from "./page/profile/ProfilePage";
 import ChangePassword from "./page/profile/ChangePassword";
 import OrderHistory from "./page/profile/OrderHistory";
 import LayoutAdmin from "./layout/LayoutAdmin";
+import BlogDetailPage from "./page/Blog/BlogDetailPage";
+
 // admin page
 import BlogCategory from "./page/admin/BlogCategory";
 import Users from "./page/admin/Users";
@@ -110,7 +112,10 @@ function App() {
             <Route path="blog-category" element={<BlogCategory />} />
             <Route path="blogs" element={<Blogs />} />
           </Route>
-
+          {/* blog route */}
+          <Route path="/blogs">
+             <Route path=":categorySlug/:nameBlogSlug" element={<BlogDetailPage/>}/>
+          </Route>
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </LayoutPage>

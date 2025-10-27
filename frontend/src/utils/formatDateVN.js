@@ -1,18 +1,10 @@
-// utils/formatDate.js
-export const formatDateVN = (isoString) => {
-  if (!isoString) return "";
-  const date = new Date(isoString);
+export function formatDateVN(date) {
+  if (!date) return "";
 
-  const options = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,       // 24h format
-    timeZone: "Asia/Ho_Chi_Minh", // múi giờ Việt Nam
-  };
+  const d = new Date(date); // đảm bảo là Date object
+  const day = d.getDate().toString().padStart(2, "0"); // ngày với 2 chữ số
+  const month = (d.getMonth() + 1).toString().padStart(2, "0"); // tháng từ 01 đến 12
+  const year = d.getFullYear();
 
-  return date.toLocaleString("vi-VN", options);
-};
+  return `${day} Tháng ${month}, ${year}`;
+}
