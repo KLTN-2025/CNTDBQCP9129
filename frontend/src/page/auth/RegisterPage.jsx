@@ -16,10 +16,8 @@ const RegisterPage = () => {
     setNotification("");
     try {
       const res = await authApi.registerUser(name, email, password);
-      console.log("res: ", res.data);
       setNotification(res.data.message);
     } catch (error) {
-      console.log("error: ", error);
       setError(error.response?.data?.message || "Có lỗi xảy ra");
     } finally {
       setIsLoading(false);

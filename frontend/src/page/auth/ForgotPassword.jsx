@@ -14,10 +14,8 @@ const ForgotPassword = () => {
     setNotification("");
     try {
       const res = await authApi.forgotPassword(email);
-      console.log("res: ", res.data);
       setNotification(res.data.message);
     } catch (error) {
-      console.log("error: ", error);
       setError(error.response?.data?.message || "Có lỗi xảy ra");
     } finally {
       setIsLoading(false);

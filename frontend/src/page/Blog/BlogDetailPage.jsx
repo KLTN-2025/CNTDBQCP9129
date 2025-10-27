@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import blogApi from "../../api/blogAPI";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { formatDateVN } from "../../utils/formatDateVN";
 import BlogsRelatedSection from "./BlogsRelatedSection";
@@ -17,7 +17,10 @@ const BlogDetailPage = () => {
       }
     };
     fetchBlog();
-  }, []);
+  }, [categorySlug, nameBlogSlug]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" }); // Cuộn lên đầu mượt
+  }, [nameBlogSlug]);
   return (
     <div className="w-full flex flex-col items-center text-lg gap-y-10 p-4 select-none px-20 max-sm:px-4 pt-20">
       {dataBlog && (

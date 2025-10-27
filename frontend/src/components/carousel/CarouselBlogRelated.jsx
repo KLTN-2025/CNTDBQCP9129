@@ -5,7 +5,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import BlogCard from "../BlogCard";
 
-export default function CarouselBlogRelated({ dataBlogRelated }) {
+export default function CarouselBlogRelated({ dataBlogRelated, categorySlug }) {
   return (
     <div className="relative w-full mt-8 px-10">
       <Swiper
@@ -32,7 +32,7 @@ export default function CarouselBlogRelated({ dataBlogRelated }) {
       >
         {dataBlogRelated.map((blog, index) => (
           <SwiperSlide key={blog._id || index}>
-            <BlogCard blog={blog} />
+            <BlogCard blog={blog} categorySlug={categorySlug}/>
           </SwiperSlide>
         ))}
       </Swiper>

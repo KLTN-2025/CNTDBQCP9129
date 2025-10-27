@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import blogApi from "../../api/blogAPI";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import CarouselBlogRelated from "../../components/carousel/CarouselBlogRelated";
-const BlogsRelatedSection = ({dataBlogId}) => {
+const BlogsRelatedSection = ({dataBlogId,}) => {
   const [dataBlogRelated, setDataBlogRelated] = useState([]);
   const { categorySlug } = useParams();
   useEffect(() => {
@@ -20,7 +20,7 @@ const BlogsRelatedSection = ({dataBlogId}) => {
   return (
     <>
       <h2 className="font-bold text-2xl pt-14">BÀI VIẾT LIÊN QUAN</h2>
-      <CarouselBlogRelated dataBlogRelated={dataBlogRelated}/>
+      <CarouselBlogRelated dataBlogRelated={dataBlogRelated} categorySlug={categorySlug}/>
     </>
   );
 };
