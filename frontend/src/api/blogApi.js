@@ -24,7 +24,16 @@ const blogApi = {
       throw error;
     }
   },
-
+  // Lấy 6 blog ngẫu nhiên
+  getRandom: async () => {
+    try {
+      const res = await axiosClient.get("/blogs/random");
+      return res.data;
+    } catch (error) {
+      if (error.response && error.response.data) return error.response.data;
+      throw error;
+    }
+  },
   // Lấy blog theo slug category và slug blog
   getBySlug: async (slugCategory, slug) => {
     try {
