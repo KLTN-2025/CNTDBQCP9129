@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import blogCategoryApi from "../../api/blogCategoryApi";
-import { formatDateVN } from "../../utils/formatDateVN";
+import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import ModalCreateBlogCategory from "../../components/modal/adminBlogCategory/ModalCreateBlogCategory";
 import ModalUpdateBlogCategory from "../../components/modal/adminBlogCategory/ModalUpdateBlogCategory";
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
@@ -131,7 +131,7 @@ export default function BlogCategory() {
                     {category.slug}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {formatDateVN(category.createdAt)}
+                    {formatDatetimeVN(category.createdAt)}
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-6">

@@ -1,15 +1,11 @@
 // BannerSection.jsx
 import React from "react";
-import CoffeeCarousel from "../../components/carousel/Carousel";
 import { Parallax } from "react-scroll-parallax";
-
+import Carousel from "../../components/carousel/Carousel";
 const BannerSection = () => {
   return (
       <div className="w-full pb-10 relative">
-        <CoffeeCarousel
-          img1={`/banner.jpg`}
-          img2={`/banner2.jpg`}
-          img3={`/banner3.jpg`}
+        <Carousel
         />
         <div className="absolute top-[20%] right-[10%] z-[20]">
           <Parallax speed={10}>

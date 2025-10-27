@@ -11,23 +11,35 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-creative";
 
-export default function Carousel() {
+export default function CarouselViewShop() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const dataBlogRelated = [
     {
-      images: ["/banner.jpg"],
+      images: ["/view-shop5.jpg"],
     },
     {
-      images: ["/banner2.jpg"],
+      images: ["/view-shop4.jpg"],
     },
     {
-      images: ["/banner3.jpg"],
+      images: ["/view-shop7.jpg"],
+    },
+    {
+      images: ["/view-shop6.jpg"],
+    },
+    {
+      images: ["/view-shop8.jpg"],
+    },
+    {
+      images: ["/view-shop9.jpg"],
+    },
+    {
+      images: ["/view-shop10.jpg"],
     },
   ];
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-4">
+    <div className="w-full h-full  flex items-center justify-center p-4">
       <div className="w-full max-w-7xl">
         <div className="relative rounded-3xl overflow-hidden shadow-2xl">
           <Swiper

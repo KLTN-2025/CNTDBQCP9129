@@ -1,0 +1,28 @@
+import React, { useEffect, useState } from "react";
+import blogApi from "../../api/blogAPI";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import CarouselBlogRelated from "../../components/carousel/CarouselBlogRelated";
+const BlogsRelatedSection = ({dataBlogId}) => {
+  const [dataBlogRelated, setDataBlogRelated] = useState([]);
+  const { categorySlug } = useParams();
+  useEffect(() => {
+    const fetchBlogBySlug = async () => {
+      try {
+        const data = await blogApi.getByCategory(categorySlug);
+        setDataBlogRelated(data.filter((blog) => blog._id !== dataBlogId));
+      } catch {
+        toast.error("Đã có lỗi xảy ra khi hiển thị bài viết liên quan");
+      }
+    };
+    fetchBlogBySlug();
+  }, []);
+  return (
+    <div className="flex flex-col pt-20 gap-y-10">
+      <h2 className="font-bold text-2xl">BÀI VIẾT LIÊN QUAN</h2>
+      <CarouselBlogRelated dataBlogRelated={dataBlogRelated}/>
+    </div>
+  );
+};
+
+export default BlogsRelatedSection;

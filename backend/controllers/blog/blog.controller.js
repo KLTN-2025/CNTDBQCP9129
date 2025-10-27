@@ -38,8 +38,14 @@ export const getAllBlogs = async (req, res) => {
 // Lấy 6 blog ngẫu nhiên
 export const getRandomBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.aggregate([{ $sample: { size: 6 } }]); 
-    res.status(200).json(blogs);
+    const blogs = await Blog.aggregate([{ $sample: { size: 6 } }]);
+
+    const blogsWithCategory = await Blog.populate(blogs, {
+      path: "categoryId",
+      select: "slug"
+    });
+
+    res.status(200).json(blogsWithCategory);
   } catch (error) {
     res.status(500).json({ message: "Lỗi lấy blog ngẫu nhiên", error });
   }
