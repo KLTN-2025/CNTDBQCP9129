@@ -11,24 +11,14 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-creative";
 
-export default function Carousel() {
+export default function Carousel({images}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const dataBlogRelated = [
-    {
-      images: ["/banner.jpg"],
-    },
-    {
-      images: ["/banner2.jpg"],
-    },
-    {
-      images: ["/banner3.jpg"],
-    },
-  ];
+ 
 
   return (
     <div className="w-full h-full flex items-center justify-center p-4">
-      <div className="w-full max-w-7xl">
+      <div className="w-full">
         <div className="relative rounded-3xl overflow-hidden shadow-2xl">
           <Swiper
             modules={[Autoplay, Navigation, Pagination, EffectCreative]}
@@ -49,7 +39,7 @@ export default function Carousel() {
             loop={true}
             speed={800}
             autoplay={{
-              delay: 5000,
+              delay: 2000,
               disableOnInteraction: false,
               pauseOnMouseEnter: true,
             }}
@@ -66,10 +56,9 @@ export default function Carousel() {
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
             className="travel-slider"
           >
-            {dataBlogRelated.map((item, idx) => (
+            {images.map((item, idx) => (
               <SwiperSlide key={idx}>
                 <div className="relative w-full h-[70vh] md:h-[85vh]">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10"></div>
 
                   <img
                     src={item.images[0]}
@@ -82,7 +71,7 @@ export default function Carousel() {
           </Swiper>
 
           {/* Custom Navigation Buttons */}
-          <button className="swiper-button-prev-custom absolute left-6 top-1/2 -translate-y-1/2 z-30 w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
+          <button className="swiper-button-prev-custom absolute left-6 top-1/2 -translate-y-1/2 z-30 w-14 h-14 rounded-full cursor-pointer bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
             <svg
               className="w-6 h-6 transform group-hover:-translate-x-1 transition-transform"
               fill="none"
@@ -98,7 +87,7 @@ export default function Carousel() {
             </svg>
           </button>
 
-          <button className="swiper-button-next-custom absolute right-6 top-1/2 -translate-y-1/2 z-30 w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
+          <button className="swiper-button-next-custom absolute right-6 top-1/2 -translate-y-1/2 z-30 w- cursor-pointer w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
             <svg
               className="w-6 h-6 transform group-hover:translate-x-1 transition-transform"
               fill="none"

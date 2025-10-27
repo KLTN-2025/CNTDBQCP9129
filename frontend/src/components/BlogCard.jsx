@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 const BlogCard = ({ blog }) => {
-  console.log('blog', blog.images[0])
   return (
     <div className="relative flex w-full flex-col rounded-xl bg-white bg-clip-border text-gray-700 shadow-md">
       <div className="relative mx-4 -mt-6 h-50 overflow-hidden rounded-xl bg-blue-gray-500 bg-clip-border text-white shadow-lg shadow-blue-gray-500/40 bg-gradient-to-r from-blue-500 to-blue-600">
