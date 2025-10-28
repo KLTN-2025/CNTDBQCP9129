@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { ToastContainer } from "react-toastify";
+import { ParallaxProvider } from "react-scroll-parallax";
 
 // Pages
 import HomePage from "./page/home/HomePage";
@@ -19,13 +20,13 @@ import ChangePassword from "./page/profile/ChangePassword";
 import OrderHistory from "./page/profile/OrderHistory";
 import LayoutAdmin from "./layout/LayoutAdmin";
 import BlogDetailPage from "./page/Blog/BlogDetailPage";
-
+import NewsPage from "./page/news/NewsPage";
+import AboutMe from "./page/about/AboutMe";
 // admin page
 import BlogCategory from "./page/admin/BlogCategory";
 import Users from "./page/admin/Users";
 import Blogs from "./page/admin/Blogs";
-import { ParallaxProvider } from "react-scroll-parallax";
-import NewsPage from "./page/news/NewsPage";
+
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -116,6 +117,8 @@ function App() {
              <Route path=":categorySlug/:nameBlogSlug" element={<BlogDetailPage/>}/>
              <Route path=":categorySlug/" element={<NewsPage/>}/>
           </Route>
+          {/* about me router */}
+          <Route path="/about-me" element={<AboutMe/>}/>
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </LayoutPage>
