@@ -91,7 +91,7 @@ export default function LayoutAdmin() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-scroll p-6">
           {isRootProfile ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <h2 className="text-2xl font-semibold mb-2">
