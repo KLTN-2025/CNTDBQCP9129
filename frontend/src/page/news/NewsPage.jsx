@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import blogApi from "../../api/blogAPI";
 import { motion } from "framer-motion";
 import BlogCard from "../../components/BlogCard";
+import { Parallax } from "react-scroll-parallax";
+
 const NewsPage = () => {
   const { categorySlug } = useParams();
   const [blogcategories, setBlogCategories] = useState([]);
@@ -43,8 +45,17 @@ const NewsPage = () => {
   };
 
   return (
-    <div className="mx-auto px-20 max-sm:px-4 pt-10 flex flex-col w-full bg-gradient-to-b bg-yellow-100 to-white">
-      <div className="flex flex-col items-center gap-y-4 pb-20">
+    <div className="mx-auto px-20 max-sm:px-4 pt-10 flex flex-col w-full bg-gradient-to-b bg-yellow-100 to-white ">
+      <div className="flex flex-col items-center gap-y-4 pb-20 relative">
+        <div className="absolute top-[36%] right-[16%] z-[20] max-lg:hidden">
+          <Parallax speed={10}>
+            <img
+              src="/sticker.png"
+              alt="sticker"
+              className="w-24 max-md:w-16"
+            />
+          </Parallax>
+        </div>
         <h1 className="text-center text-4xl font-bold">
           {currentCategory ? currentCategory.name : categorySlug}
         </h1>
