@@ -1,5 +1,6 @@
 import React from "react";
 import Carousel from "../../components/carousel/Carousel";
+import { Link } from "react-router-dom";
 const ViewShopSection = () => {
   const viewShopImages = [
     {
@@ -34,11 +35,13 @@ const ViewShopSection = () => {
             Nơi cuộc hèn tràn đây với cà phê đặc sản và không gian cảm hứng
           </p>
         </div>
-        <button className="animate-button">
-          <span className="shadow"></span>
-          <span className="edge"></span>
-          <span className="front text font-semibold"> Tìm hiểu thêm</span>
-        </button>
+        <Link to="/shop">
+          <button className="animate-button">
+            <span className="shadow"></span>
+            <span className="edge"></span>
+            <span className="front text font-semibold"> Tìm hiểu thêm</span>
+          </button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 w-full rounded-2xl h-[500px] overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1">

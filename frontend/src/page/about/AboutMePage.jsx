@@ -1,7 +1,7 @@
 import React from "react";
 import { Parallax } from "react-scroll-parallax";
 
-const AboutMe = () => {
+const AboutMePage = () => {
   return (
     <div className="mx-auto w-full space-y-10">
       <div className="w-full flex flex-col items-center min-h-[700px] h-screen md:h-screen bg-[url('/banner-page-coffeego.png')] bg-cover bg-center bg-no-repeat px-4">
@@ -201,4 +201,4 @@ const AboutMe = () => {
   );
 };
 
-export default AboutMe;
+export default AboutMePage;
