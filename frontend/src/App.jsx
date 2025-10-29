@@ -21,11 +21,12 @@ import OrderHistory from "./page/profile/OrderHistory";
 import LayoutAdmin from "./layout/LayoutAdmin";
 import BlogDetailPage from "./page/Blog/BlogDetailPage";
 import NewsPage from "./page/news/NewsPage";
-import AboutMe from "./page/about/AboutMe";
+import AboutMePage from "./page/about/AboutMePage";
 // admin page
 import BlogCategory from "./page/admin/BlogCategory";
 import Users from "./page/admin/Users";
 import Blogs from "./page/admin/Blogs";
+import ShopPage from "./page/shop/ShopPage";
 
 function App() {
   const navigate = useNavigate();
@@ -118,7 +119,9 @@ function App() {
              <Route path=":categorySlug/" element={<NewsPage/>}/>
           </Route>
           {/* about me router */}
-          <Route path="/about-me" element={<AboutMe/>}/>
+          <Route path="/about-me" element={<AboutMePage/>}/>
+          {/* admin route */}
+          <Route path='/shop' element={<ShopPage/>}/>
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </LayoutPage>
