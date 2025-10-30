@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // tự động tạo createdAt & updatedAt
+    timestamps: true, 
   }
 );
 
