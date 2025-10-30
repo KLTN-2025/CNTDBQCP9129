@@ -1,6 +1,6 @@
 import slugify from "slugify";
 import ProductCategory from "../../model/productCategory.model.js";
-import Product from "../../model/product.model.js";
+import Product from '../../model/product.model.js'
 
 // Lấy tất cả danh mục sản phẩm
 export const getAllCategories = async (req, res) => {
