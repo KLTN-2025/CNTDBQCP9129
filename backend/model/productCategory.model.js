@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import slugify from "slugify"; // nhớ cài: npm install slugify
+import slugify from "slugify";
 
 const productCategorySchema = new mongoose.Schema(
   {
@@ -18,7 +18,7 @@ const productCategorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🧠 Tự động tạo slug từ name mỗi khi tạo hoặc sửa name
+//  Tự động tạo slug từ name mỗi khi tạo hoặc sửa name
 productCategorySchema.pre("save", function (next) {
   if (this.isModified("name")) {
     this.slug = slugify(this.name, { lower: true, strict: true, locale: "vi" });
