@@ -26,5 +26,5 @@ productCategorySchema.pre("save", function (next) {
   next();
 });
 
-const ProductCategory = mongoose.model("BlogCategory", blogCategorySchema);
+const ProductCategory = mongoose.model("ProductCategory", productCategorySchema);
 export default ProductCategory;

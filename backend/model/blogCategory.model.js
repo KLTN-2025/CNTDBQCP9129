@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import slugify from "slugify";
+import slugify from "slugify"; // nhớ cài: npm install slugify
 
 const blogCategorySchema = new mongoose.Schema(
   {
