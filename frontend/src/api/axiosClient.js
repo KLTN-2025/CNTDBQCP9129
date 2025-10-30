@@ -21,7 +21,7 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// 🧩 Interceptor RESPONSE
+//  Interceptor RESPONSE
 // Xử lý phản hồi hoặc lỗi toàn cục
 axiosClient.interceptors.response.use(
   (response) => {
