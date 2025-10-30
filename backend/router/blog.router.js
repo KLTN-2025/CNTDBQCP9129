@@ -12,8 +12,8 @@ import { verifyToken, isAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.get("/random", getRandomBlogs)
 router.get("/", getAllBlogs);
+router.get("/random", getRandomBlogs)
 router.get("/:slugCategory/:slug", getBlogBySlug);
 router.get("/:slugCategory", getBlogsByCategory);
 router.post("/", verifyToken, isAdmin, createBlog);
