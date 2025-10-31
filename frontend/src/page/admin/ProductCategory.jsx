@@ -59,8 +59,8 @@ export default function ProductCategory() {
       setIsOpenModalUpdateCategory(false);
       setCurrentCategoryId(null);
       setUpdateCategoryName("");
-    } catch {
-      toast.error("Cập nhật thất bại, vui lòng thử lại");
+    } catch(err) {
+      toast.error(err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại");
     }
   };
 
@@ -70,7 +70,6 @@ export default function ProductCategory() {
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
       toast.success(res.message);
     } catch (err) {
-      console.log(err);
       toast.error(err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại");
     } finally {
       setIsOpenConfirmDelete(false);
