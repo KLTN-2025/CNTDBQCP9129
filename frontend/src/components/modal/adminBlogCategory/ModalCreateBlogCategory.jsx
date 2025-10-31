@@ -1,30 +1,14 @@
 import Modal from "react-modal";
-import { useState } from "react";
-import blogCategoryApi from "../../../api/blogCategoryApi";
-import { toast } from "react-toastify";
 import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
-const ModalCreateBlogCategory = ({isOpenModalCreateCategory, setIsOpenModalCreateCategory, setCategories}) => {
+const ModalCreateBlogCategory = ({
+  isOpenModalCreateCategory,
+  setIsOpenModalCreateCategory,
+  createNameCategory,
+  onConfirm,
+  setCreateNameCategory,
+}) => {
   useLockBodyScroll(isOpenModalCreateCategory);
-  const [newNameCategory, setNewNameCategory] = useState('');
- const handleCreateCategory = async () => {
-    if (!newNameCategory.trim()) {
-      toast.error("Tên danh mục không được để trống");
-      return;
-    }
-    try {
-      const newCategory = await blogCategoryApi.create({ name: newNameCategory });
-      if (newCategory && newCategory._id && newCategory.name) {
-        setCategories(prev => [newCategory, ...prev]);
-        toast.success('Thêm mới danh mục thành công!')
-      } else {
-        toast.error(newCategory.message);
-      }
-      setNewNameCategory('');
-      setIsOpenModalCreateCategory(false);
-    } catch (err) {
-      toast(err.message || "Có lỗi xảy ra, vui lòng thử lại");
-    }
-  };
+
   return (
     <Modal
       appElement={document.getElementById("root")}
@@ -61,19 +45,25 @@ const ModalCreateBlogCategory = ({isOpenModalCreateCategory, setIsOpenModalCreat
           <p>Tên danh mục *</p>
           <input
             type="text"
-            value={newNameCategory}
-            onChange={(e) => setNewNameCategory(e.target.value)}
+            value={createNameCategory}
+            onChange={(e) => setCreateNameCategory(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             placeholder="Tên danh mục"
           />
         </div>
         <div className="flex items-center gap-x-6 px-4 w-full py-8">
-           <button className="w-full border px-2 py-2 rounded-md cursor-pointer"
+          <button
+            className="w-full border px-2 py-2 rounded-md cursor-pointer"
             onClick={() => setIsOpenModalCreateCategory(false)}
-           >Hủy</button>
-           <button className="bg-green-700 w-full rounded-md px-2 py-2 cursor-pointer"
-            onClick={handleCreateCategory}
-           >Thêm mới</button>
+          >
+            Hủy
+          </button>
+          <button
+            className="bg-green-700 w-full rounded-md px-2 py-2 cursor-pointer"
+            onClick={onConfirm}
+          >
+            Thêm mới
+          </button>
         </div>
       </div>
     </Modal>
