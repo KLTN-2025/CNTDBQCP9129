@@ -14,6 +14,8 @@ const productCategorySchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    images: { type: String, trim: true, required: true },
+
   },
   { timestamps: true }
 );
