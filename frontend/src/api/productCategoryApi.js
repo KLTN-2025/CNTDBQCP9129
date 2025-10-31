@@ -1,8 +1,22 @@
 import axiosClient from "./axiosClient";
-const productCategoryApi = {
-  getAll: () => axiosClient.get("/product-category"),
-  create: (data) => axiosClient.post("/product-category", data),
-  update: (id, data) => axiosClient.put(`/product-category/${id}`, data),
-  delete: (id) => axiosClient.delete(`/product-category/${id}`),
+
+const blogCategoryApi = {
+  getAll: async () => {
+    const res = await axiosClient.get("/product-categories");
+    return res.data;
+  },
+  create: async (data) => {
+    const res = await axiosClient.post("/product-categories", data);
+    return res.data;
+  },
+  update: async (id, data) => {
+    const res = await axiosClient.put(`/product-categories/${id}`, data);
+    return res.data;
+  },
+  delete: async (id) => {
+    const res = await axiosClient.delete(`/product-categories/${id}`);
+    return res.data;
+  },
 };
-export default productCategoryApi;
+
+export default blogCategoryApi;

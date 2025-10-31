@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import blogCategoryApi from "../../api/blogCategoryApi";
+import productCategory from "../../api/productCategoryApi";
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
-import ModalCreateBlogCategory from "../../components/modal/adminBlogCategory/ModalCreateBlogCategory";
-import ModalUpdateBlogCategory from "../../components/modal/adminBlogCategory/ModalUpdateBlogCategory";
+import ModalCreateBlogCategory from "../../components/modal/adminBlogCategory/ModalCreateBlogCategory"; // dùng chung modal BlogCategory
+import ModalUpdateBlogCategory from "../../components/modal/adminBlogCategory/ModalUpdateBlogCategory"; // dùng chung modal BlogCategory
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 
 export default function ProductCategory() {
@@ -21,7 +21,7 @@ export default function ProductCategory() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const data = await blogCategoryApi.getAll();
+        const data = await productCategory.getAll();
         setCategories(data);
       } catch (err) {
         toast.error("Lỗi lấy danh mục:", err);
@@ -32,7 +32,7 @@ export default function ProductCategory() {
 
   const handleUpdateCategory = async (id, newName) => {
     try {
-      await blogCategoryApi.update(id, { name: newName });
+      await productCategory.update(id, { name: newName });
       setCategories((prev) =>
         prev.map((cat) => (cat._id === id ? { ...cat, name: newName } : cat))
       );
@@ -47,7 +47,7 @@ export default function ProductCategory() {
 
   const handleDeleteCategory = async (id) => {
     try {
-      const res = await blogCategoryApi.delete(id);
+      const res = await productCategory.delete(id);
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
       toast.success(res.message);
     } catch (err) {
@@ -58,17 +58,17 @@ export default function ProductCategory() {
       setDeleteCategoryId(null);
     }
   };
-
+  console.log("categories", categories)
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">
-              Quản lý danh mục
+              Quản lý danh mục sản phẩm
             </h2>
             <p className="text-gray-600 mt-1">
-              Quản lý các danh mục bài viết trên website
+              Quản lý các danh mục sản phẩm trên website
             </p>
           </div>
           <button
@@ -116,7 +116,7 @@ export default function ProductCategory() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {categories
+            {categories && categories.length > 0 && categories
               .filter((category) =>
                 category.name.toLowerCase().includes(searchTerm.toLowerCase())
               )

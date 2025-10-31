@@ -18,6 +18,8 @@ export default function BlogCategory() {
     useState(false);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
   const [updateCategoryName, setUpdateCategoryName] = useState("");
+  const [createNameCategory, setCreateNameCategory] = useState('');
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -30,6 +32,25 @@ export default function BlogCategory() {
     fetchCategories();
   }, []);
 
+ const handleCreateCategory = async () => {
+    if (!createNameCategory.trim()) {
+      toast.error("Tên danh mục không được để trống");
+      return;
+    }
+    try {
+      const newCategory = await blogCategoryApi.create({ name: createNameCategory });
+      if (newCategory && newCategory._id && newCategory.name) {
+        setCategories(prev => [newCategory, ...prev]);
+        toast.success('Thêm mới danh mục thành công!')
+      } else {
+        toast.error(newCategory.message);
+      }
+      setCreateNameCategory('');
+      setIsOpenModalCreateCategory(false);
+    } catch (err) {
+      toast(err.message || "Có lỗi xảy ra, vui lòng thử lại");
+    }
+  };
   const handleUpdateCategory = async (id, newName) => {
     try {
       await blogCategoryApi.update(id, { name: newName });
@@ -65,7 +86,7 @@ export default function BlogCategory() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">
-              Quản lý danh mục
+              Quản lý danh mục bài viết
             </h2>
             <p className="text-gray-600 mt-1">
               Quản lý các danh mục bài viết trên website
@@ -170,7 +191,9 @@ export default function BlogCategory() {
         <ModalCreateBlogCategory
           isOpenModalCreateCategory={isOpenModalCreateCategory}
           setIsOpenModalCreateCategory={setIsOpenModalCreateCategory}
-          setCategories={setCategories}
+          onConfirm={handleCreateCategory}
+          createNameCategory={createNameCategory}
+          setCreateNameCategory={setCreateNameCategory}
         />
       )}
 
