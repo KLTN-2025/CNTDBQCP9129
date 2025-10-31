@@ -13,7 +13,7 @@ const blogSchema = new mongoose.Schema(
     },
 
     // Gộp tất cả ảnh (ảnh chính, ảnh phụ) vào 1 mảng
-    image: [{ type: String, trim: true, required: true }],
+    images: [{ type: String, trim: true, require: true }],
 
     // Nội dung chia 3 phần
     content: {
