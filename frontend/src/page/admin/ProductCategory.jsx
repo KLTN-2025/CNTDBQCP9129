@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import productCategory from "../../api/productCategoryApi";
+import productCategoryApi from "../../api/productCategoryApi";
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import ModalCreateBlogCategory from "../../components/modal/adminBlogCategory/ModalCreateBlogCategory"; // dùng chung modal BlogCategory
 import ModalUpdateBlogCategory from "../../components/modal/adminBlogCategory/ModalUpdateBlogCategory"; // dùng chung modal BlogCategory
@@ -18,10 +18,11 @@ export default function ProductCategory() {
     useState(false);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
   const [updateCategoryName, setUpdateCategoryName] = useState("");
+  const [createNameCategory, setCreateNameCategory] = useState('');
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const data = await productCategory.getAll();
+        const data = await productCategoryApi.getAll();
         setCategories(data);
       } catch (err) {
         toast.error("Lỗi lấy danh mục:", err);
@@ -29,10 +30,28 @@ export default function ProductCategory() {
     };
     fetchCategories();
   }, []);
-
+ const handleCreateCategory = async () => {
+    if (!createNameCategory.trim()) {
+      toast.error("Tên danh mục không được để trống");
+      return;
+    }
+    try {
+      const newCategory = await productCategoryApi.create({ name: createNameCategory });
+      if (newCategory && newCategory._id && newCategory.name) {
+        setCategories(prev => [newCategory, ...prev]);
+        toast.success('Thêm mới danh mục thành công!')
+      } else {
+        toast.error(newCategory.message);
+      }
+      setCreateNameCategory('');
+      setIsOpenModalCreateCategory(false);
+    } catch (err) {
+      toast(err.message || "Có lỗi xảy ra, vui lòng thử lại");
+    }
+  };
   const handleUpdateCategory = async (id, newName) => {
     try {
-      await productCategory.update(id, { name: newName });
+      await productCategoryApi.update(id, { name: newName });
       setCategories((prev) =>
         prev.map((cat) => (cat._id === id ? { ...cat, name: newName } : cat))
       );
@@ -47,7 +66,7 @@ export default function ProductCategory() {
 
   const handleDeleteCategory = async (id) => {
     try {
-      const res = await productCategory.delete(id);
+      const res = await productCategoryApi.delete(id);
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
       toast.success(res.message);
     } catch (err) {
@@ -58,7 +77,6 @@ export default function ProductCategory() {
       setDeleteCategoryId(null);
     }
   };
-  console.log("categories", categories)
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200">
@@ -171,6 +189,9 @@ export default function ProductCategory() {
           isOpenModalCreateCategory={isOpenModalCreateCategory}
           setIsOpenModalCreateCategory={setIsOpenModalCreateCategory}
           setCategories={setCategories}
+          onConfirm={handleCreateCategory}
+          createNameCategory={createNameCategory}
+          setCreateNameCategory={setCreateNameCategory}
         />
       )}
 

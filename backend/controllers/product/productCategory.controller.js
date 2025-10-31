@@ -15,14 +15,14 @@ export const getAllCategories = async (req, res) => {
 // Thêm danh mục sản phẩm mới
 export const createCategory = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, image } = req.body;
     const slug = slugify(name, { lower: true, strict: true });
 
     const existing = await ProductCategory.findOne({ slug });
     if (existing)
       return res.status(400).json({ message: "Danh mục đã tồn tại" });
 
-    const newCategory = new ProductCategory({ name });
+    const newCategory = new ProductCategory({ name, image });
     await newCategory.save();
     res.status(201).json(newCategory);
   } catch (error) {
