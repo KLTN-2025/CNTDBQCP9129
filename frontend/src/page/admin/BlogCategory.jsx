@@ -48,7 +48,7 @@ export default function BlogCategory() {
       setCreateNameCategory('');
       setIsOpenModalCreateCategory(false);
     } catch (err) {
-      toast(err.message || "Có lỗi xảy ra, vui lòng thử lại");
+      toast.error(err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại");
     }
   };
   const handleUpdateCategory = async (id, newName) => {
@@ -61,8 +61,8 @@ export default function BlogCategory() {
       setIsOpenModalUpdateCategory(false);
       setCurrentCategoryId(null);
       setUpdateCategoryName("");
-    } catch {
-      toast.error("Cập nhật thất bại, vui lòng thử lại");
+    } catch(err) {
+      toast.error(err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại");
     }
   };
 
@@ -72,7 +72,6 @@ export default function BlogCategory() {
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
       toast.success(res.message);
     } catch (err) {
-      console.log(err);
       toast.error(err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại");
     } finally {
       setIsOpenConfirmDelete(false);
