@@ -17,15 +17,9 @@ export const createCategory = async (req, res) => {
   try {
     const { name, image } = req.body;
     const slug = slugify(name, { lower: true, strict: true });
-
     const existing = await ProductCategory.findOne({ slug });
-    const existingImage = await ProductCategory.findOne({ image });
-
     if (existing)
       return res.status(400).json({ message: "Loại sản phẩm đã tồn tại" });
-    if (existingImage){
-      return res.status(400).json({ message: "Hình ảnh Loại sản phẩm đã tồn tại " });
-    }
     const newCategory = new ProductCategory({ name, image });
     await newCategory.save();
     res.status(201).json(newCategory);

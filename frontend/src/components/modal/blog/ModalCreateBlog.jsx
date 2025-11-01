@@ -21,7 +21,7 @@ const ModalCreateBlog = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const { selectedFile, handleImageChange, setSelectedFile } =
-    usePreviewImage();
+    usePreviewImage(3);
   const {handleImageUpload} = useUpAndGetLinkImage()
   const [introHighlight, setIntroHighlight] = useState("");
   const [bodyHighlight, setBodyHighlight] = useState("");
@@ -97,9 +97,8 @@ const ModalCreateBlog = ({
       }else {
         toast.error(newBlog.message || "Đã có lỗi xảy ra vui lòng thử lại");
       }
-    } catch {
-      toast.error("Đã có lỗi xảy ra khi thêm mới");
-      
+    } catch(error) {
+      toast.error(error?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại");
     } finally {
       setIsLoading(false);
     }
