@@ -14,7 +14,7 @@ const productCategorySchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-    image: { type: String, trim: true, required: true, unique: true },
+    image: { type: String, trim: true, required: true },
 
   },
   { timestamps: true }

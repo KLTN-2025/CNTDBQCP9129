@@ -24,7 +24,7 @@ const ModalUpdateBlog = ({
   const [title, setTitle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { selectedFile, handleImageChange, setSelectedFile } = usePreviewImage();
+  const { selectedFile, handleImageChange, setSelectedFile } = usePreviewImage(3);
   const { handleImageUpload } = useUpAndGetLinkImage();
 
   const [introHighlight, setIntroHighlight] = useState("");
