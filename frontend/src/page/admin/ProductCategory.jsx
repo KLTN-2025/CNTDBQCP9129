@@ -30,25 +30,25 @@ export default function ProductCategory() {
     };
     fetchCategories();
   }, []);
- const handleCreateCategory = async () => {
-    if (!createNameCategory.trim()) {
-      toast.error("Tên danh mục không được để trống");
-      return;
-    }
-    try {
-      const newCategory = await productCategoryApi.create({ name: createNameCategory });
-      if (newCategory && newCategory._id && newCategory.name) {
-        setCategories(prev => [newCategory, ...prev]);
-        toast.success('Thêm mới danh mục thành công!')
-      } else {
-        toast.error(newCategory.message);
-      }
-      setCreateNameCategory('');
-      setIsOpenModalCreateCategory(false);
-    } catch (err) {
-      toast(err.message || "Có lỗi xảy ra, vui lòng thử lại");
-    }
-  };
+//  const handleCreateCategory = async () => {
+//     if (!createNameCategory.trim()) {
+//       toast.error("Tên danh mục không được để trống");
+//       return;
+//     }
+//     try {
+//       const newCategory = await productCategoryApi.create({ name: createNameCategory });
+//       if (newCategory && newCategory._id && newCategory.name) {
+//         setCategories(prev => [newCategory, ...prev]);
+//         toast.success('Thêm mới danh mục thành công!')
+//       } else {
+//         toast.error(newCategory.message);
+//       }
+//       setCreateNameCategory('');
+//       setIsOpenModalCreateCategory(false);
+//     } catch (err) {
+//       toast(err.message || "Có lỗi xảy ra, vui lòng thử lại");
+//     }
+//   };
   const handleUpdateCategory = async (id, newName) => {
     try {
       await productCategoryApi.update(id, { name: newName });
