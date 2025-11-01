@@ -2,7 +2,7 @@ import slugify from "slugify";
 import ProductCategory from "../../model/productCategory.model.js";
 import Product from '../../model/product.model.js'
 
-// Lấy tất cả danh mục sản phẩm
+// Lấy tất cả loại sản phẩm
 export const getAllCategories = async (req, res) => {
   try {
     const categories = await ProductCategory.find().sort({ createdAt: -1 });
@@ -12,18 +12,20 @@ export const getAllCategories = async (req, res) => {
   }
 };
 
-// Thêm danh mục sản phẩm mới
+// Thêm loại sản phẩm mới
 export const createCategory = async (req, res) => {
   try {
     const { name, image } = req.body;
     const slug = slugify(name, { lower: true, strict: true });
 
     const existing = await ProductCategory.findOne({ slug });
-    // const existing = await ProductCategory.findOne({ slug });
+    const existingImage = await ProductCategory.findOne({ image });
 
     if (existing)
-      return res.status(400).json({ message: "Danh mục đã tồn tại" });
-
+      return res.status(400).json({ message: "Loại sản phẩm đã tồn tại" });
+    if (existingImage){
+      return res.status(400).json({ message: "Hình ảnh Loại sản phẩm đã tồn tại " });
+    }
     const newCategory = new ProductCategory({ name, image });
     await newCategory.save();
     res.status(201).json(newCategory);
@@ -32,7 +34,7 @@ export const createCategory = async (req, res) => {
   }
 };
 
-// Sửa danh mục sản phẩm
+// Sửa loại sản phẩm 
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -40,7 +42,7 @@ export const updateCategory = async (req, res) => {
 
     const category = await ProductCategory.findById(id);
     if (!category)
-      return res.status(404).json({ message: "Không tìm thấy danh mục" });
+      return res.status(404).json({ message: "Không tìm thấy loại sản phẩm" });
 
     category.name = name; // cập nhật tên
     await category.save(); // save lại => middleware pre('save') chạy => slug được tạo lại
@@ -52,20 +54,20 @@ export const updateCategory = async (req, res) => {
   }
 };
 
-// Xóa danh mục sản phẩm
+// Xóa loại  sản phẩm
 export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
     const productCount = await Product.countDocuments({ categoryId: id });
     if (productCount > 0) {
       return res.status(400).json({
-        message: `Không thể xóa danh mục vì đang chứa ${productCount} sản phẩm.`,
+        message: `Không thể xóa loại sản phẩm vì đang chứa ${productCount} sản phẩm.`,
       });
     }
 
     const deleted = await ProductCategory.findByIdAndDelete(id);
     if (!deleted)
-      return res.status(404).json({ message: "Không tìm thấy danh mục" });
+      return res.status(404).json({ message: "Không tìm thấy loại sản phẩm" });
 
     res.status(200).json({ message: "Xóa thành công" });
   } catch (error) {
