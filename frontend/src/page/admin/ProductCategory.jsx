@@ -85,11 +85,10 @@ export default function ProductCategory() {
         imageUrl = newImage[0];
       }
 
-      await productCategoryApi.update(id, { name: newName, image: imageUrl });
-
+      const res = await productCategoryApi.update(id, { name: newName, image: imageUrl });
       setCategories((prev) =>
         prev.map((cat) =>
-          cat._id === id ? { ...cat, name: newName, image: imageUrl } : cat
+          cat._id === id ? { ...cat, name: newName, image: imageUrl, slug: res.slug } : cat
         )
       );
 
@@ -197,7 +196,7 @@ export default function ProductCategory() {
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
                       <button
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
                         onClick={() => {
                           setIsOpenModalUpdateCategory(true);
                           setCurrentCategoryId(category._id);
@@ -212,7 +211,7 @@ export default function ProductCategory() {
                           setDeleteCategoryId(category._id);
                           setIsOpenConfirmDelete(true);
                         }}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

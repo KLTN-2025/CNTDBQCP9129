@@ -6,6 +6,7 @@ import authRouter from './router/auth.router.js'
 import blogCategoryRouter from './router/blogCategory.router.js';
 import blog from './router/blog.router.js'
 import productCategoryRouter from './router/productCategory.router.js'
+import product from './router/product.router.js'
 dotenv.config()
 const app = express();
 app.use(express.json());
@@ -14,6 +15,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/blog-categories", blogCategoryRouter);
 app.use("/api/blogs", blog);
 app.use("/api/product-categories", productCategoryRouter);
+app.use("/api/products", product);
 // app.use("/api/products", productCategoryRouter);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
