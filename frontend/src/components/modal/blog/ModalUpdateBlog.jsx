@@ -61,7 +61,6 @@ const ModalUpdateBlog = ({
         ? [blogData.images]
         : [];
       setSelectedFile(imagesArray);
-
       setIntroHighlight(blogData.content?.intro?.highlight || "");
       setIntroText(blogData.content?.intro?.text || "");
       setBodyHighlight(blogData.content?.body?.highlight || "");

@@ -32,13 +32,14 @@ export const createCategory = async (req, res) => {
 export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, image } = req.body;
 
     const category = await ProductCategory.findById(id);
     if (!category)
       return res.status(404).json({ message: "Không tìm thấy loại sản phẩm" });
 
-    category.name = name; // cập nhật tên
+    category.name = name; 
+    category.image = image;
     await category.save(); // save lại => middleware pre('save') chạy => slug được tạo lại
 
     res.status(200).json(category);
