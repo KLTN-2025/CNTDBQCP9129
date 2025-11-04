@@ -125,7 +125,7 @@ const handleToggleStatus = async (product) => {
               .map((product, index) => (
                 <tr key={product._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm">{index + 1}</td>
-                  <td className="px-6 py-4 text-sm truncate max-w-xs">
+                  <td className="px-6 py-4 text-sm truncate max-w-[200px]">
                     {product.name}
                   </td>
                   <td className="px-6 py-4 text-sm">
@@ -152,7 +152,7 @@ const handleToggleStatus = async (product) => {
                       onClick={() => handleToggleStatus(product)}
                       className={`${
                         product.status ? "bg-green-600" : "bg-red-600"
-                      } text-white cursor-pointer px-4 py-2 rounded-lg transition-colors`}
+                      } text-white cursor-pointer px-4 py-2 whitespace-nowrap rounded-lg transition-colors`}
                     >
                       {product.status ? "Còn hàng" : "Hết hàng"}
                     </button>
