@@ -1,27 +1,24 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import productApi from "../../api/productApi";
 import ModalCreateProduct from "../../components/modal/adminProduct/ModalCreateProduct";
+import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
+import ModalUpdateProduct from "../../components/modal/adminProduct/ModalUpdateProduct";
+
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
-  const [isOpenModalCreateProduct, setIsOpenModalCreateProduct] =
-    useState(false);
-  const [newProduct, setNewProduct] = useState({
-    name: "",
-    price: "",
-    image: "",
-    description: "",
-    discount: "",
-    productCategoryId: "",
-  });
+  const [isOpenModalCreateProduct, setIsOpenModalCreateProduct] = useState(false);
+  const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] = useState(false);
+  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
+  const [productSelected, setProductSelected] = useState(null);
+  const [productId, setProductId] = useState(null);
 
   // Lấy danh sách sản phẩm
   useEffect(() => {
-    const get10Products = async () => {
+    const getAllProducts = async () => {
       try {
         const res = await productApi.getAllProducts();
         setProducts(res);
@@ -29,8 +26,22 @@ export default function Products() {
         toast.error(error.response?.data?.message || "Lỗi khi tải sản phẩm");
       }
     };
-    get10Products();
+    getAllProducts();
   }, []);
+
+  // Xóa sản phẩm
+  const handleRemoveProduct = async (id) => {
+    try {
+      await productApi.delete(id);
+      setProducts((prev) => prev.filter((p) => p._id !== id));
+      setIsOpenModalConfirmDelete(false);
+      toast.success("Xóa sản phẩm thành công");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Lỗi khi xóa sản phẩm");
+    } finally {
+      setProductId(null);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
@@ -38,9 +49,7 @@ export default function Products() {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">
-              Quản lý sản phẩm
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800">Quản lý sản phẩm</h2>
             <p className="text-gray-600 mt-1">Quản lý sản phẩm trên website</p>
           </div>
           <button
@@ -92,8 +101,8 @@ export default function Products() {
           </thead>
           <tbody className="bg-white divide-y">
             {products
-              .filter((c) =>
-                c.name.toLowerCase().includes(searchTerm.toLowerCase())
+              .filter((p) =>
+                p.name.toLowerCase().includes(searchTerm.toLowerCase())
               )
               .map((product, index) => (
                 <tr key={product._id} className="hover:bg-gray-50">
@@ -124,15 +133,30 @@ export default function Products() {
                         product.status ? "bg-green-600" : "bg-red-600"
                       } text-white cursor-pointer px-4 py-2 rounded-lg`}
                     >
-                      {product ? "Còn hàng" : "Hết hàng"}
+                      {product.status ? "Còn hàng" : "Hết hàng"}
                     </button>
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
-                      <button className="text-blue-600 hover:text-blue-800 cursor-pointer">
+                      {/* Nút sửa */}
+                      <button
+                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                        onClick={() => {
+                          setProductSelected(product);
+                          setIsOpenModalUpdateProduct(true);
+                        }}
+                      >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button className="text-red-600 hover:text-red-800 cursor-pointer">
+
+                      {/* Nút xóa */}
+                      <button
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
+                        onClick={() => {
+                          setProductId(product._id);
+                          setIsOpenModalConfirmDelete(true);
+                        }}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -149,6 +173,26 @@ export default function Products() {
           isOpenModalCreateProduct={isOpenModalCreateProduct}
           setIsOpenModalCreateProduct={setIsOpenModalCreateProduct}
           setProducts={setProducts}
+        />
+      )}
+
+      {/* Modal cập nhật sản phẩm */}
+      {isOpenModalUpdateProduct && productSelected && (
+        <ModalUpdateProduct
+          isOpenModalUpdateProduct={isOpenModalUpdateProduct}
+          setIsOpenModalUpdateProduct={setIsOpenModalUpdateProduct}
+          setProducts={setProducts}
+          product={productSelected}
+        />
+      )}
+
+      {/* Modal xác nhận xóa */}
+      {isOpenModalConfirmDelete && (
+        <ModalConfirmDelete
+          content="Bạn có chắn chắn muốn xóa sản phẩm này?"
+          isOpenConfirmDelete={isOpenModalConfirmDelete}
+          setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
+          onConfirm={() => handleRemoveProduct(productId)}
         />
       )}
     </div>
