@@ -33,7 +33,7 @@ export default function ProductCategory() {
         const data = await productCategoryApi.getAll();
         setCategories(data);
       } catch (err) {
-        toast.error("Lỗi lấy loại sản phẩm");
+        toast.error(err.response.data.message);
       }
     };
     fetchCategories();

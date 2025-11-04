@@ -9,7 +9,9 @@ export const createProduct = async (req, res) => {
     if (!name || !productCategoryId || !description || !image || !price) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
-
+    if (discount > 100){
+      return res.status(400).json({ message: "Giảm giá lớn hơn 100%" });
+    }
     const existingProduct = await Product.findOne({ name });
     if (existingProduct) {
       return res.status(400).json({ message: "Tên sản phẩm đã tồn tại" });
@@ -31,6 +33,33 @@ export const createProduct = async (req, res) => {
     res.status(500).json({ message: "Tạo sản phẩm thất bại" });
   }
 };
+// Lấy tối đa 10 sản phẩm mới nhất
+export const getLimitedProducts = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .populate("productCategoryId", "name")
+      .sort({ createdAt: -1 }) // Sản phẩm mới nhất trước
+      .limit(10); // Giới hạn 10 sản phẩm
+
+    res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lấy sản phẩm giới hạn thất bại" });
+  }
+};
+// Lấy tất cả sản phẩm
+  export const getAllProducts = async (req, res) => {
+    try {
+      const products = await Product.find()
+        .populate("productCategoryId", "name") // lấy tên danh mục
+        .sort({ createdAt: -1 }); // sản phẩm mới nhất lên đầu
+
+      res.status(200).json(products);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Lấy tất cả sản phẩm thất bại" });
+    }
+  };
 
 //  Lấy sản phẩm theo danh mục
 export const getProductsByCategory = async (req, res) => {

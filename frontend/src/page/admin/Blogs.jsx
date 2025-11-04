@@ -26,6 +26,7 @@ export default function BlogCategory() {
         setAllBlogs(data);
       } catch (err) {
         console.error("Lỗi lấy bài viết:", err);
+        toast.error(err.response.data.message)
       }
     };
     fetchBlogs();

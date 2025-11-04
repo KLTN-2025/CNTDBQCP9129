@@ -7,6 +7,14 @@ const productApi = {
     return res.data;
   },
 
+  getLimitedProducts: async () => {
+    const res = await axiosClient.get("/products/limit");
+    return res.data;
+  },
+  getAllProducts: async () => {
+    const res = await axiosClient.get("/products");
+    return res.data
+  },
   // Lấy products theo category slug
   getByCategory: async (slugCategory) => {
     const res = await axiosClient.get(`/products/${slugCategory}`);
