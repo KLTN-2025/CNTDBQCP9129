@@ -29,6 +29,7 @@ import Blogs from "./page/admin/Blogs";
 import ShopPage from "./page/shop/ShopPage";
 import ProductCategory from "./page/admin/ProductCategory";
 import Products from "./page/admin/Products";
+import MenuPage from "./page/menu/MenuPage";
 
 function App() {
   const navigate = useNavigate();
@@ -120,12 +121,14 @@ function App() {
           {/* blog route */}
           <Route path="/blogs">
              <Route path=":categorySlug/:nameBlogSlug" element={<BlogDetailPage/>}/>
-             <Route path=":categorySlug/" element={<NewsPage/>}/>
+             <Route path=":categorySlug" element={<NewsPage/>}/>
           </Route>
           {/* about me route */}
           <Route path="/about-me" element={<AboutMePage/>}/>
           {/* shop route */}
           <Route path='/shop' element={<ShopPage/>}/>
+          {/* menu route */}
+          <Route path="/menu/:categorySlug?" element={<MenuPage />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </LayoutPage>

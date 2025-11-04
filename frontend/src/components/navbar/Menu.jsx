@@ -1,9 +1,11 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
 const Menu = () => {
   return (
     <div>
-      <span className="hover:text-green-700 cursor-pointer">THỰC ĐƠN</span>
+      <Link to='/menu'>
+       <span className="hover:text-green-700 cursor-pointer">THỰC ĐƠN</span>
+      </Link>
     </div>
   );
 };
