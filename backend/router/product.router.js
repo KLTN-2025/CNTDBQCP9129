@@ -4,10 +4,10 @@ import { verifyToken, isAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.post("/", createProduct);
+router.post("/", verifyToken, isAdmin, createProduct);
 router.get("/:slugCategory", getProductsByCategory);
-router.delete("/:id", deleteProduct);
-router.put("/:id", updateProduct);
+router.delete("/:id", verifyToken, isAdmin, deleteProduct);
+router.put("/:id", verifyToken, isAdmin, updateProduct);
 
 
 export default router;

@@ -28,6 +28,7 @@ import Users from "./page/admin/Users";
 import Blogs from "./page/admin/Blogs";
 import ShopPage from "./page/shop/ShopPage";
 import ProductCategory from "./page/admin/ProductCategory";
+import Products from "./page/admin/Products";
 
 function App() {
   const navigate = useNavigate();
@@ -114,6 +115,7 @@ function App() {
             <Route path="blog-category" element={<BlogCategory />} />
             <Route path="blogs" element={<Blogs />} />
             <Route path="product-category" element={<ProductCategory />} />
+            <Route path="products" element={<Products/>} />
           </Route>
           {/* blog route */}
           <Route path="/blogs">
