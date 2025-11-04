@@ -4,12 +4,13 @@ import ProductCategory from "../../model/productCategory.model.js";
 //  Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
   try {
-    const { name, productCategoryId, description, image, price, discount } = req.body;
+    const { name, productCategoryId, description, image, price, discount } =
+      req.body;
 
     if (!name || !productCategoryId || !description || !image || !price) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
-    if (discount > 100){
+    if (discount > 100) {
       return res.status(400).json({ message: "Giảm giá lớn hơn 100%" });
     }
     const existingProduct = await Product.findOne({ name });
@@ -36,48 +37,57 @@ export const createProduct = async (req, res) => {
 // Lấy tối đa 10 sản phẩm mới nhất
 export const getLimitedProducts = async (req, res) => {
   try {
-    const products = await Product.find()
-      .populate("productCategoryId", "name")
-      .sort({ createdAt: -1 }) // Sản phẩm mới nhất trước
-      .limit(10); // Giới hạn 10 sản phẩm
+    const products = await Product.aggregate([
+      { $sample: { size: 10 } }, // Lấy ngẫu nhiên 10 sản phẩm
+    ]);
 
-    res.status(200).json(products);
+    // Nếu muốn populate categoryId
+    const productsWithCategory = await Product.populate(products, {
+      path: "productCategoryId",
+      select: "name",
+    });
+
+    res.status(200).json(productsWithCategory);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Lấy sản phẩm giới hạn thất bại" });
   }
 };
 // Lấy tất cả sản phẩm
-  export const getAllProducts = async (req, res) => {
-    try {
-      const products = await Product.find()
-        .populate("productCategoryId", "name") // lấy tên danh mục
-        .sort({ createdAt: -1 }); // sản phẩm mới nhất lên đầu
+export const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .populate("productCategoryId", "name") // lấy tên danh mục
+      .sort({ createdAt: -1 }); // sản phẩm mới nhất lên đầu
 
-      res.status(200).json(products);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Lấy tất cả sản phẩm thất bại" });
-    }
-  };
+    res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lấy tất cả sản phẩm thất bại" });
+  }
+};
 
 //  Lấy sản phẩm theo danh mục
 export const getProductsByCategory = async (req, res) => {
   try {
     const { slugCategory } = req.params;
-    console.log(slugCategory)
+    console.log(slugCategory);
 
     if (!slugCategory) {
       return res.status(400).json({ message: "Thiếu slug danh mục" });
     }
- 
-    const productCategory = await ProductCategory.findOne({ slug: slugCategory });
-    console.log(productCategory)
+
+    const productCategory = await ProductCategory.findOne({
+      slug: slugCategory,
+    });
+    console.log(productCategory);
     if (!productCategory) {
       return res.status(404).json({ message: "Không tìm thấy danh mục" });
     }
 
-    const products = await Product.find({ productCategoryId: productCategory._id })
+    const products = await Product.find({
+      productCategoryId: productCategory._id,
+    })
       .populate("productCategoryId", "name")
       .sort({ createdAt: -1 });
 
@@ -90,7 +100,8 @@ export const getProductsByCategory = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    const { name, description, productCategoryId, image, price, discount } = req.body;
+    const { name, description, productCategoryId, image, price, discount } =
+      req.body;
 
     const product = await Product.findByIdAndUpdate(
       req.params.id,
