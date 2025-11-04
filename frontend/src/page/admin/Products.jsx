@@ -43,6 +43,24 @@ export default function Products() {
     }
   };
 
+  // Toggle tình trạng
+const handleToggleStatus = async (product) => {
+  try {
+    const updatedStatus = !product.status;
+    const res = await productApi.updateStatus(product._id, { status: updatedStatus });
+
+    setProducts((prev) =>
+      prev.map((p) =>
+        p._id === product._id ? { ...p, status: res.status } : p
+      )
+    );
+
+    toast.success("Cập nhật trạng thái thành công");
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
+  }
+};
+
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
       {/* Header */}
@@ -127,15 +145,19 @@ export default function Products() {
                     {product.description}
                   </td>
                   <td className="px-6 py-4 text-sm">{product.discount}%</td>
+
+                  {/* Nút toggle tình trạng */}
                   <td className="px-6 py-4 text-sm">
                     <button
+                      onClick={() => handleToggleStatus(product)}
                       className={`${
                         product.status ? "bg-green-600" : "bg-red-600"
-                      } text-white cursor-pointer px-4 py-2 rounded-lg`}
+                      } text-white cursor-pointer px-4 py-2 rounded-lg transition-colors`}
                     >
                       {product.status ? "Còn hàng" : "Hết hàng"}
                     </button>
                   </td>
+
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
                       {/* Nút sửa */}

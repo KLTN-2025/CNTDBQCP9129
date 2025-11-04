@@ -13,7 +13,7 @@ const productApi = {
   },
   getAllProducts: async () => {
     const res = await axiosClient.get("/products");
-    return res.data
+    return res.data;
   },
   // Lấy products theo category slug
   getByCategory: async (slugCategory) => {
@@ -26,7 +26,11 @@ const productApi = {
     const res = await axiosClient.put(`/products/${id}`, data);
     return res.data;
   },
-
+  // Cập nhật trạng thái product theo ID
+  updateStatus: async (id, data) => {
+    const res = await axiosClient.patch(`/products/${id}`, data);
+    return res.data;
+  },
   // Xóa product theo ID
   delete: async (id) => {
     const res = await axiosClient.delete(`/products/${id}`);
