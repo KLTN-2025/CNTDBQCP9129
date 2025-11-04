@@ -7,6 +7,8 @@ import ModalCreateProductCategory from "../../components/modal/adminProductCateg
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import usePreviewImage from "../../hooks/usePreviewImage";
 import useUpAndGetLinkImage from "../../hooks/useUpAndGetLinkImage";
+import ModalUpdateProductCategory from "../../components/modal/adminProductCategory/ModalUpdateProductCategory";
+
 export default function ProductCategory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
@@ -23,29 +25,28 @@ export default function ProductCategory() {
     usePreviewImage(1);
   const { handleImageUpload } = useUpAndGetLinkImage();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Lấy danh sách category
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const data = await productCategoryApi.getAll();
         setCategories(data);
       } catch (err) {
-        toast.error("Lỗi lấy loại sản phẩm:", err);
+        toast.error("Lỗi lấy loại sản phẩm");
       }
     };
     fetchCategories();
   }, []);
+
+  // Thêm mới loại sản phẩm
   const handleCreateCategory = async () => {
-    if (isLoading) {
-      return toast.warning("Loại sản phẩm đang được thêm");
-    }
-    if (!createNameCategory.trim()) {
-      toast.error("Tên loại sản phẩm không được để trống");
-      return;
-    }
-    if (selectedFile.length === 0) {
-      toast.error("Ảnh loại sản phẩm không được để trống");
-      return;
-    }
+    if (isLoading) return toast.warning("Đang thêm loại sản phẩm...");
+    if (!createNameCategory.trim())
+      return toast.error("Tên loại sản phẩm không được để trống");
+    if (selectedFile.length === 0)
+      return toast.error("Ảnh loại sản phẩm không được để trống");
+
     try {
       setIsLoading(true);
       const image = await handleImageUpload(selectedFile);
@@ -53,18 +54,16 @@ export default function ProductCategory() {
         name: createNameCategory,
         image: image[0],
       });
-      if (
-        newCategory &&
-        newCategory._id &&
-        newCategory.name &&
-        newCategory.image
-      ) {
+
+      if (newCategory?._id) {
         setCategories((prev) => [newCategory, ...prev]);
-        toast.success("Thêm mới danh mục thành công!");
+        toast.success("Thêm loại sản phẩm thành công!");
       }
+
+      // Reset form
       setCreateNameCategory("");
-      setIsOpenModalCreateCategory(false);
       setSelectedFile([]);
+      setIsOpenModalCreateCategory(false);
     } catch (err) {
       toast.error(
         err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại"
@@ -73,23 +72,42 @@ export default function ProductCategory() {
       setIsLoading(false);
     }
   };
+
+  // Cập nhật loại sản phẩm
   const handleUpdateCategory = async (id, newName) => {
+    if(isLoading) return toast.warning("Loại sản phẩm đang được cập nhập");
     try {
-      await productCategoryApi.update(id, { name: newName });
+      let imageUrl = selectedFile[0];
+      setIsLoading(true);
+      // Nếu người dùng chọn ảnh mới (base64) → upload lại
+      if (imageUrl && imageUrl.startsWith("data:")) {
+        const newImage = await handleImageUpload([imageUrl]);
+        imageUrl = newImage[0];
+      }
+
+      await productCategoryApi.update(id, { name: newName, image: imageUrl });
+
       setCategories((prev) =>
-        prev.map((cat) => (cat._id === id ? { ...cat, name: newName } : cat))
+        prev.map((cat) =>
+          cat._id === id ? { ...cat, name: newName, image: imageUrl } : cat
+        )
       );
+
       toast.success("Cập nhật danh mục thành công!");
       setIsOpenModalUpdateCategory(false);
+      setSelectedFile([]);
       setCurrentCategoryId(null);
       setUpdateCategoryName("");
     } catch (err) {
       toast.error(
         err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại"
       );
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Xóa loại sản phẩm
   const handleDeleteCategory = async (id) => {
     try {
       const res = await productCategoryApi.delete(id);
@@ -97,13 +115,14 @@ export default function ProductCategory() {
       toast.success(res.message);
     } catch (err) {
       toast.error(
-        err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại"
+        err.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại"
       );
     } finally {
       setIsOpenConfirmDelete(false);
       setDeleteCategoryId(null);
     }
   };
+
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200">
@@ -118,116 +137,98 @@ export default function ProductCategory() {
           </div>
           <button
             onClick={() => setIsOpenModalCreateCategory(true)}
-            className="flex items-center space-x-2 bg-green-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             <span>Thêm loại sản phẩm</span>
           </button>
         </div>
 
-        {/* Search */}
+        {/* Ô tìm kiếm */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
             placeholder="Tìm kiếm loại sản phẩm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
           />
         </div>
       </div>
 
-      {/* Table */}
+      {/* Bảng danh sách */}
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-gray-50 border-b">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                STT
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Tên loại sản phẩm
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Hình ảnh
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Slug
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ngày tạo
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Thao tác
-              </th>
+              {["STT", "Tên loại sản phẩm", "Hình ảnh", "Slug", "Ngày tạo", "Thao tác"].map(
+                (head) => (
+                  <th
+                    key={head}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                  >
+                    {head}
+                  </th>
+                )
+              )}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {categories &&
-              categories.length > 0 &&
-              categories
-                .filter((category) =>
-                  category.name.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-                .map((category, index) => (
-                  <tr key={category._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {index + 1}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      {category.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <img
-                        src={category.image}
-                        className="w-16 h-16 object-cover rounded-xl"
-                        alt={category.name}
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {category.slug}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {formatDatetimeVN(category.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex items-center space-x-6">
-                        <button
-                          className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
-                          title="Chỉnh sửa"
-                          onClick={() => {
-                            setIsOpenModalUpdateCategory(true);
-                            setCurrentCategoryId(category._id);
-                            setUpdateCategoryName(category.name);
-                          }}
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDeleteCategoryId(category._id);
-                            setIsOpenConfirmDelete(true);
-                          }}
-                          className="text-red-600 hover:text-red-800 transition-colors cursor-pointer"
-                          title="Xóa"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+          <tbody className="bg-white divide-y">
+            {categories
+              .filter((c) =>
+                c.name.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((category, index) => (
+                <tr key={category._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm">{index + 1}</td>
+                  <td className="px-6 py-4 text-sm">{category.name}</td>
+                  <td className="px-6 py-4">
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-16 h-16 object-cover rounded-xl"
+                    />
+                  </td>
+                  <td className="px-6 py-4 text-sm">{category.slug}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {formatDatetimeVN(category.createdAt)}
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    <div className="flex items-center space-x-4">
+                      <button
+                        className="text-blue-600 hover:text-blue-800"
+                        onClick={() => {
+                          setIsOpenModalUpdateCategory(true);
+                          setCurrentCategoryId(category._id);
+                          setUpdateCategoryName(category.name);
+                          setSelectedFile([category.image]);
+                        }}
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDeleteCategoryId(category._id);
+                          setIsOpenConfirmDelete(true);
+                        }}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
 
-      {/* Modal thêm loại sản phẩm */}
+      {/* Modal thêm */}
       {isOpenModalCreateCategory && (
         <ModalCreateProductCategory
           isOpenModalCreateCategory={isOpenModalCreateCategory}
           setIsOpenModalCreateCategory={setIsOpenModalCreateCategory}
-          setCategories={setCategories}
           onConfirm={handleCreateCategory}
           createNameCategory={createNameCategory}
           setCreateNameCategory={setCreateNameCategory}
@@ -235,6 +236,23 @@ export default function ProductCategory() {
           handleImageChange={handleImageChange}
           setSelectedFile={setSelectedFile}
           isLoading={isLoading}
+        />
+      )}
+
+      {/* Modal cập nhật */}
+      {isOpenModalUpdateCategory && (
+        <ModalUpdateProductCategory
+          isOpenModalUpdateCategory={isOpenModalUpdateCategory}
+          setIsOpenModalUpdateCategory={setIsOpenModalUpdateCategory}
+          updateCategoryName={updateCategoryName}
+          setUpdateCategoryName={setUpdateCategoryName}
+          selectedFile={selectedFile}
+          handleImageChange={handleImageChange}
+          setSelectedFile={setSelectedFile}
+          isLoading={isLoading}
+          onConfirm={() =>
+            handleUpdateCategory(currentCategoryId, updateCategoryName)
+          }
         />
       )}
 
@@ -247,17 +265,6 @@ export default function ProductCategory() {
           onConfirm={() => handleDeleteCategory(deleteCategoryId)}
         />
       )}
-      {/* {isOpenModalUpdateCategory && (
-        <ModalUpdateBlogCategory
-          isOpenModalUpdateCategory={isOpenModalUpdateCategory}
-          setIsOpenModalUpdateCategory={setIsOpenModalUpdateCategory}
-          updateCategoryName={updateCategoryName}
-          setUpdateCategoryName={setUpdateCategoryName}
-          onConfirm={() =>
-            handleUpdateCategory(currentCategoryId, updateCategoryName)
-          }
-        />
-      )} */}
     </div>
   );
 }

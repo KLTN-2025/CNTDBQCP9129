@@ -14,7 +14,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/blog-categories", blogCategoryRouter);
 app.use("/api/blogs", blog);
 app.use("/api/product-categories", productCategoryRouter);
-
+// app.use("/api/products", productCategoryRouter);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   connectDB();
