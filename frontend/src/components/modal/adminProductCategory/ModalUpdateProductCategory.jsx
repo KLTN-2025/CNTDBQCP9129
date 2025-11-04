@@ -62,13 +62,13 @@ export default function ModalUpdateProductCategory({
         <div className="flex justify-end space-x-3">
           <button
             onClick={() => setIsOpenModalUpdateCategory(false)}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer"
           >
             Hủy
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-green-600 flex justify-center items-center text-white rounded hover:bg-green-700"
+            className="px-4 py-2 bg-green-600 flex justify-center cursor-pointer items-center text-white rounded hover:bg-green-700"
           >
             {isLoading ? (
               <img
