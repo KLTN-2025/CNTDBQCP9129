@@ -20,7 +20,6 @@ const ModalCreateIngredient = ({
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // Hàm xử lý nhập liệu
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -38,7 +37,7 @@ const ModalCreateIngredient = ({
       !Number(formData.quantity) ||
       formData.totalCost == ""
     ) {
-      toast.error("Vui lòng nhập đầy đủ thông tin nguyên liệu");
+      toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin nguyên liệu");
       return;
     }
 
@@ -93,14 +92,10 @@ const ModalCreateIngredient = ({
       }}
     >
       <div className="bg-white rounded-md w-full flex flex-col select-none">
-        {/* Header */}
         <div className="w-full bg-green-700 text-white py-3 px-4">
           <p className="font-bold text-lg">Thêm nguyên liệu mới</p>
         </div>
-
-        {/* Form */}
         <div className="p-6 space-y-4">
-          {/* Tên nguyên liệu */}
           <div>
             <label className="font-medium">Tên nguyên liệu *</label>
             <input
@@ -112,7 +107,6 @@ const ModalCreateIngredient = ({
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             />
           </div>
-
           {/* Đơn vị */}
           <div>
             <label className="font-medium">Đơn vị *</label>

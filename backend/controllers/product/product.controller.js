@@ -176,11 +176,11 @@ export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Kiểm tra có bao nhiêu công thức đang dùng sản phẩm này
-    const recipeCount = await Recipe.countDocuments({ productId: id });
-    if (recipeCount > 0) {
+    // Kiểm tra xem sản phẩm có đang được dùng trong công thức không
+    const isUsed = await Recipe.exists({ productId: id });
+    if (isUsed) {
       return res.status(400).json({
-        message: `Không thể xóa sản phẩm vì đang chứa trong ${recipeCount} công thức.`,
+        message: "Không thể xóa sản phẩm vì đang được sử dụng trong công thức",
       });
     }
 

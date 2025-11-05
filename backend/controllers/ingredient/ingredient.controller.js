@@ -1,5 +1,5 @@
 import Ingredient from "../../model/ingredient.model.js";
-
+import Recipe from "../../model/recipe.model.js";
 // Lấy tất cả nguyên liệu trong kho
 export const getAllIngredients = async (req, res) => {
   try {
@@ -102,9 +102,17 @@ export const updateIngredient = async (req, res) => {
 export const deleteIngredient = async (req, res) => {
   try {
     const { id } = req.params;
+    const isUsed = await Recipe.exists({ "items.ingredientId": id });
+    if (isUsed) {
+      return res.status(400).json({
+        message: "Không thể xóa nguyên liệu vì đang được sử dụng trong công thức",
+      });
+    }
+
     const deleted = await Ingredient.findByIdAndDelete(id);
     if (!deleted)
       return res.status(404).json({ message: "Không tìm thấy nguyên liệu" });
+
     res.status(200).json({ message: "Xóa thành công" });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error });
