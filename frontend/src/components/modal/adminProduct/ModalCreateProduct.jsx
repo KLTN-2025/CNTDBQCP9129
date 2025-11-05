@@ -70,8 +70,8 @@ const ModalCreateProduct = ({
     if (
       !formData.name.trim() ||
       !formData.productCategoryId ||
-      formData.price === "" ||
-      formData.discount === "" ||
+      formData.price == "" ||
+      formData.discount == "" ||
       selectedFile.length === 0
     ) {
       toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin sản phẩm");
