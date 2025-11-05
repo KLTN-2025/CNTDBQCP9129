@@ -18,13 +18,14 @@ const recipeSchema = new mongoose.Schema(
         quantity: {
           type: Number,
           required: true,
-          min: 0
+          min: 0,
         },
         unit: {
           type: String,
           enum: ["g", "ml", "cái"],
           required: true,
         },
+        _id: false,
       },
     ],
   },

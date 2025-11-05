@@ -31,7 +31,7 @@ import ProductCategory from "./page/admin/ProductCategory";
 import Products from "./page/admin/Products";
 import MenuPage from "./page/menu/MenuPage";
 import Ingredients from "./page/admin/Ingredients";
-
+import Recipes from "./page/admin/Recipes";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -119,6 +119,7 @@ function App() {
             <Route path="product-category" element={<ProductCategory />} />
             <Route path="products" element={<Products/>} />
             <Route path="ingredients" element={<Ingredients/>} />
+            <Route path="recipes" element={<Recipes/>} />
           </Route>
           {/* blog route */}
           <Route path="/blogs">
