@@ -35,12 +35,28 @@ export const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: "Tên danh mục không được để trống" });
+    }
+
+    // Kiểm tra category tồn tại
     const category = await BlogCategory.findById(id);
     if (!category)
       return res.status(404).json({ message: "Không tìm thấy danh mục" });
 
-    category.name = name; // thay đổi name
-    await category.save(); // save lại => middleware pre('save') chạy => slug được tạo lại
+    // Kiểm tra tên trùng với các category khác
+    const existingCategory = await BlogCategory.findOne({
+      name: name.trim(),
+      _id: { $ne: id } 
+    });
+
+    if (existingCategory) {
+      return res.status(400).json({ message: "Tên danh mục đã tồn tại" });
+    }
+
+    // Cập nhật tên
+    category.name = name.trim();
+    await category.save(); // middleware pre('save') chạy => slug tạo lại
 
     res.status(200).json(category);
   } catch (error) {
@@ -48,6 +64,7 @@ export const updateCategory = async (req, res) => {
     res.status(500).json({ message: "Lỗi server", error });
   }
 };
+
 
 // Xóa category
 export const deleteCategory = async (req, res) => {
