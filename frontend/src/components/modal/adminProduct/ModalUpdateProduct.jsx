@@ -61,70 +61,70 @@ const ModalUpdateProduct = ({
 
   const handleRemoveImage = () => setSelectedFile([]);
 
-  const handleSubmit = async () => {
-    if (isLoading) return;
+const handleSubmit = async () => {
+  if (isLoading) return;
+   console.log(typeof(discount));
+  // Validation
+  if (!name.trim() || !selectedCategory._id || price === "" || discount === "" || selectedFile.length === 0) {
+    return toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin");
+  }
+  if (Number(discount) > 100) {
+    return toast.error("Giảm giá không được lớn hơn 100%");
+  }
 
-    if (
-      !name.trim() ||
-      !selectedCategory._id ||
-      !price ||
-      !discount ||
-      selectedFile.length === 0
-    ) {
-      return toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin");
+  if (Number(discount) < 0) {
+    return toast.error("Giảm giá không được nhỏ hơn 0%");
+  }
+
+  if (Number(price) < 0) {
+    return toast.error("Đơn giá không được nhỏ hơn 0");
+  }
+
+  try {
+    setIsLoading(true);
+
+    let imageURL = selectedFile;
+
+    // Nếu có ảnh mới (base64) thì upload
+    if (selectedFile.length > 0 && selectedFile[0].startsWith("data:")) {
+      imageURL = await handleImageUpload(selectedFile);
     }
-    if (discount > 100) {
-      return toast.error("Vui lòng nhập giảm giá không lớn hơn 100");
+
+    const updatedData = {
+      name: name.trim(),
+      productCategoryId: selectedCategory._id,
+      description: description.trim(),
+      price: Number(price),
+      discount: Number(discount),
+      image: Array.isArray(imageURL) ? imageURL[0] : imageURL,
+    };
+
+    const updatedProduct = await productApi.update(product._id, updatedData);
+
+    if (updatedProduct && !updatedProduct.message) {
+      toast.success("Cập nhật sản phẩm thành công");
+
+      // Cập nhật state products trên frontend
+      setProducts((prev) =>
+        prev.map((p) =>
+          p._id === product._id
+            ? { ...updatedProduct, productCategoryId: selectedCategory }
+            : p
+        )
+      );
+
+      // Đóng modal và reset selectedFile
+      setIsOpenModalUpdateProduct(false);
+      setSelectedFile([]);
+    } else {
+      toast.error(updatedProduct.message || "Có lỗi xảy ra khi cập nhật");
     }
-    if (discount < 0) {
-      return toast.error("Vui lòng nhập giảm giá không nhỏ hơn 0");
-    }
-    if (price < 0){
-      return toast.error("Vui lòng nhập đơn giá không nhỏ hơn 0");
-    }
-    try {
-      setIsLoading(true);
-
-      let imageURL = selectedFile;
-
-      if (selectedFile.length > 0 && selectedFile[0].startsWith("data:")) {
-        imageURL = await handleImageUpload(selectedFile);
-      }
-
-      const updatedData = {
-        name,
-        productCategoryId: selectedCategory._id,
-        description,
-        price,
-        discount,
-        image: Array.isArray(imageURL) ? imageURL[0] : imageURL,
-      };
-
-      const updatedProduct = await productApi.update(product._id, updatedData);
-
-      if (updatedProduct && !updatedProduct.message) {
-        toast.success("Cập nhật sản phẩm thành công");
-
-        // Cập nhật lại danh sách products bên frontend
-        setProducts((prev) =>
-          prev.map((p) =>
-            p._id === product._id
-              ? { ...updatedProduct, productCategoryId: selectedCategory }
-              : p
-          )
-        );
-
-        setIsOpenModalUpdateProduct(false);
-        setSelectedFile([]);
-      } else {
-        toast.error(updatedProduct.message || "Có lỗi xảy ra");
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Có lỗi xảy ra khi cập nhật");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Có lỗi xảy ra khi cập nhật");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <Modal
