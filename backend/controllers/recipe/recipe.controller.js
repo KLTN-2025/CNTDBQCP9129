@@ -1,23 +1,35 @@
-import Recipe from "../../model/recipe.model.js";
-
+import Recipe from "../../model/recipe.model.js";// chọn field muốn trả về
 // Tạo công thức mới
+
 export const createRecipe = async (req, res) => {
   try {
     const { productId, items } = req.body;
     if (!productId || !items || items.length === 0) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
+
     const existingRecipe = await Recipe.findOne({ productId });
     if (existingRecipe) {
-      return res.status(400).json({ message: "Công thức cho món này đã tồn tại" });
+      return res
+        .status(400)
+        .json({ message: "Công thức cho món này đã tồn tại" });
     }
+
     if (items.some((item) => item.quantity < 0)) {
-      return res.status(400).json({ message: "Số lượng không được nhỏ hơn 0" });
+      return res
+        .status(400)
+        .json({ message: "Số lượng không được nhỏ hơn 0" });
     }
+
     const newRecipe = new Recipe({ productId, items });
     const savedRecipe = await newRecipe.save();
 
-    res.status(201).json(savedRecipe);
+    // Sau khi lưu, populate khóa phụ để trả chi tiết product/ingredient
+    const populatedRecipe = await Recipe.findById(savedRecipe._id)
+      .populate("productId", "name price")
+      .populate("items.ingredientId", "name unit"); 
+
+    res.status(201).json(populatedRecipe);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
