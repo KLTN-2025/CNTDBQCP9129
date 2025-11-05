@@ -1,42 +1,41 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import recipeApi from "../../api/recipeApi";
+import ModalCreateRecipe from "../../components/modal/adminRecipe/ModalCreateRecipe";
 export default function Recipes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [recipes, setRecipes] = useState([]);
   // const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
-  // const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] = useState(false);
+  const [isOpenModalCreateRecipe, setIsOpenModalCreateRecipe] = useState(false);
   // const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] = useState(false);
   // const [selectedIngredient, setSelectedIngredient] = useState(null);
   // const [ingredientId, setIngredientId] = useState(null)
   // const [productId, setProductId] = useState(null);
 
-  // Lấy danh sách nguyên liệu trong kho
+  // Lấy danh sách công thức
   useEffect(() => {
     const getAllProducts = async () => {
       try {
         const res = await recipeApi.getAll();
         setRecipes(res);
       } catch (error) {
-        toast.error(error.response?.data?.message || "Lỗi khi tải nguyên liệu trong kho");
+        toast.error(error.response?.data?.message || "Lỗi khi tải công thức");
       }
     };
     getAllProducts();
   }, []);
-  console.log(recipes);
 
-  // Xóa nguyên liệu trong kho
+  // Xóa công thức
   // const handleRemoveProduct = async (id) => {
   //   try {
   //     await ingredientApi.delete(id);
   //     setIngredients((prev) => prev.filter((p) => p._id !== id));
   //     setIsOpenModalConfirmDelete(false);
-  //     toast.success("Xóa nguyên liệu trong kho thành công");
+  //     toast.success("Xóa công thức thành công");
   //   } catch (error) {
-  //     toast.error(error.response?.data?.message || "Lỗi khi xóa nguyên liệu trong kho");
+  //     toast.error(error.response?.data?.message || "Lỗi khi xóa công thức");
   //   } finally {
   //     setIngredientId(null);
   //   }
@@ -66,14 +65,14 @@ export default function Recipes() {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Quản lý nguyên liệu trong kho</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Quản lý công thức</h2>
           </div>
           <button
-            // onClick={() => setIsOpenModalCreateIngredient(true)}
+            onClick={() => setIsOpenModalCreateRecipe(true)}
             className="flex items-center cursor-pointer space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
-            <span>Thêm nguyên liệu trong kho</span>
+            <span>Thêm công thức</span>
           </button>
         </div>
 
@@ -82,7 +81,7 @@ export default function Recipes() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Tìm kiếm nguyên liệu trong kho..."
+            placeholder="Tìm kiếm tên món..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
@@ -112,9 +111,9 @@ export default function Recipes() {
           </thead>
           <tbody className="bg-white divide-y">
             {recipes
-              .filter((r) =>
-                r.productId.name.toLowerCase().includes(searchTerm.toLowerCase())
-              )
+              // .filter((r) =>
+              //   r.productId.name.toLowerCase().includes(searchTerm.toLowerCase())
+              // )
               .map((recipe, index) => (
                 <tr key={recipe._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm">{index + 1}</td>
@@ -162,16 +161,16 @@ export default function Recipes() {
         </table>
       </div>
 
-      {/* Modal thêm nguyên liệu trong kho */}
-      {/* {isOpenModalCreateIngredient && (
-        <ModalCreateIngredient
-          isOpenModalCreateIngredient={isOpenModalCreateIngredient}
-          setIsOpenModalCreateIngredient={setIsOpenModalCreateIngredient}
-          setIngredients={setIngredients}
+      {/* Modal thêm công thức */}
+      {isOpenModalCreateRecipe && (
+        <ModalCreateRecipe
+          isOpenModalCreateRecipe={isOpenModalCreateRecipe}
+          setIsOpenModalCreateRecipe={setIsOpenModalCreateRecipe}
+          setRecipes={setRecipes}
         />
-      )} */}
+      )}
 
-      {/* Modal cập nhật nguyên liệu trong kho */}
+      {/* Modal cập nhật công thức */}
       {/* {isOpenModalUpdateIngredient && selectedIngredient && (
         <ModalUpdateIngredient
           isOpenModalUpdateIngredient={isOpenModalUpdateIngredient}
