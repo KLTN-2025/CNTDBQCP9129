@@ -40,7 +40,7 @@ export const createIngredient = async (req, res) => {
       unit,
       totalCost,
       perUnitCost,
-      status: true // mặc định còn hàng
+      status: true 
     });
 
     await newIngredient.save();
@@ -70,7 +70,7 @@ export const updateIngredient = async (req, res) => {
     // Check tên trùng với ingredient khác
     const existingIngredient = await Ingredient.findOne({
       name: name.trim(),
-      _id: { $ne: id } // bỏ qua chính ingredient này
+      _id: { $ne: id } 
     });
 
     if (existingIngredient) {
