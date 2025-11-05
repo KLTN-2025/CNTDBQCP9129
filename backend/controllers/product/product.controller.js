@@ -10,8 +10,14 @@ export const createProduct = async (req, res) => {
     if (!name || !productCategoryId || !description || !image || !price) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
+    if(price < 0){
+      return res.status(400).json({ message: "Đơn giá nhỏ hơn 0" });
+    }
     if (discount > 100) {
       return res.status(400).json({ message: "Giảm giá lớn hơn 100%" });
+    }
+    if (discount < 0) {
+      return res.status(400).json({ message: "Giảm giá lớn nhỏ 0" });
     }
     const existingProduct = await Product.findOne({ name });
     if (existingProduct) {
@@ -102,7 +108,15 @@ export const updateProduct = async (req, res) => {
   try {
     const { name, description, productCategoryId, image, price, discount } =
       req.body;
-
+    if(price < 0){
+      return res.status(404).json({ message: "Đơn giá không được nhỏ hơn 0"});
+    }
+    if(discount < 0){
+      return res.status(404).json({ message: "Phần trăm giảm giá không được nhỏ hơn 0"});
+    }
+    if(discount > 100){
+      return res.status(404).json({ message: "Phần trăm giảm giá không được lớn hơn 100"});
+    }
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       { name, description, productCategoryId, image, price, discount },

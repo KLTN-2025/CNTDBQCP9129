@@ -5,12 +5,15 @@ import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import ingredientApi from "../../api/ingredientApi"
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import ModalCreateIngredient from "../../components/modal/adminIngredient/ModalCreateIngredient";
+import ModalUpdateIngredient from "../../components/modal/adminIngredient/ModalUpdateIngredient";
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState("");
   const [ingredients, setIngredients] = useState([]);
   const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
-  const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] = useState(false)
-  // const [productSelected, setProductSelected] = useState(null);
+  const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] = useState(false);
+  const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] = useState(false);
+  const [selectedIngredient, setSelectedIngredient] = useState(null);
+  const [ingredientId, setIngredientId] = useState(null)
   // const [productId, setProductId] = useState(null);
 
   // Lấy danh sách nguyên liệu trong kho
@@ -27,18 +30,18 @@ export default function Products() {
   }, []);
 
   // Xóa nguyên liệu trong kho
-  // const handleRemoveProduct = async (id) => {
-  //   try {
-  //     await productApi.delete(id);
-  //     setProducts((prev) => prev.filter((p) => p._id !== id));
-  //     setIsOpenModalConfirmDelete(false);
-  //     toast.success("Xóa nguyên liệu trong kho thành công");
-  //   } catch (error) {
-  //     toast.error(error.response?.data?.message || "Lỗi khi xóa nguyên liệu trong kho");
-  //   } finally {
-  //     setProductId(null);
-  //   }
-  // };
+  const handleRemoveProduct = async (id) => {
+    try {
+      await ingredientApi.delete(id);
+      setIngredients((prev) => prev.filter((p) => p._id !== id));
+      setIsOpenModalConfirmDelete(false);
+      toast.success("Xóa nguyên liệu trong kho thành công");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Lỗi khi xóa nguyên liệu trong kho");
+    } finally {
+      setIngredientId(null);
+    }
+  };
 
   // Toggle tình trạng
 // const handleToggleStatus = async (product) => {
@@ -148,10 +151,10 @@ export default function Products() {
                       {/* Nút sửa */}
                       <button
                         className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                        // onClick={() => {
-                        //   setProductSelected(product);
-                        //   setIsOpenModalUpdateProduct(true);
-                        // }}
+                        onClick={() => {
+                          setSelectedIngredient(ingredient);
+                          setIsOpenModalUpdateIngredient(true);
+                        }}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -159,10 +162,10 @@ export default function Products() {
                       {/* Nút xóa */}
                       <button
                         className="text-red-600 hover:text-red-800 cursor-pointer"
-                        // onClick={() => {
-                        //   setProductId(product._id);
-                        //   setIsOpenModalConfirmDelete(true);
-                        // }}
+                        onClick={() => {
+                          setIngredientId(ingredient._id);
+                          setIsOpenModalConfirmDelete(true);
+                        }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -184,24 +187,24 @@ export default function Products() {
       )}
 
       {/* Modal cập nhật nguyên liệu trong kho */}
-      {/* {isOpenModalUpdateProduct && productSelected && (
-        <ModalUpdateProduct
-          isOpenModalUpdateProduct={isOpenModalUpdateProduct}
-          setIsOpenModalUpdateProduct={setIsOpenModalUpdateProduct}
-          setProducts={setProducts}
-          product={productSelected}
+      {isOpenModalUpdateIngredient && selectedIngredient && (
+        <ModalUpdateIngredient
+          isOpenModalUpdateIngredient={isOpenModalUpdateIngredient}
+          setIsOpenModalUpdateIngredient={setIsOpenModalUpdateIngredient}
+          setIngredients={setIngredients}
+          selectedIngredient={selectedIngredient}
         />
-      )} */}
+      )}
 
       {/* Modal xác nhận xóa */}
-      {/* {isOpenModalConfirmDelete && (
+      {isOpenModalConfirmDelete && (
         <ModalConfirmDelete
-          content="Bạn có chắn chắn muốn xóa nguyên liệu trong kho này?"
+          content="Bạn có chắn chắn muốn xóa nguyên liệu này?"
           isOpenConfirmDelete={isOpenModalConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
-          onConfirm={() => handleRemoveProduct(productId)}
+          onConfirm={() => handleRemoveProduct(ingredientId)}
         />
-      )} */}
+      )}
     </div>
   );
 }
