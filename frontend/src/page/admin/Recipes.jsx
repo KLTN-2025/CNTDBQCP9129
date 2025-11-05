@@ -4,15 +4,15 @@ import { toast } from "react-toastify";
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import recipeApi from "../../api/recipeApi";
 import ModalCreateRecipe from "../../components/modal/adminRecipe/ModalCreateRecipe";
+import ModalUpdateRecipe from "../../components/modal/adminRecipe/ModalUpdateRecipe";
 export default function Recipes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [recipes, setRecipes] = useState([]);
-  // const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
+  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
   const [isOpenModalCreateRecipe, setIsOpenModalCreateRecipe] = useState(false);
-  // const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] = useState(false);
-  // const [selectedIngredient, setSelectedIngredient] = useState(null);
-  // const [ingredientId, setIngredientId] = useState(null)
-  // const [productId, setProductId] = useState(null);
+  const [isOpenModalUpdateRecipe, setIsOpenModalUpdateRecipe] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [recipeId, setRecipeId] = useState(null)
 
   // Lấy danh sách công thức
   useEffect(() => {
@@ -28,36 +28,18 @@ export default function Recipes() {
   }, []);
 
   // Xóa công thức
-  // const handleRemoveProduct = async (id) => {
-  //   try {
-  //     await ingredientApi.delete(id);
-  //     setIngredients((prev) => prev.filter((p) => p._id !== id));
-  //     setIsOpenModalConfirmDelete(false);
-  //     toast.success("Xóa công thức thành công");
-  //   } catch (error) {
-  //     toast.error(error.response?.data?.message || "Lỗi khi xóa công thức");
-  //   } finally {
-  //     setIngredientId(null);
-  //   }
-  // };
-
-  // Toggle tình trạng
-// const handleToggleStatus = async (product) => {
-//   try {
-//     const updatedStatus = !product.status;
-//     const res = await productApi.updateStatus(product._id, { status: updatedStatus });
-
-//     setProducts((prev) =>
-//       prev.map((p) =>
-//         p._id === product._id ? { ...p, status: res.status } : p
-//       )
-//     );
-
-//     toast.success("Cập nhật trạng thái thành công");
-//   } catch (err) {
-//     toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
-//   }
-// };
+  const handleRemoveProduct = async (id) => {
+    try {
+      await recipeApi.delete(id);
+      setRecipes((prev) => prev.filter((p) => p._id !== id));
+      setIsOpenModalConfirmDelete(false);
+      toast.success("Xóa công thức thành công");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Lỗi khi xóa công thức");
+    } finally {
+      setRecipeId(null);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
@@ -111,9 +93,9 @@ export default function Recipes() {
           </thead>
           <tbody className="bg-white divide-y">
             {recipes
-              // .filter((r) =>
-              //   r.productId.name.toLowerCase().includes(searchTerm.toLowerCase())
-              // )
+              .filter((r) =>
+                r.productId.name.toLowerCase().includes(searchTerm.toLowerCase())
+              )
               .map((recipe, index) => (
                 <tr key={recipe._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm">{index + 1}</td>
@@ -123,7 +105,7 @@ export default function Recipes() {
                     <td className="px-6 py-4 text-sm truncate whitespace-normal">
                       {recipe.items.map((item, i) => (
                         <div className="space-y-2 flex gap-x-10">
-                          <p>Nguyên liệu {i + 1}: {item.ingredientId.name}</p>
+                          <p className="min-w-xs">Nguyên liệu {i + 1}: {item.ingredientId.name}</p>
                           <p>Số lượng: {item.quantity}{item.unit}</p>
                         </div>
                       ))}
@@ -135,10 +117,10 @@ export default function Recipes() {
                       {/* Nút sửa */}
                       <button
                         className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                        // onClick={() => {
-                        //   setSelectedIngredient(ingredient);
-                        //   setIsOpenModalUpdateIngredient(true);
-                        // }}
+                        onClick={() => {
+                          setSelectedRecipe(recipe);
+                          setIsOpenModalUpdateRecipe(true);
+                        }}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -146,10 +128,10 @@ export default function Recipes() {
                       {/* Nút xóa */}
                       <button
                         className="text-red-600 hover:text-red-800 cursor-pointer"
-                        // onClick={() => {
-                        //   setIngredientId(ingredient._id);
-                        //   setIsOpenModalConfirmDelete(true);
-                        // }}
+                        onClick={() => {
+                          setRecipeId(recipe._id);
+                          setIsOpenModalConfirmDelete(true);
+                        }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -171,24 +153,24 @@ export default function Recipes() {
       )}
 
       {/* Modal cập nhật công thức */}
-      {/* {isOpenModalUpdateIngredient && selectedIngredient && (
-        <ModalUpdateIngredient
-          isOpenModalUpdateIngredient={isOpenModalUpdateIngredient}
-          setIsOpenModalUpdateIngredient={setIsOpenModalUpdateIngredient}
-          setIngredients={setIngredients}
-          selectedIngredient={selectedIngredient}
+      {ModalUpdateRecipe && selectedRecipe && (
+        <ModalUpdateRecipe
+          isOpenModalUpdateRecipe={isOpenModalUpdateRecipe}
+          setIsOpenModalUpdateRecipe={setIsOpenModalUpdateRecipe}
+          setRecipes={setRecipes}
+          selectedRecipe={selectedRecipe}
         />
-      )} */}
+      )}
 
       {/* Modal xác nhận xóa */}
-      {/* {isOpenModalConfirmDelete && (
+      {isOpenModalConfirmDelete && (
         <ModalConfirmDelete
           content="Bạn có chắn chắn muốn xóa nguyên liệu này?"
           isOpenConfirmDelete={isOpenModalConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
-          onConfirm={() => handleRemoveProduct(ingredientId)}
+          onConfirm={() => handleRemoveProduct(recipeId)}
         />
-      )} */}
+      )}
     </div>
   );
 }

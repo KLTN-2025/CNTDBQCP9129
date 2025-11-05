@@ -1,4 +1,4 @@
-import Recipe from "../../model/recipe.model.js";// chọn field muốn trả về
+import Recipe from "../../model/recipe.model.js"; // chọn field muốn trả về
 // Tạo công thức mới
 
 export const createRecipe = async (req, res) => {
@@ -15,10 +15,13 @@ export const createRecipe = async (req, res) => {
         .json({ message: "Công thức cho món này đã tồn tại" });
     }
 
-    if (items.some((item) => item.quantity < 0)) {
-      return res
-        .status(400)
-        .json({ message: "Số lượng không được nhỏ hơn 0" });
+    if (items.some((item) => item.quantity < 1)) {
+      return res.status(400).json({ message: "Số lượng không được nhỏ hơn 1" });
+    }
+    const ids = items.map((i) => i.ingredientId);
+    const uniqueIds = new Set(ids);
+    if (uniqueIds.size !== ids.length) {
+      return toast.error("Công thức có chứa nguyên liệu trùng nhau!");
     }
 
     const newRecipe = new Recipe({ productId, items });
@@ -27,14 +30,13 @@ export const createRecipe = async (req, res) => {
     // Sau khi lưu, populate khóa phụ để trả chi tiết product/ingredient
     const populatedRecipe = await Recipe.findById(savedRecipe._id)
       .populate("productId", "name price")
-      .populate("items.ingredientId", "name unit"); 
+      .populate("items.ingredientId", "name unit");
 
     res.status(201).json(populatedRecipe);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // Lấy tất cả công thức
 export const getAllRecipes = async (req, res) => {
@@ -71,17 +73,41 @@ export const updateRecipe = async (req, res) => {
     if (!productId || !items || items.length === 0) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
+    const existingRecipe = await Recipe.findOne({ 
+      productId, 
+      _id: { $ne: req.params.id }  // bỏ qua recipe đang update
+    });
+    
+    if (existingRecipe) {
+      return res
+        .status(400)
+        .json({ message: "Công thức cho món này đã tồn tại" });
+    }
+    if (items.some((item) => item.quantity < 1)) {
+      return res.status(400).json({ message: "Số lượng không được nhỏ hơn 1" });
+    }
+    const ids = items.map((i) => i.ingredientId);
+    const uniqueIds = new Set(ids);
+    if (uniqueIds.size !== ids.length) {
+      return toast.error("Công thức có chứa nguyên liệu trùng nhau!");
+    }
 
+    // Cập nhật
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       req.params.id,
       { productId, items },
-      { new: true }
+      { new: true } // trả về document mới
     );
 
     if (!updatedRecipe)
       return res.status(404).json({ message: "Không tìm thấy công thức" });
 
-    res.status(200).json(updatedRecipe);
+    // Populate sau khi update
+    const populatedRecipe = await Recipe.findById(updatedRecipe._id)
+      .populate("productId", "name price")
+      .populate("items.ingredientId", "name unit");
+
+    res.status(200).json(populatedRecipe);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
