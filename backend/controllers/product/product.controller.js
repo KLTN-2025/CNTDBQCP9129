@@ -1,13 +1,13 @@
 import Product from "../../model/product.model.js";
 import ProductCategory from "../../model/productCategory.model.js";
-
+import Recipe from "../../model/recipe.model.js"
 //  Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
   try {
     const { name, productCategoryId, description, image, price, discount } =
       req.body;
 
-    if (!name || !productCategoryId || !description || !image || !price) {
+    if (!name || !productCategoryId || !description || !image || price === "") {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
     if (price < 0) {
@@ -174,10 +174,21 @@ export const updateProductStatus = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+
+    // Kiểm tra có bao nhiêu công thức đang dùng sản phẩm này
+    const recipeCount = await Recipe.countDocuments({ productId: id });
+    if (recipeCount > 0) {
+      return res.status(400).json({
+        message: `Không thể xóa sản phẩm vì đang chứa trong ${recipeCount} công thức.`,
+      });
+    }
+
+    const product = await Product.findByIdAndDelete(id);
     if (!product)
       return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
-    res.json({ message: "Xóa sản phẩm thành công" });
+
+    res.status(200).json({ message: "Xóa sản phẩm thành công" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Xóa sản phẩm thất bại" });

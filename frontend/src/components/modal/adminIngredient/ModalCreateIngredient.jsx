@@ -32,12 +32,11 @@ const ModalCreateIngredient = ({
   // Submit
   const handleSubmit = async () => {
     if (isLoading) return;
-
     if (
       !formData.name.trim() ||
       !formData.unit.trim() ||
-      !formData.quantity ||
-      !formData.totalCost
+      !Number(formData.quantity) ||
+      formData.totalCost == ""
     ) {
       toast.error("Vui lòng nhập đầy đủ thông tin nguyên liệu");
       return;

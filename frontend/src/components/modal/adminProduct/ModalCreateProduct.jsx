@@ -45,13 +45,19 @@ const ModalCreateProduct = ({
     fetchCategories();
   }, []);
 
-  // Hàm xử lý nhập liệu chung
+  // Hàm xử lý nhập liệu chung, convert number khi cần
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === "price" || name === "discount"
+          ? value === "" 
+            ? ""
+            : Number(value) 
+          : value,
+    }));
   };
 
   // Xóa ảnh
@@ -64,8 +70,8 @@ const ModalCreateProduct = ({
     if (
       !formData.name.trim() ||
       !formData.productCategoryId ||
-      !formData.price ||
-      !formData.discount ||
+      formData.price === "" ||
+      formData.discount === "" ||
       selectedFile.length === 0
     ) {
       toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin sản phẩm");
@@ -74,16 +80,31 @@ const ModalCreateProduct = ({
 
     try {
       setIsLoading(true);
+
       const imageURLs = await handleImageUpload(selectedFile);
+
+      // Convert lại để chắc chắn trước khi gửi
       const newProduct = {
         ...formData,
+        price: Number(formData.price),
+        discount: Number(formData.discount),
         image: imageURLs[0],
       };
+
       const response = await productApi.create(newProduct);
 
       if (!response.message) {
         toast.success("Thêm sản phẩm thành công!");
-        setProducts((prev) => [...prev, {...response, productCategoryId: {...response.productCategoryId, name: nameProductCategory}}]);
+        setProducts((prev) => [
+          ...prev,
+          {
+            ...response,
+            productCategoryId: {
+              ...response.productCategoryId,
+              name: nameProductCategory
+            }
+          }
+        ]);
         setIsOpenModalCreateProduct(false);
       } else {
         toast.error(response.message || "Đã có lỗi xảy ra");
@@ -186,6 +207,7 @@ const ModalCreateProduct = ({
             <input
               type="number"
               name="price"
+              min="0"
               value={formData.price}
               onChange={handleChange}
               placeholder="Nhập giá sản phẩm"
