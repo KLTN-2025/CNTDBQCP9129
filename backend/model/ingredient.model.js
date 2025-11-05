@@ -9,7 +9,8 @@ const ingredientSchema = new mongoose.Schema({
   quantity: {
     type: Number,
     required: true,
-    default: 0 
+    default: 0,
+    min: 0,
   },
   unit: {
     type: String,
@@ -19,12 +20,14 @@ const ingredientSchema = new mongoose.Schema({
   totalCost: { // tổng tiền nhập kho
     type: Number,
     required: true,
-    default: 0
+    default: 0,
+    min: 0
   },
   perUnitCost: { // giá trên 1 đơn vị = totalCost / quantity nhập
     type: Number,
     required: true,
-    default: 0
+    default: 0,
+    min: 0
   },
   status: { 
     type: Boolean,

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Menu, User, Users, FileCog, PenSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Outlet } from "react-router-dom";
+import { MdWarehouse } from "react-icons/md";
 export default function LayoutAdmin() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const activePath = location.pathname;
@@ -96,6 +97,19 @@ export default function LayoutAdmin() {
               <span>Quản lý sản phẩm</span>
             </Link>
           </li>
+          <li>
+            <Link
+              to="/admin/ingredients"
+              className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
+                activePath.includes("ingredients")
+                  ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              <MdWarehouse className="w-5 h-5 mr-3" />
+              <span>Quản lý kho</span>
+            </Link>
+          </li>
         </ul>
       </aside>
 
@@ -111,7 +125,7 @@ export default function LayoutAdmin() {
               <Menu className="w-6 h-6 text-gray-700"/>
             </button>
             <h1 className="text-xl font-semibold text-gray-800">
-              Quản Lý Menu
+              Danh sách quản lý
             </h1>
           </div>
         </header>
