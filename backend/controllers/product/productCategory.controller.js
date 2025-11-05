@@ -34,13 +34,25 @@ export const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { name, image } = req.body;
 
+    // Kiểm tra category tồn tại
     const category = await ProductCategory.findById(id);
     if (!category)
       return res.status(404).json({ message: "Không tìm thấy loại sản phẩm" });
 
-    category.name = name; 
+    // Kiểm tra tên trùng với category khác
+    const existingCategory = await ProductCategory.findOne({
+      name: name.trim(),
+      _id: { $ne: id } // bỏ qua category hiện tại
+    });
+
+    if (existingCategory) {
+      return res.status(400).json({ message: "Tên loại sản phẩm đã tồn tại" });
+    }
+
+    // Cập nhật
+    category.name = name.trim();
     category.image = image;
-    await category.save(); // save lại => middleware pre('save') chạy => slug được tạo lại
+    await category.save(); // middleware pre('save') vẫn chạy => slug tạo lại
 
     res.status(200).json(category);
   } catch (error) {

@@ -60,25 +60,37 @@ export const updateIngredient = async (req, res) => {
     if (!name || quantity == null || !unit || totalCost == null) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
-    if(quantity < 0){
-      return res.status(400).json({ message: "Số lượng không được nhỏ hơn 0"});
+    if (quantity < 0) {
+      return res.status(400).json({ message: "Số lượng không được nhỏ hơn 0" });
+    }
+    if (totalCost < 0) {
+      return res.status(400).json({ message: "Tổng tiền không được nhỏ hơn 0" });
     }
 
-    if(totalCost < 0){
-      return res.status(400).json({ message: "Tổng tiền không được nhỏ hơn 0"});
+    // Check tên trùng với ingredient khác
+    const existingIngredient = await Ingredient.findOne({
+      name: name.trim(),
+      _id: { $ne: id } // bỏ qua chính ingredient này
+    });
+
+    if (existingIngredient) {
+      return res.status(400).json({ message: "Tên nguyên liệu đã tồn tại" });
     }
 
     const ingredient = await Ingredient.findById(id);
-    if (!ingredient)
+    if (!ingredient) {
       return res.status(404).json({ message: "Không tìm thấy nguyên liệu" });
+    }
 
-    ingredient.name = name;
+    // Update dữ liệu
+    ingredient.name = name.trim();
     ingredient.quantity = quantity;
     ingredient.unit = unit;
     ingredient.totalCost = totalCost;
-    ingredient.perUnitCost = totalCost / quantity; 
+    ingredient.perUnitCost = totalCost / quantity;
 
     await ingredient.save();
+
     res.status(200).json(ingredient);
   } catch (error) {
     console.error(error);
