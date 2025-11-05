@@ -6,29 +6,23 @@ import recipeApi from "../../../api/recipeApi";
 import ingredientApi from "../../../api/ingredientApi";
 import productApi from "../../../api/productApi";
 
-const ModalCreateRecipe = ({
-  isOpenModalCreateRecipe,
-  setIsOpenModalCreateRecipe,
+const ModalUpdateRecipe = ({
+  isOpenModalUpdateRecipe,
+  setIsOpenModalUpdateRecipe,
+  selectedRecipe,
   setRecipes,
 }) => {
-  useLockBodyScroll(isOpenModalCreateRecipe);
+  useLockBodyScroll(isOpenModalUpdateRecipe);
 
   const [isLoading, setIsLoading] = useState(false);
   const [ingredients, setIngredients] = useState([]);
   const [products, setProducts] = useState([]);
-
   const [formData, setFormData] = useState({
     productId: "",
-    items: [
-      {
-        ingredientId: "",
-        quantity: "",
-        unit: "",
-      },
-    ],
+    items: [{ ingredientId: "", quantity: "", unit: "" }],
   });
 
-  // Lấy danh sách nguyên liệu + sản phẩm
+  // Load dữ liệu nguyên liệu + sản phẩm khi mở modal
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -39,19 +33,32 @@ const ModalCreateRecipe = ({
         setIngredients(ingredientRes);
         setProducts(productRes);
       } catch (error) {
-        console.log(error);
-        toast.error("Có lỗi xảy ra khi tải dữ liệu");
+        toast.error("Lỗi khi tải dữ liệu");
       }
     };
-    if (isOpenModalCreateRecipe) fetchData();
-  }, [isOpenModalCreateRecipe]);
+    if (isOpenModalUpdateRecipe) fetchData();
+  }, [isOpenModalUpdateRecipe]);
 
-  // Thay đổi input trong từng item
+  // Reset formData khi mở modal
+  useEffect(() => {
+    if (isOpenModalUpdateRecipe && selectedRecipe) {
+      setFormData({
+        productId: selectedRecipe.productId?._id || selectedRecipe.productId || "",
+        items:
+          selectedRecipe.items?.map((i) => ({
+            ingredientId: i.ingredientId?._id || i.ingredientId,
+            quantity: i.quantity,
+            unit: i.unit || "",
+          })) || [{ ingredientId: "", quantity: "", unit: "" }],
+      });
+    }
+  }, [isOpenModalUpdateRecipe, selectedRecipe]);
+
+  // Xử lý thay đổi input
   const handleItemChange = (index, field, value) => {
     const newItems = [...formData.items];
     newItems[index][field] = value;
 
-    // Nếu user chọn nguyên liệu → tự lấy đơn vị
     if (field === "ingredientId") {
       const selectedIngredient = ingredients.find((i) => i._id === value);
       newItems[index].unit = selectedIngredient ? selectedIngredient.unit : "";
@@ -71,11 +78,13 @@ const ModalCreateRecipe = ({
   // Xóa dòng nguyên liệu
   const handleRemoveItem = (index) => {
     if (formData.items.length === 1) return;
-    const newItems = formData.items.filter((_, i) => i !== index);
-    setFormData({ ...formData, items: newItems });
+    setFormData({
+      ...formData,
+      items: formData.items.filter((_, i) => i !== index),
+    });
   };
 
-  // Submit
+  // Submit cập nhật công thức
   const handleSubmit = async () => {
     if (isLoading) return;
 
@@ -89,9 +98,11 @@ const ModalCreateRecipe = ({
         return toast.error("Vui lòng nhập đầy đủ thông tin nguyên liệu!");
       }
       if (item.quantity < 1) {
-        return toast.error("Số lượng của nguyên liệu phải lớn hơn 1");
+        return toast.error("Số lượng nguyên liệu phải lớn hơn 1!");
       }
     }
+
+    // Check trùng nguyên liệu
     const ids = formData.items.map((i) => i.ingredientId);
     const uniqueIds = new Set(ids);
     if (uniqueIds.size !== ids.length) {
@@ -100,7 +111,7 @@ const ModalCreateRecipe = ({
 
     try {
       setIsLoading(true);
-      const response = await recipeApi.create({
+      const response = await recipeApi.update(selectedRecipe._id, {
         productId: formData.productId,
         items: formData.items.map((i) => ({
           ingredientId: i.ingredientId,
@@ -110,14 +121,16 @@ const ModalCreateRecipe = ({
       });
 
       if (!response.message) {
-        toast.success("Thêm công thức thành công!");
-        setRecipes((prev) => [...prev, response]);
-        setIsOpenModalCreateRecipe(false);
+        toast.success("Cập nhật công thức thành công!");
+        setRecipes((prev) =>
+          prev.map((r) => (r._id === selectedRecipe._id ? response : r))
+        );
+        setIsOpenModalUpdateRecipe(false);
       } else {
-        toast.error(response.message || "Có lỗi xảy ra");
+        toast.error(response.message || "Có lỗi xảy ra khi cập nhật");
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Lỗi khi thêm công thức");
+      toast.error(err?.response?.data?.message || "Lỗi khi cập nhật công thức");
     } finally {
       setIsLoading(false);
     }
@@ -126,11 +139,11 @@ const ModalCreateRecipe = ({
   return (
     <Modal
       appElement={document.getElementById("root")}
-      isOpen={isOpenModalCreateRecipe}
-      onRequestClose={() => setIsOpenModalCreateRecipe(false)}
+      isOpen={isOpenModalUpdateRecipe}
+      onRequestClose={() => setIsOpenModalUpdateRecipe(false)}
       style={{
         overlay: {
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          backgroundColor: "rgba(0,0,0,0.8)",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -141,35 +154,31 @@ const ModalCreateRecipe = ({
           left: "auto",
           right: "auto",
           bottom: "auto",
-          padding: 0,
-          overflow: "auto",
           border: "none",
           borderRadius: "0.5rem",
           width: "100%",
           maxWidth: "600px",
+          padding: 0,
         },
       }}
     >
       <div className="bg-white rounded-md w-full flex flex-col select-none">
-        {/* Header */}
         <div className="w-full bg-green-700 text-white py-3 px-4">
-          <p className="font-bold text-lg">Thêm công thức mới</p>
+          <p className="font-bold text-lg">Cập nhật công thức</p>
         </div>
 
-        {/* Form */}
         <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-          {/* Chọn sản phẩm */}
+          {/* Chọn món */}
           <div>
             <label className="font-medium">Chọn món *</label>
             <select
-              name="productId"
               value={formData.productId}
               onChange={(e) =>
                 setFormData({ ...formData, productId: e.target.value })
               }
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             >
-              <option value="">-- Chọn món trong thực đơn --</option>
+              <option value="">-- Chọn món --</option>
               {products.map((p) => (
                 <option key={p._id} value={p._id}>
                   {p.name}
@@ -220,7 +229,6 @@ const ModalCreateRecipe = ({
                   <div className="col-span-3">
                     <input
                       type="text"
-                      placeholder="Đơn vị"
                       value={item.unit}
                       readOnly
                       className="w-full px-2 py-2 border rounded-md bg-gray-100 cursor-not-allowed"
@@ -237,7 +245,6 @@ const ModalCreateRecipe = ({
                   </div>
                 </div>
               ))}
-
               <button
                 className="text-green-600 border border-green-600 px-3 py-1 rounded-md mt-2 text-sm"
                 onClick={handleAddItem}
@@ -248,11 +255,10 @@ const ModalCreateRecipe = ({
           </div>
         </div>
 
-        {/* Footer */}
         <div className="flex gap-4 px-6 py-4 border-t">
           <button
             className="w-full border px-4 py-2 rounded-md cursor-pointer"
-            onClick={() => setIsOpenModalCreateRecipe(false)}
+            onClick={() => setIsOpenModalUpdateRecipe(false)}
           >
             Hủy
           </button>
@@ -267,7 +273,7 @@ const ModalCreateRecipe = ({
                 alt="đang tải"
               />
             ) : (
-              <p>Thêm công thức</p>
+              <p>Cập nhật công thức</p>
             )}
           </button>
         </div>
@@ -276,4 +282,4 @@ const ModalCreateRecipe = ({
   );
 };
 
-export default ModalCreateRecipe;
+export default ModalUpdateRecipe;
