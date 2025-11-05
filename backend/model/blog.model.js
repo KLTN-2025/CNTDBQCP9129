@@ -3,7 +3,7 @@ import slugify from "slugify";
 
 const blogSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, trim: true },
+    title: { type: String, required: true, trim: true, unique: true},
     slug: { type: String, trim: true, unique: true },
 
     categoryId: {
