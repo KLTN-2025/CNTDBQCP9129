@@ -68,14 +68,20 @@ const ModalUpdateProduct = ({
       !name.trim() ||
       !selectedCategory._id ||
       !price ||
+      !discount ||
       selectedFile.length === 0
     ) {
-      return toast.error("Vui lòng nhập đầy đủ thông tin");
+      return toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin");
     }
     if (discount > 100) {
       return toast.error("Vui lòng nhập giảm giá không lớn hơn 100");
     }
-
+    if (discount < 0) {
+      return toast.error("Vui lòng nhập giảm giá không nhỏ hơn 0");
+    }
+    if (price < 0){
+      return toast.error("Vui lòng nhập đơn giá không nhỏ hơn 0");
+    }
     try {
       setIsLoading(true);
 
