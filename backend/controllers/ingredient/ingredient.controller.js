@@ -17,7 +17,14 @@ export const createIngredient = async (req, res) => {
 
     // Kiểm tra đủ dữ liệu
     if (!name || quantity == null || !unit || totalCost == null) {
-      return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
+      return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc"});
+    }
+    if(quantity < 0){
+      return res.status(400).json({ message: "Số lượng không được nhỏ hơn 0"});
+    }
+
+    if(totalCost < 0){
+      return res.status(400).json({ message: "Tổng tiền không được nhỏ hơn 0"});
     }
 
     // Tính perUnitCost tự động
@@ -52,6 +59,13 @@ export const updateIngredient = async (req, res) => {
     // Kiểm tra đủ dữ liệu
     if (!name || quantity == null || !unit || totalCost == null) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
+    }
+    if(quantity < 0){
+      return res.status(400).json({ message: "Số lượng không được nhỏ hơn 0"});
+    }
+
+    if(totalCost < 0){
+      return res.status(400).json({ message: "Tổng tiền không được nhỏ hơn 0"});
     }
 
     const ingredient = await Ingredient.findById(id);

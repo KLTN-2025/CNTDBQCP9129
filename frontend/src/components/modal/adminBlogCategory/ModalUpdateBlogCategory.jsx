@@ -36,8 +36,8 @@ const ModalUpdateBlogCategory = ({
         },
       }}
     >
-      <div className="bg-color-dash overflow-hidden rounded-md w-full flex flex-col select-none">
-        <div className="w-full bg-color-dash py-3 px-4 relative border-b-1 border-b-gray-400">
+      <div className="overflow-hidden rounded-md w-full flex flex-col select-none">
+        <div className="w-full py-3 px-4 relative border-b-1 border-b-gray-400">
           <p className="font-bold text-xl">Cập nhập danh mục</p>
         </div>
         <div className="py-8 px-4 space-y-4">
