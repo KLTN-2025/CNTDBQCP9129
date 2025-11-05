@@ -2,46 +2,45 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
-import ingredientApi from "../../api/ingredientApi"
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
-import ModalCreateIngredient from "../../components/modal/adminIngredient/ModalCreateIngredient";
-import ModalUpdateIngredient from "../../components/modal/adminIngredient/ModalUpdateIngredient";
-export default function Ingredients() {
+import recipeApi from "../../api/recipeApi";
+export default function Recipes() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [ingredients, setIngredients] = useState([]);
-  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
-  const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] = useState(false);
-  const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] = useState(false);
-  const [selectedIngredient, setSelectedIngredient] = useState(null);
-  const [ingredientId, setIngredientId] = useState(null)
+  const [recipes, setRecipes] = useState([]);
+  // const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
+  // const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] = useState(false);
+  // const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] = useState(false);
+  // const [selectedIngredient, setSelectedIngredient] = useState(null);
+  // const [ingredientId, setIngredientId] = useState(null)
   // const [productId, setProductId] = useState(null);
 
   // Lấy danh sách nguyên liệu trong kho
   useEffect(() => {
-    const getAllIngredients = async () => {
+    const getAllProducts = async () => {
       try {
-        const res = await ingredientApi.getAll();
-        setIngredients(res);
+        const res = await recipeApi.getAll();
+        setRecipes(res);
       } catch (error) {
         toast.error(error.response?.data?.message || "Lỗi khi tải nguyên liệu trong kho");
       }
     };
-    getAllIngredients();
+    getAllProducts();
   }, []);
+  console.log(recipes);
 
   // Xóa nguyên liệu trong kho
-  const handleRemoveProduct = async (id) => {
-    try {
-      await ingredientApi.delete(id);
-      setIngredients((prev) => prev.filter((p) => p._id !== id));
-      setIsOpenModalConfirmDelete(false);
-      toast.success("Xóa nguyên liệu trong kho thành công");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Lỗi khi xóa nguyên liệu trong kho");
-    } finally {
-      setIngredientId(null);
-    }
-  };
+  // const handleRemoveProduct = async (id) => {
+  //   try {
+  //     await ingredientApi.delete(id);
+  //     setIngredients((prev) => prev.filter((p) => p._id !== id));
+  //     setIsOpenModalConfirmDelete(false);
+  //     toast.success("Xóa nguyên liệu trong kho thành công");
+  //   } catch (error) {
+  //     toast.error(error.response?.data?.message || "Lỗi khi xóa nguyên liệu trong kho");
+  //   } finally {
+  //     setIngredientId(null);
+  //   }
+  // };
 
   // Toggle tình trạng
 // const handleToggleStatus = async (product) => {
@@ -70,7 +69,7 @@ export default function Ingredients() {
             <h2 className="text-2xl font-bold text-gray-800">Quản lý nguyên liệu trong kho</h2>
           </div>
           <button
-            onClick={() => setIsOpenModalCreateIngredient(true)}
+            // onClick={() => setIsOpenModalCreateIngredient(true)}
             className="flex items-center cursor-pointer space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -98,11 +97,8 @@ export default function Ingredients() {
             <tr>
               {[
                 "STT",
-                "Tên nguyên liệu",
-                "Số lượng",
-                "Tổng tiền",
-                "Giá / đơn vị",
-                "Tình trạng",
+                "Tên món",
+                "Thành phần nguyên liệu",
                 "Thao tác",
               ].map((head) => (
                 <th
@@ -115,46 +111,35 @@ export default function Ingredients() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y">
-            {ingredients
-              .filter((p) =>
-                p.name.toLowerCase().includes(searchTerm.toLowerCase())
+            {recipes
+              .filter((r) =>
+                r.productId.name.toLowerCase().includes(searchTerm.toLowerCase())
               )
-              .map((ingredient, index) => (
-                <tr key={ingredient._id} className="hover:bg-gray-50">
+              .map((recipe, index) => (
+                <tr key={recipe._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm">{index + 1}</td>
-                  <td className="px-6 py-4 text-sm truncate max-w-[200px]">
-                    {ingredient.name}
+                  <td className="px-6 py-4 text-sm truncate max-w-[200px] whitespace-normal">
+                    {recipe.productId.name}
                   </td>
-                  <td className="px-6 py-4 text-sm truncate max-w-[200px]">
-                    {ingredient.quantity} {ingredient.unit}
-                  </td>
-                  <td className="px-6 py-4 text-sm truncate max-w-[160px]">
-                    {formatCurrencyVN(ingredient.totalCost)}
-                  </td>
-                  <td className="px-6 py-4 text-sm truncate max-w-[160px]">
-                    {formatCurrencyVN(ingredient.perUnitCost)} / 1{ingredient.unit}
-                  </td>
-                  {/* Nút toggle tình trạng */}
-                  <td className="px-6 py-4 text-sm">
-                    <button
-                      // onClick={() => handleToggleStatus(product)}
-                      className={`${
-                        ingredient.status ? "bg-green-600" : "bg-red-600"
-                      } text-white cursor-pointer px-4 py-2 whitespace-nowrap rounded-lg transition-colors`}
-                    >
-                      {ingredient.status ? "Còn hàng" : "Hết hàng"}
-                    </button>
-                  </td>
+                    <td className="px-6 py-4 text-sm truncate whitespace-normal">
+                      {recipe.items.map((item, i) => (
+                        <div className="space-y-2 flex gap-x-10">
+                          <p>Nguyên liệu {i + 1}: {item.ingredientId.name}</p>
+                          <p>Số lượng: {item.quantity}{item.unit}</p>
+                        </div>
+                      ))}
+                    </td>
+
 
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
                       {/* Nút sửa */}
                       <button
                         className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                        onClick={() => {
-                          setSelectedIngredient(ingredient);
-                          setIsOpenModalUpdateIngredient(true);
-                        }}
+                        // onClick={() => {
+                        //   setSelectedIngredient(ingredient);
+                        //   setIsOpenModalUpdateIngredient(true);
+                        // }}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -162,10 +147,10 @@ export default function Ingredients() {
                       {/* Nút xóa */}
                       <button
                         className="text-red-600 hover:text-red-800 cursor-pointer"
-                        onClick={() => {
-                          setIngredientId(ingredient._id);
-                          setIsOpenModalConfirmDelete(true);
-                        }}
+                        // onClick={() => {
+                        //   setIngredientId(ingredient._id);
+                        //   setIsOpenModalConfirmDelete(true);
+                        // }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -178,33 +163,33 @@ export default function Ingredients() {
       </div>
 
       {/* Modal thêm nguyên liệu trong kho */}
-      {isOpenModalCreateIngredient && (
+      {/* {isOpenModalCreateIngredient && (
         <ModalCreateIngredient
           isOpenModalCreateIngredient={isOpenModalCreateIngredient}
           setIsOpenModalCreateIngredient={setIsOpenModalCreateIngredient}
           setIngredients={setIngredients}
         />
-      )}
+      )} */}
 
       {/* Modal cập nhật nguyên liệu trong kho */}
-      {isOpenModalUpdateIngredient && selectedIngredient && (
+      {/* {isOpenModalUpdateIngredient && selectedIngredient && (
         <ModalUpdateIngredient
           isOpenModalUpdateIngredient={isOpenModalUpdateIngredient}
           setIsOpenModalUpdateIngredient={setIsOpenModalUpdateIngredient}
           setIngredients={setIngredients}
           selectedIngredient={selectedIngredient}
         />
-      )}
+      )} */}
 
       {/* Modal xác nhận xóa */}
-      {isOpenModalConfirmDelete && (
+      {/* {isOpenModalConfirmDelete && (
         <ModalConfirmDelete
           content="Bạn có chắn chắn muốn xóa nguyên liệu này?"
           isOpenConfirmDelete={isOpenModalConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
           onConfirm={() => handleRemoveProduct(ingredientId)}
         />
-      )}
+      )} */}
     </div>
   );
 }
