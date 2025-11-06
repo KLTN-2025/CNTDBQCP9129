@@ -180,7 +180,7 @@ export const deleteProduct = async (req, res) => {
     const isUsed = await Recipe.exists({ productId: id });
     if (isUsed) {
       return res.status(400).json({
-        message: "Không thể xóa sản phẩm vì đang được sử dụng trong công thức",
+        message: "Không thể xóa sản phẩm này vì đang được sử dụng trong công thức",
       });
     }
 

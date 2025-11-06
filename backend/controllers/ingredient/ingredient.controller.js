@@ -105,7 +105,7 @@ export const deleteIngredient = async (req, res) => {
     const isUsed = await Recipe.exists({ "items.ingredientId": id });
     if (isUsed) {
       return res.status(400).json({
-        message: "Không thể xóa nguyên liệu vì đang được sử dụng trong công thức",
+        message: "Không thể xóa nguyên liệu này vì đang được sử dụng trong công thức",
       });
     }
 
