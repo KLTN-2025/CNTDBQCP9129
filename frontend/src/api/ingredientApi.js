@@ -10,6 +10,10 @@ const ingredientApi = {
     const res = await axiosClient.post("/ingredients", data);
     return res.data;
   },
+  updateStatus: async (id) => {
+    const res = await axiosClient.patch(`/ingredients/${id}`);
+    return res.data;
+  },
   update: async (id, data) => {
     const res = await axiosClient.put(`/ingredients/${id}`, data);
     return res.data;
