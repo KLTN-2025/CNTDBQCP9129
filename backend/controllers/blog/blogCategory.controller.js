@@ -73,7 +73,7 @@ export const deleteCategory = async (req, res) => {
     const postCount = await Blog.countDocuments({ categoryId: id });
     if (postCount > 0) {
       return res.status(400).json({
-        message: `Không thể xóa danh mục vì đang chứa ${postCount} bài viết.`,
+        message: `Không thể xóa danh mục này vì đang chứa ${postCount} bài viết.`,
       });
     }
     const deleted = await BlogCategory.findByIdAndDelete(id);

@@ -68,7 +68,7 @@ export const deleteCategory = async (req, res) => {
     const productCount = await Product.countDocuments({ productCategoryId: id });
     if (productCount > 0) {
       return res.status(400).json({
-        message: `Không thể xóa loại sản phẩm vì đang chứa ${productCount} sản phẩm.`,
+        message: `Không thể xóa loại sản phẩm này vì đang chứa ${productCount} sản phẩm.`,
       });
     }
 

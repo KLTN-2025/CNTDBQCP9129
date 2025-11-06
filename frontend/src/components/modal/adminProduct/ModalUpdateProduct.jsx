@@ -63,8 +63,7 @@ const ModalUpdateProduct = ({
 
 const handleSubmit = async () => {
   if (isLoading) return;
-   console.log(typeof(discount));
-  // Validation
+   console.log(price);
   if (!name.trim() || !selectedCategory._id || price === "" || discount === "" || selectedFile.length === 0) {
     return toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin");
   }
@@ -208,6 +207,7 @@ const handleSubmit = async () => {
             <label className="font-medium">Giá tiền *</label>
             <input
               type="number"
+              min="0"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="Nhập giá sản phẩm"

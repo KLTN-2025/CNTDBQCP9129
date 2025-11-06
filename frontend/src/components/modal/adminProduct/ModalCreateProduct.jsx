@@ -83,7 +83,6 @@ const ModalCreateProduct = ({
 
       const imageURLs = await handleImageUpload(selectedFile);
 
-      // Convert lại để chắc chắn trước khi gửi
       const newProduct = {
         ...formData,
         price: Number(formData.price),
