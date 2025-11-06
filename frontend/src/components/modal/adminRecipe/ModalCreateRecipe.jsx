@@ -5,6 +5,7 @@ import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 import recipeApi from "../../../api/recipeApi";
 import ingredientApi from "../../../api/ingredientApi";
 import productApi from "../../../api/productApi";
+import { IoMdRemove } from "react-icons/io";
 
 const ModalCreateRecipe = ({
   isOpenModalCreateRecipe,
@@ -229,10 +230,11 @@ const ModalCreateRecipe = ({
 
                   <div className="col-span-1 flex justify-center">
                     <button
-                      className="text-red-500 text-lg"
+                      className="text-red-600 text-lg cursor-pointer"
                       onClick={() => handleRemoveItem(index)}
+                      title="Xóa nguyên liệu"
                     >
-                      ✕
+                      <IoMdRemove className="text-3xl"/>
                     </button>
                   </div>
                 </div>
