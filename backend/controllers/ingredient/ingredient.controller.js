@@ -1,5 +1,6 @@
 import Ingredient from "../../model/ingredient.model.js";
 import Recipe from "../../model/recipe.model.js";
+import Product from "../../model/product.model.js"
 // Lấy tất cả nguyên liệu trong kho
 export const getAllIngredients = async (req, res) => {
   try {
@@ -45,6 +46,33 @@ export const createIngredient = async (req, res) => {
 
     await newIngredient.save();
     res.status(201).json(newIngredient);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error });
+  }
+};
+// Cập nhập trạng thái nguyên liệu trong kho
+export const toggleIngredientStatus = async (req, res) => {
+  try {
+    const { id } = req.params; // id nguyên liệu
+    const ingredient = await Ingredient.findById(id);
+    if (!ingredient) return res.status(404).json({ message: "Không tìm thấy nguyên liệu" });
+
+    const newStatus = !ingredient.status;
+
+    // Cập nhật trạng thái nguyên liệu
+    await Ingredient.findByIdAndUpdate(id, { status: newStatus });
+
+    // Tìm tất cả công thức có chứa nguyên liệu này
+    const recipes = await Recipe.find({ "items.ingredientId": id });
+    const productIds = recipes.map(r => r.productId);
+
+    // Cập nhật trạng thái món nước liên quan
+    await Product.updateMany(
+      { _id: { $in: productIds } },
+      { $set: { status: newStatus } }
+    );
+
+    res.json({ message: "Cập nhật trạng thái thành công", newStatus });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error });
   }

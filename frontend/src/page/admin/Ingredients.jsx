@@ -2,18 +2,22 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
-import ingredientApi from "../../api/ingredientApi"
+import ingredientApi from "../../api/ingredientApi";
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import ModalCreateIngredient from "../../components/modal/adminIngredient/ModalCreateIngredient";
 import ModalUpdateIngredient from "../../components/modal/adminIngredient/ModalUpdateIngredient";
+import { IoIosWarning } from "react-icons/io";
 export default function Ingredients() {
   const [searchTerm, setSearchTerm] = useState("");
   const [ingredients, setIngredients] = useState([]);
-  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
-  const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] = useState(false);
-  const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] = useState(false);
+  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] =
+    useState(false);
+  const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] =
+    useState(false);
+  const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] =
+    useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState(null);
-  const [ingredientId, setIngredientId] = useState(null)
+  const [ingredientId, setIngredientId] = useState(null);
   // const [productId, setProductId] = useState(null);
 
   // Lấy danh sách nguyên liệu trong kho
@@ -23,7 +27,9 @@ export default function Ingredients() {
         const res = await ingredientApi.getAll();
         setIngredients(res);
       } catch (error) {
-        toast.error(error.response?.data?.message || "Lỗi khi tải nguyên liệu trong kho");
+        toast.error(
+          error.response?.data?.message || "Lỗi khi tải nguyên liệu trong kho"
+        );
       }
     };
     getAllIngredients();
@@ -37,29 +43,29 @@ export default function Ingredients() {
       setIsOpenModalConfirmDelete(false);
       toast.success("Xóa nguyên liệu trong kho thành công");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Lỗi khi xóa nguyên liệu trong kho");
+      toast.error(
+        error.response?.data?.message || "Lỗi khi xóa nguyên liệu trong kho"
+      );
     } finally {
       setIngredientId(null);
     }
   };
 
   // Toggle tình trạng
-// const handleToggleStatus = async (product) => {
-//   try {
-//     const updatedStatus = !product.status;
-//     const res = await productApi.updateStatus(product._id, { status: updatedStatus });
+  const handleToggleStatus = async (ingredient) => {
+    try {
+      const res = await ingredientApi.updateStatus(ingredient._id);
+      setIngredients((prev) =>
+        prev.map((ing) =>
+          ing._id === ingredient._id ? { ...ing, status: res.newStatus } : ing
+        )
+      );
 
-//     setProducts((prev) =>
-//       prev.map((p) =>
-//         p._id === product._id ? { ...p, status: res.status } : p
-//       )
-//     );
-
-//     toast.success("Cập nhật trạng thái thành công");
-//   } catch (err) {
-//     toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
-//   }
-// };
+      toast.success("Cập nhật trạng thái thành công");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
@@ -67,7 +73,9 @@ export default function Ingredients() {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Quản lý nguyên liệu trong kho</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Quản lý nguyên liệu trong kho
+            </h2>
           </div>
           <button
             onClick={() => setIsOpenModalCreateIngredient(true)}
@@ -125,19 +133,27 @@ export default function Ingredients() {
                   <td className="px-6 py-4 text-sm truncate max-w-[200px]">
                     {ingredient.name}
                   </td>
-                  <td className="px-6 py-4 text-sm truncate max-w-[200px]">
-                    {ingredient.quantity} {ingredient.unit}
+                  <td className="px-6 py-4 flex gap-x-2 items-center text-sm truncate max-w-[200px]">
+                    {(ingredient.unit === "cái" && ingredient.quantity <= 5) ||
+                    (ingredient.unit !== "cái" &&
+                      ingredient.quantity <= 500) ? (
+                      <IoIosWarning className="text-xl text-yellow-400" 
+                       title="Nguyên liệu sắp hết"
+                      />
+                    ) : null}
+                     {ingredient.quantity} {ingredient.unit}
                   </td>
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
                     {formatCurrencyVN(ingredient.totalCost)}
                   </td>
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
-                    {formatCurrencyVN(ingredient.perUnitCost)} / 1{ingredient.unit}
+                    {formatCurrencyVN(ingredient.perUnitCost)} / 1
+                    {ingredient.unit}
                   </td>
                   {/* Nút toggle tình trạng */}
                   <td className="px-6 py-4 text-sm">
                     <button
-                      // onClick={() => handleToggleStatus(product)}
+                      onClick={() => handleToggleStatus(ingredient)}
                       className={`${
                         ingredient.status ? "bg-green-600" : "bg-red-600"
                       } text-white cursor-pointer px-4 py-2 whitespace-nowrap rounded-lg transition-colors`}
