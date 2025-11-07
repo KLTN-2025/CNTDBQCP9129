@@ -72,7 +72,7 @@ export const loginUser = async (req, res) => {
     });
     res.status(200).json({
       message: "Đăng nhập thành công",
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, role:user.role, email: user.email },
       token,
     });
   } catch (error) {
@@ -152,7 +152,7 @@ export const resetPassword = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
   try {
-    const { token } = req.query; // token lấy từ URL
+    const { token } = req.query; 
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { name, email, password } = decoded;
@@ -171,7 +171,7 @@ export const verifyEmail = async (req, res) => {
 
     res.status(201).json({
       message: "Xác thực email thành công. Tài khoản của bạn đã được tạo!",
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, role:user.role, email: user.email },
     });
   } catch (error) {
     res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
