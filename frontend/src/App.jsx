@@ -64,6 +64,7 @@ function App() {
     if (!token) return <Navigate to="/account/login" replace />;
     return children;
   };
+  console.log(user);
   return (
     <ParallaxProvider>
       <LayoutPage>
@@ -111,7 +112,7 @@ function App() {
           {/* admin route */}
           <Route
             path="/admin"
-            element={!user ? <Navigate to="/account/login" /> : <LayoutAdmin />}
+            element={user?.role === "customer" ? <Navigate to="/error" /> : <LayoutAdmin />}
           >
             <Route path="users" element={<Users />} />
             <Route path="blog-category" element={<BlogCategory />} />
