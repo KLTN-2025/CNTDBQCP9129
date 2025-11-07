@@ -133,15 +133,19 @@ export default function Ingredients() {
                   <td className="px-6 py-4 text-sm truncate max-w-[200px]">
                     {ingredient.name}
                   </td>
-                  <td className="px-6 py-4 flex gap-x-2 items-center text-sm truncate max-w-[200px]">
-                    {(ingredient.unit === "cái" && ingredient.quantity <= 5) ||
-                    (ingredient.unit !== "cái" &&
-                      ingredient.quantity <= 500) ? (
-                      <IoIosWarning className="text-xl text-yellow-400" 
-                       title="Nguyên liệu sắp hết"
-                      />
-                    ) : null}
-                     {ingredient.quantity} {ingredient.unit}
+                  <td className="px-6 py-4 items-center text-sm truncate max-w-[200px]">
+                    <div className="flex  gap-x-2">
+                      {(ingredient.unit === "cái" &&
+                        ingredient.quantity <= 5) ||
+                      (ingredient.unit !== "cái" &&
+                        ingredient.quantity <= 500) ? (
+                        <IoIosWarning
+                          className="text-xl text-yellow-400"
+                          title="Nguyên liệu sắp hết"
+                        />
+                      ) : null}
+                      {ingredient.quantity} {ingredient.unit}
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
                     {formatCurrencyVN(ingredient.totalCost)}

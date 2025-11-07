@@ -8,6 +8,7 @@ const ProfilePage = () => {
 
   const isRootProfile = activePath === "/profile";
   const user = useAuthStore((state) => state.user);
+  console.log(user);
   return (
     <div className="flex px-20 pt-10 gap-x-10 max-lg:px-4 mx-auto max-lg:flex-col max-lg:gap-y-10 ">
       <div className="w-1/4 max-lg:w-full bg-gray-200 rounded-md p-4">
