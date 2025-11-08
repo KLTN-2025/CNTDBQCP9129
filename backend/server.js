@@ -9,6 +9,7 @@ import productCategoryRouter from './router/productCategory.router.js'
 import productRouter from './router/product.router.js'
 import ingredientRouter from './router/ingredient.router.js'
 import recipeRouter from './router/recipe.router.js'
+import cartRouter from './router/cart.router.js';
 dotenv.config()
 const app = express();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use("/api/product-categories", productCategoryRouter);
 app.use("/api/products", productRouter);
 app.use("/api/ingredients", ingredientRouter);
 app.use("/api/recipes", recipeRouter);
+app.use("/api/carts", cartRouter);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   connectDB();
