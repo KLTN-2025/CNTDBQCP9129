@@ -137,7 +137,7 @@ export default function BlogCategory() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={() => { 
                           setBlogId(blog._id);
                           setIsOpenConfirmDelete(true);
                         }}
