@@ -5,6 +5,11 @@ import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
 import { HiOutlinePlus } from "react-icons/hi";
 import { HiMinus } from "react-icons/hi2";
 import { CgNotes } from "react-icons/cg";
+import { toast } from "react-toastify";
+import cartApi from "../../../api/cartApi";
+import useAuthStore from "../../../store/authStore";
+import useCartStore from "../../../store/cartStore";
+
 const ModalDetailProduct = ({
   isOpenModalDetailProduct,
   setIsOpenModalDetailProduct,
@@ -17,7 +22,10 @@ const ModalDetailProduct = ({
   const charLimit = 80;
   const description = productDetail.description || "";
   const shouldShowToggle = description.length > charLimit;
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [note, setNote] = useState("");
+  const {user} = useAuthStore();
+  const {addToCart, cart} = useCartStore();
   const displayedText =
     !isExpanded && shouldShowToggle
       ? description.slice(0, charLimit) + "..."
@@ -30,6 +38,28 @@ const ModalDetailProduct = ({
       setCount((prev) => prev - 1);
     }
   };
+  const handleClickAddToCart = async () => {
+    try {
+      if(isLoading) return 
+      setIsLoading(true);
+      if(note.length > 50) return toast.error("Ghi chú quá dài");
+      if(count < 1) return toast.error("Số lượng nhỏ hơn 1");
+      const data = {
+        productId: productDetail._id,
+        quantity: count,
+        note
+      }
+      const res = await cartApi.addToCart(user.id, data);
+      // addToCart(res.);
+      localStorage.setItem("cart", cart);
+      console.log(cart);
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
   return (
     <Modal
       appElement={document.getElementById("root")}
@@ -115,11 +145,15 @@ const ModalDetailProduct = ({
           </div>
           <input
             type="text"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
             className="flex-1 h-10 px-2 outline-none focus:ring-0 focus:border-none"
             placeholder="Nhập ghi chú cho món này"
           />
         </div>
-        <button className="py-2 w-full text-center bg-orange-400 text-white rounded-md font-bold cursor-pointer">Thêm món vào giỏ hàng</button>
+        <button className="py-2 w-full text-center bg-orange-400 text-white rounded-md font-bold cursor-pointer"
+         onClick={handleClickAddToCart}
+        >Thêm món vào giỏ hàng</button>
       </div>
     </Modal>
   );

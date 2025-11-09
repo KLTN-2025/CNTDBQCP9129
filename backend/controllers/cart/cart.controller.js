@@ -5,7 +5,7 @@ export const getCart = async (req, res) => {
     const { userId } = req.params;
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     if (!cart)
-      return res.status(400).json({ message: "Không tìm thấy giỏ hàng" });
+      return res.status(201).json({ message: "Không tìm thấy giỏ hàng" });
     res.status(200).json(cart);
   } catch (error) {
     res.status(500).json({ message: error.message } || "lỗi server");
