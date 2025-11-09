@@ -3,6 +3,7 @@ import { authApi } from "../../api/authApi";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
+import cartApi from "../../api/cartApi";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,17 +20,22 @@ const handleLogin = async (e) => {
 
   try {
     const res = await authApi.loginUser(email, password);
+    const resCart = await cartApi.getCart(res.user.id);
     if (res.token) {
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
+      if(!resCart.message){
+       localStorage.setItem("cart", JSON.stringify(resCart));
+      }
       login(res.user);
       navigate("/");
     } else {
+      console.log(3);
       setError(res.message);
     }
   } catch (error) {
-    console.error(error);
-    setError("Đăng nhập thất bại. Vui lòng thử lại!");
+    console.log(error.response.data.message);
+    setError(error.response.data.message);
   } finally {
     setIsLoading(false); // tắt loading
   }
