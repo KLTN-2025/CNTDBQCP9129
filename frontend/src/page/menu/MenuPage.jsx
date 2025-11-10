@@ -41,7 +41,6 @@ const MenuPage = () => {
     const getProductByCategory = async () => {
       try {
         const data = await productApi.getByCategory(categorySlug);
-        console.log(data);
         setProducts(data);
       } catch (error) {
         toast.error(error.response.data.message);

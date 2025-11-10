@@ -63,7 +63,6 @@ const ModalUpdateProduct = ({
 
 const handleSubmit = async () => {
   if (isLoading) return;
-   console.log(price);
   if (!name.trim() || !selectedCategory._id || price === "" || discount === "" || selectedFile.length === 0) {
     return toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin");
   }

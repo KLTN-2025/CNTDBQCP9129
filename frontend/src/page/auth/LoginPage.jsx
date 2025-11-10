@@ -30,11 +30,9 @@ const handleLogin = async (e) => {
       login(res.user);
       navigate("/");
     } else {
-      console.log(3);
       setError(res.message);
     }
   } catch (error) {
-    console.log(error.response.data.message);
     setError(error.response.data.message);
   } finally {
     setIsLoading(false); // tắt loading

@@ -7,7 +7,6 @@ const ModalPreviewBlog = ({
   dataBlog,
 }) => {
   useLockBodyScroll(isOpenModalPreviewBlog);
-  console.log("dataBlog", dataBlog);
   return (
     <Modal
       appElement={document.getElementById("root")}

@@ -25,7 +25,7 @@ const ModalDetailProduct = ({
   const [isLoading, setIsLoading] = useState(false);
   const [note, setNote] = useState("");
   const {user} = useAuthStore();
-  const {addToCart, cart} = useCartStore();
+  const {cart, setCart} = useCartStore();
   const displayedText =
     !isExpanded && shouldShowToggle
       ? description.slice(0, charLimit) + "..."
@@ -50,11 +50,11 @@ const ModalDetailProduct = ({
         note
       }
       const res = await cartApi.addToCart(user.id, data);
-      // addToCart(res.);
-      localStorage.setItem("cart", cart);
-      console.log(cart);
+      if(res && !res.message){  
+        setCart(res);
+        localStorage.setItem("cart", JSON.stringify(res));
+      }
     } catch (error) {
-      console.log(error);
       toast.error(error.response.data.message);
     } finally {
       setIsLoading(false);
