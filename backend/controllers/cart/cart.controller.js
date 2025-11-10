@@ -17,6 +17,7 @@ export const addToCart = async (req, res) => {
     const { userId } = req.params;
     const { productId, quantity, note } = req.body;
     if (!quantity || quantity < 1) return res.status(400).json({message: "Số lượng không được nhỏ hơn 1"});
+    if (note.length > 100) return res.status(400).json({message: "ghi chú quá dài"});
     let cart = await Cart.findOne({ userId });
     if (!cart) {
       cart = new Cart({

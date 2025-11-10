@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import cartApi from "../../api/cartApi";
+import useCartStore from "../../store/cartStore";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,6 +12,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const login = useAuthStore((state) => state.login);
+  const {setCart} = useCartStore();
 const handleLogin = async (e) => {
   e.preventDefault();
   if (!email || !password || isLoading) return;
@@ -25,7 +27,8 @@ const handleLogin = async (e) => {
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
       if(!resCart.message){
-       localStorage.setItem("cart", JSON.stringify(resCart));
+       localStorage.setItem("cart", JSON.stringify(resCart.items));
+       setCart(resCart.items);
       }
       login(res.user);
       navigate("/");
@@ -39,7 +42,7 @@ const handleLogin = async (e) => {
   }
 };
   return (
-    <div className="w-full  flex flex-col items-center justify-center pt-10">
+    <div className="w-full flex flex-col items-center justify-center pt-10">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
         <h1 className="text-2xl font-bold text-center mb-2 text-gray-800">
           ĐĂNG NHẬP TÀI KHOẢN
