@@ -11,11 +11,11 @@ const cartApi = {
     return res.data;
   },
   updateCartItem: async (id, data) => {
-    const res = await axiosClient.patch(`/carts/${id}`, data);
+    const res = await axiosClient.put(`/carts/${id}`, data);
     return res.data;
   },
   removeCartItem: async (id, data) => {
-    const res = await axiosClient.put(`/${id}/item`, data);
+    const res = await axiosClient.delete(`carts/${id}/item`, {data});
     return res.data;
   },
 };

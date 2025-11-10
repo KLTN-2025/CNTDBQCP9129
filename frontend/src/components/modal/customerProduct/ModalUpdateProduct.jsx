@@ -10,20 +10,19 @@ import cartApi from "../../../api/cartApi";
 import useAuthStore from "../../../store/authStore";
 import useCartStore from "../../../store/cartStore";
 
-const ModalDetailProduct = ({
-  isOpenModalDetailProduct,
-  setIsOpenModalDetailProduct,
-  productDetail,
+const ModalUpdateProduct = ({
+  itemUpdate,
+  isOpenModalUpdateItem,
+  setIsOpenModalUpdateItem,
 }) => {
-  useLockBodyScroll(isOpenModalDetailProduct);
+  useLockBodyScroll(isOpenModalUpdateItem);
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [count, setCount] = useState(1);
+  const [count, setCount] = useState(itemUpdate.quantity);
   const charLimit = 80;
-  const description = productDetail.description || "";
+  const description = itemUpdate.productId.description || "";
   const shouldShowToggle = description.length > charLimit;
-  const [isLoading, setIsLoading] = useState(false);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(itemUpdate.note);
   const {user} = useAuthStore();
   const {cart, setCart} = useCartStore();
   const displayedText =
@@ -38,34 +37,30 @@ const ModalDetailProduct = ({
       setCount((prev) => prev - 1);
     }
   };
-  const handleClickAddToCart = async () => {
+  console.log(itemUpdate);
+  const handleClickUpdate = async() => {
     try {
-      if(isLoading) return 
-      setIsLoading(true);
-      if(note.length > 100) return toast.error("Ghi chú quá dài");
-      if(count < 1) return toast.error("Số lượng nhỏ hơn 1");
-      const data = {
-        productId: productDetail._id,
+      const updateData = {
+        productId: itemUpdate.productId._id,
         quantity: count,
-        note: note?.trim()
+        note
       }
-      const res = await cartApi.addToCart(user.id, data);
-      if(res && !res.message){  
-        setCart(res.items);
-        toast.success("Đã thêm sản phẩm vào giỏ hàng");
-        localStorage.setItem("cart", JSON.stringify(res.items));
-      }
+      console.log(updateData);
+      await cartApi.updateCartItem(user.id, updateData);
+      toast.success("Đã thêm sản phẩm vào giỏ hàng");
+      const cartUpdate = cart.map((item) => item.productId._id === itemUpdate.productId._id ? {...item, note: note, quantity: count} : item)
+      setCart(cartUpdate);
+      localStorage.setItem("cart", JSON.stringify(cartUpdate));
+      setIsOpenModalUpdateItem(false);
     } catch (error) {
       toast.error(error.response.data.message);
-    } finally {
-      setIsLoading(false);
     }
   }
   return (
     <Modal
       appElement={document.getElementById("root")}
-      isOpen={isOpenModalDetailProduct}
-      onRequestClose={() => setIsOpenModalDetailProduct(false)}
+      isOpen={isOpenModalUpdateItem}
+      onRequestClose={() => setIsOpenModalUpdateItem(false)}
       style={{
         overlay: {
           backgroundColor: "rgba(0, 0, 0, 0.8)",
@@ -92,24 +87,24 @@ const ModalDetailProduct = ({
       <div className="mx-auto overflow-hidden rounded-md w-full flex flex-col p-4 gap-y-4">
         <div className="w-full flex gap-x-4">
           <img
-            src={productDetail.image}
-            alt={productDetail.name}
+            src={itemUpdate.productId.image}
+            alt={itemUpdate.productId.name}
             className="w-26 h-26 rounded-full"
           />
           <div className="space-y-4 flex-1">
-            <p className="text-xl font-bold">{productDetail.name}</p>
+            <p className="text-xl font-bold">{itemUpdate.productId.name}</p>
             <div className="flex items-center gap-4 font-bold text-2xl">
-              {productDetail.discount > 0 && (
+              {itemUpdate.productId.discount > 0 && (
                 <span className="line-through text-gray-400">
-                  {formatCurrencyVN(productDetail.price)}
+                  {formatCurrencyVN(itemUpdate.productId.price)}
                 </span>
               )}
               <span className="text-red-500 font-bold">
-                {productDetail.discount > 0
+                {itemUpdate.productId.discount > 0
                   ? formatCurrencyVN(
-                      productDetail.price * (1 - productDetail.discount / 100)
+                      itemUpdate.productId.price * (1 - itemUpdate.productId.discount / 100)
                     )
-                  : formatCurrencyVN(productDetail.price)}
+                  : formatCurrencyVN(itemUpdate.productId.price)}
               </span>
             </div>
           </div>
@@ -153,11 +148,11 @@ const ModalDetailProduct = ({
           />
         </div>
         <button className="py-2 w-full text-center bg-orange-400 text-white rounded-md font-bold cursor-pointer"
-         onClick={handleClickAddToCart}
+         onClick={handleClickUpdate}
         >Thêm món vào giỏ hàng</button>
       </div>
     </Modal>
   );
 };
 
-export default ModalDetailProduct;
+export default ModalUpdateProduct;
