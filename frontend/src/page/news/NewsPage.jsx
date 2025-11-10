@@ -18,8 +18,7 @@ const NewsPage = () => {
         const data = await blogCategoryApi.getAll();
         setBlogCategories(data);
       } catch (error) {
-        console.log(error);
-        toast.error("Đã có lỗi xảy ra khi hiển thị danh mục");
+        toast.error(error.response.data.message);
       }
     };
     fetchAllCategoryBlog();
