@@ -42,17 +42,18 @@ const ModalDetailProduct = ({
     try {
       if(isLoading) return 
       setIsLoading(true);
-      if(note.length > 50) return toast.error("Ghi chú quá dài");
+      if(note.length > 100) return toast.error("Ghi chú quá dài");
       if(count < 1) return toast.error("Số lượng nhỏ hơn 1");
       const data = {
         productId: productDetail._id,
         quantity: count,
-        note
+        note: note?.trim()
       }
       const res = await cartApi.addToCart(user.id, data);
       if(res && !res.message){  
-        setCart(res);
-        localStorage.setItem("cart", JSON.stringify(res));
+        setCart(res.items);
+        toast.success("Đã thêm sản phẩm vào giỏ hàng");
+        localStorage.setItem("cart", JSON.stringify(res.items));
       }
     } catch (error) {
       toast.error(error.response.data.message);

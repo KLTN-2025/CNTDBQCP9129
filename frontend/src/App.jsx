@@ -22,6 +22,7 @@ import LayoutAdmin from "./layout/LayoutAdmin";
 import BlogDetailPage from "./page/Blog/BlogDetailPage";
 import NewsPage from "./page/news/NewsPage";
 import AboutMePage from "./page/about/AboutMePage";
+import CheckOut from "./page/checkout/CheckOut";
 // admin page
 import BlogCategory from "./page/admin/BlogCategory";
 import Users from "./page/admin/Users";
@@ -46,12 +47,14 @@ function App() {
           // Token hết hạn
           localStorage.removeItem("token");
           localStorage.removeItem("user");
+          localStorage.removeItem("cart");
           logout();
           navigate("/account/login");
         }
       } catch {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+          localStorage.removeItem("cart");
         logout();
         navigate("/account/login");
       }
@@ -130,6 +133,8 @@ function App() {
           <Route path="/about-me" element={<AboutMePage/>}/>
           {/* shop route */}
           <Route path='/shop' element={<ShopPage/>}/>
+          {/* check out route */}
+          <Route path='/checkout' element={<CheckOut/>}/>
           {/* menu route */}
           <Route path="/menu/:categorySlug?" element={<MenuPage />} />
           <Route path="*" element={<ErrorPage />} />
