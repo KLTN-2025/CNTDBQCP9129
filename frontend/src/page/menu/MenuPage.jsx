@@ -5,7 +5,7 @@ import productCategoryApi from "../../api/productCategoryApi";
 import { useParams } from "react-router-dom";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN.js";
 import { Link } from "react-router-dom";
-import ModalDetailProduct from "../../components/modal/adminProduct/ModalDetailProduct.jsx";
+import ModalDetailProduct from "../../components/modal/customerProduct/ModalDetailProduct.jsx";
 const MenuPage = () => {
   const [products, setProducts] = useState([]);
   const [productCategories, setProductCategories] = useState([]);

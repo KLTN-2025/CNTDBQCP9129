@@ -8,6 +8,9 @@ import { Link } from "react-router-dom";
 import { MdDelete } from "react-icons/md";
 import { MdModeEdit } from "react-icons/md";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
+import { toast } from "react-toastify";
+import cartApi from "../../api/cartApi";
+import ModalUpdateProduct from "../../components/modal/customerProduct/ModalUpdateProduct";
 const CheckOut = () => {
   const { user } = useAuthStore();
   const [timeSlots, setTimeSlots] = useState([]);
@@ -16,14 +19,16 @@ const CheckOut = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [deliveryNote, setDeliveryNote] = useState("");
   const [receiveMethod, setReceiveMethod] = useState("delivery");
-  const { cart } = useCartStore();
+  const { cart, setCart } = useCartStore();
+  const [itemUpdate, setItemUpdate] = useState();
+  const [isOpenModalUpdateItem, setIsOpenModalUpdateItem] = useState(false);
   useEffect(() => {
     setTimeSlots(["Càng sớm càng tốt", ...getDeliverySlots()]);
   }, []);
   const subTotal = useMemo(() => {
     return cart.reduce(
       (sum, item) =>
-        sum + item.productId.price * (1 - item.productId.discount / 100),
+        sum + item.productId.price * (1 - item.productId.discount / 100) * item.quantity,
       0
     );
   }, [cart]);
@@ -31,18 +36,33 @@ const CheckOut = () => {
     if (receiveMethod === "delivery") {
       return cart.reduce(
         (sum, item) =>
-          sum + item.productId.price * (1 - item.productId.discount / 100),
+          sum + item.productId.price * (1 - item.productId.discount / 100) * item.quantity,
         20000
       );
     }
     return cart.reduce(
       (sum, item) =>
-        sum + item.productId.price * (1 - item.productId.discount / 100),
+        sum + item.productId.price * (1 - item.productId.discount / 100) * item.quantity ,
       0
     );
   }, [cart, receiveMethod]);
+  const handleClickRemoveProduct = async (item) => {
+    try {
+      await cartApi.removeCartItem(user.id, {
+        productId: item.productId._id,
+        note: item.note,
+      });
+      const newCart = cart.filter(
+        (product) => product.productId._id !== item.productId._id
+      );
+      setCart(newCart);
+      localStorage.setItem("cart", JSON.stringify(newCart));
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
   return (
-    <div className="mx-auto max-sm:px-4 px-40 py-10 w-full">
+    <div className="mx-auto max-lg:px-4 px-40 py-10 w-full">
       <div className="w-full flex items-center justify-center gap-x-2">
         <PiNotepadFill className="text-2xl text-orange-600" />
         <h1 className="text-2xl font-semibold">Xác nhận đơn hàng</h1>
@@ -55,7 +75,7 @@ const CheckOut = () => {
           với bán kính tối đa 10 km.
         </span>
       </div>
-      <div className="flex max-sm:pt-4 w-full gap-x-8">
+      <div className="flex max-lg:pt-4 w-full gap-x-8 max-lg:flex-col max-lg: gap-y-8">
         <div className="w-full">
           {/* Thời gian nhận hàng */}
           <div className="pt-2">
@@ -158,85 +178,101 @@ const CheckOut = () => {
             </div>
           </div>
         </div>
-           {/*Order sản phẩm*/}
-        <div className="w-full card pt-2">
-          <div className="flex items-center w-full justify-between px-4">
-            <p className="text-xl font-semibold">Các món đã chọn</p>
-            <Link to="/menu">
-              <button className="px-4 py-1 rounded-full border cursor-pointer bg-amber-600 text-white">
-                Thêm món
-              </button>
-            </Link>
-          </div>
-          <hr className="w-[3rem] border-2 border-orange-600 ml-4" />
-           {/*Danh sách sản phẩm*/}
-          <div className="space-y-2 mt-4 w-full px-4">
-            {cart.length > 0 &&
-              cart.map((item) => (
-                <div className="flex space-x-4 w-full">
-                  <img
-                    src={item.productId.image}
-                    className="h-20 w-20 border rounded-md border-gray-200"
-                    alt={item.productId.name}
-                  />
-                  <div className="space-y-1 flex-1">
-                    <p>
-                      {item.quantity} x {item.productId.name}
-                    </p>
-                    {item.note && (
-                      <p className="whitespace-break-spaces">
-                        Note: {item.note}
+        {/*Order sản phẩm*/}
+        <div className="w-full">
+          <div className="w-full card pt-2">
+            <div className="flex items-center w-full justify-between px-4">
+              <p className="text-xl font-semibold">Các món đã chọn</p>
+              <Link to="/menu">
+                <button className="px-4 py-1 rounded-full border cursor-pointer bg-amber-600 text-white">
+                  Thêm món
+                </button>
+              </Link>
+            </div>
+            <hr className="w-[3rem] border-2 border-orange-600 ml-4" />
+            {/*Danh sách sản phẩm*/}
+            <div className="space-y-2 mt-4 w-full px-4">
+              {cart.length > 0 &&
+                cart.map((item) => (
+                  <div className="flex space-x-4 w-full">
+                    <img
+                      src={item.productId.image}
+                      className="h-20 w-20 border rounded-md border-gray-200"
+                      alt={item.productId.name}
+                    />
+                    <div className="space-y-1 flex-1">
+                      <p>
+                        {item.quantity} x {item.productId.name}
                       </p>
-                    )}
-                    <div className="space-x-4 flex">
-                      <button
-                        className="text-xl text-red-700 cursor-pointer"
-                        title="Xóa sản phẩm"
-                      >
-                        <MdDelete />
-                      </button>
-                      <button
-                        className="text-xl text-orange-500 cursor-pointer"
-                        title="Chỉnh sửa sản phẩm"
-                      >
-                        <MdModeEdit />
-                      </button>
+                      {item.note && (
+                        <p className="whitespace-break-spaces">
+                          Note: {item.note}
+                        </p>
+                      )}
+                      <div className="space-x-4 flex">
+                        <button
+                          className="text-xl text-red-700 cursor-pointer"
+                          title="Xóa sản phẩm"
+                          onClick={() => handleClickRemoveProduct(item)}
+                        >
+                          <MdDelete />
+                        </button>
+                        <button
+                          className="text-xl text-orange-500 cursor-pointer"
+                          title="Chỉnh sửa sản phẩm"
+                        >
+                          <MdModeEdit 
+                           onClick={() => {
+                            setItemUpdate(item);
+                            setIsOpenModalUpdateItem(true);
+                           }}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="w-[100px] font-bold">
+                      {formatCurrencyVN(
+                        item.productId.price *
+                          (1 - item.productId.discount / 100) * item.quantity
+                      )}
                     </div>
                   </div>
-                  <div className="w-[100px] font-bold">
-                    {formatCurrencyVN(
-                      item.productId.price * (1 - item.productId.discount / 100)
-                    )}
-                  </div>
-                </div>
-              ))}
-          </div>
-           {/*Tính tiền*/}
-          <div className="pt-10">
-            <p className="text-xl font-semibold px-4 pr-6">Tổng cộng</p>
-            <hr className="w-[3rem] border-2 border-orange-600" />
-            <div className="pt-4 flex w-full justify-between px-4 pr-6">
-              <p className="text-gray-600">Thành tiền:</p>
-              <p className="font-bold">{formatCurrencyVN(subTotal)}</p>
+                ))}
             </div>
-            {receiveMethod === "delivery" && (
+            {/*Tính tiền*/}
+            <div className="pt-10">
+              <p className="text-xl font-semibold px-4 pr-6">Tổng cộng</p>
+              <hr className="w-[3rem] border-2 border-orange-600 ml-4" />
               <div className="pt-4 flex w-full justify-between px-4 pr-6">
-                <p className="text-gray-600">Phí giao hàng:</p>
-                <p className="font-bold">{formatCurrencyVN(20000)}</p>
+                <p className="text-gray-600">Thành tiền:</p>
+                <p className="font-bold">{formatCurrencyVN(subTotal)}</p>
               </div>
-            )}
-            <div className="mt-6 rounded-bl-lg rounded-br-lg px-4 items-center py-2 flex w-full justify-between bg-orange-500 text-white">
-              <div>
-                <p>Thành tiền</p>
-                <p className="font-bold">{formatCurrencyVN(total)}</p>
+              {receiveMethod === "delivery" && (
+                <div className="pt-4 flex w-full justify-between px-4 pr-6">
+                  <p className="text-gray-600">Phí giao hàng:</p>
+                  <p className="font-bold">{formatCurrencyVN(20000)}</p>
+                </div>
+              )}
+              <div className="mt-6 rounded-bl-lg rounded-br-lg px-4 items-center py-2 flex w-full justify-between bg-orange-500 text-white">
+                <div>
+                  <p>Thành tiền</p>
+                  <p className="font-bold">{formatCurrencyVN(total)}</p>
+                </div>
+                <button className="px-5 py-2 bg-white text-orange-500 rounded-full cursor-pointer">
+                  Đặt hàng
+                </button>
               </div>
-              <button className="px-5 py-2 bg-white text-orange-500 rounded-full cursor-pointer">
-                Đặt hàng
-              </button>
             </div>
           </div>
         </div>
       </div>
+      {isOpenModalUpdateItem && (
+        <ModalUpdateProduct
+          itemUpdate={itemUpdate}
+          isOpenModalUpdateItem={isOpenModalUpdateItem}
+          setIsOpenModalUpdateItem={setIsOpenModalUpdateItem}
+        />
+      )}
     </div>
   );
 };
