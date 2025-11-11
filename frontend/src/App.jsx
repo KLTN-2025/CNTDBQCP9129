@@ -33,11 +33,12 @@ import Products from "./page/admin/Products";
 import MenuPage from "./page/menu/MenuPage";
 import Ingredients from "./page/admin/Ingredients";
 import Recipes from "./page/admin/Recipes";
+import useCartStore from "./store/cartStore";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const { logout, user } = useAuthStore();
-
+  const {cart} = useCartStore();
   // Check token khi app load
   useEffect(() => {
     if (token) {
@@ -134,7 +135,7 @@ function App() {
           {/* shop route */}
           <Route path='/shop' element={<ShopPage/>}/>
           {/* check out route */}
-          <Route path='/checkout' element={<CheckOut/>}/>
+          <Route path='/checkout' element={cart?.length > 0 && user ? <CheckOut/> : <Navigate to="/menu"/>}/>
           {/* menu route */}
           <Route path="/menu/:categorySlug?" element={<MenuPage />} />
           <Route path="*" element={<ErrorPage />} />

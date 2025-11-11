@@ -4,7 +4,7 @@ import getDeliverySlots from "../../hooks/deliveryTime";
 import useAuthStore from "../../store/authStore";
 import "../../css/checkBox.css";
 import useCartStore from "../../store/cartStore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdDelete } from "react-icons/md";
 import { MdModeEdit } from "react-icons/md";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
@@ -22,6 +22,7 @@ const CheckOut = () => {
   const { cart, setCart } = useCartStore();
   const [itemUpdate, setItemUpdate] = useState();
   const [isOpenModalUpdateItem, setIsOpenModalUpdateItem] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     setTimeSlots(["Càng sớm càng tốt", ...getDeliverySlots()]);
   }, []);
@@ -55,6 +56,9 @@ const CheckOut = () => {
       const newCart = cart.filter(
         (product) => product.productId._id !== item.productId._id
       );
+      if(newCart.length === 0){
+        navigate('/menu')
+      }
       setCart(newCart);
       localStorage.setItem("cart", JSON.stringify(newCart));
     } catch (error) {
