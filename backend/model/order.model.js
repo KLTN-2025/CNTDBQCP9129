@@ -1,69 +1,56 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-  // Ai tạo đơn
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
-  employeeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null,
-  },
-
-  // Danh sách món
-  items: [
-    {
-      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-      name: { type: String, required: true }, // lưu tên sản phẩm tại thời điểm order
-      quantity: { type: Number, required: true },
-      price: { type: Number, required: true }, // giá tại thời điểm order
+const orderSchema = new mongoose.Schema(
+  {
+    // Ai tạo đơn
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
     },
-  ],
-  // Thông tin giao hàng
-  delivery: {
-    type: {
-      name: String,
-      phone: String,
-      address: String,
+    // Danh sách món
+    items: [
+      {
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        name: { type: String, required: true },
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true },
+        note: { type: String, default:""},
+
+      },
+    ],
+    totalPrice: { type: Number, required: true },
+
+    // Thông tin giao hàng
+    delivery: {
+      name: { type: String, required: true },
+      phone: { type: String, required: true },
+      address: { type: String, default: null },
       note: { type: String, default: "" },
     },
-    default: null,
+    orderType: { type: String, enum: ["ONLINE", "OFFLINE"], required: true },
+    // Phương thức thanh toán
+    paymentMethod: { type: String, enum: ["CASH", "VNPAY"], required: true },
+    paymentStatus: {
+      type: String,
+      enum: ["PENDING", "SUCCESS", "FAILED"],
+      default: "PENDING",
+    },
+
+    // Thông tin VNPAY (nếu thanh toán online)
+    vnp_TxnRef: { type: String, default: null },
+    vnp_TransactionNo: { type: String, default: null },
+    vnp_PayDate: { type: String, default: null },
+    vnp_Amount: { type: Number, default: null },
+    // Trạng thái đơn hàng
+    status: {
+      type: String,
+      enum: ["PENDING", "CONFIRMED", "PROCESSING", "COMPLETED", "CANCELLED"],
+      default: "PENDING",
+    },
   },
-  // Tổng tiền
-  totalPrice: { type: Number, required: true },
+  { timestamps: true }
+);
 
-  // Phương thức thanh toán
-  paymentMethod: { type: String, enum: ["CASH", "VNPAY"], required: true },
-  paymentStatus: {
-    type: String,
-    enum: ["PENDING", "SUCCESS", "FAILED"],
-    default: "PENDING",
-  },
-
-  // Thông tin VNPAY (nếu thanh toán online)
-  vnp_TxnRef: { type: String, default: null },
-  vnp_TransactionNo: { type: String, default: null },
-  vnp_PayDate: { type: String, default: null },
-  vnp_Amount: { type: Number, default: null },
-
-  // Phân biệt loại order
-  orderType: { type: String, enum: ["ONLINE", "OFFLINE"], required: true },
-
-  // Trạng thái đơn hàng
-  status: {
-    type: String,
-    enum: [
-      "PENDING",
-      "CONFIRMED",
-      "PAID",
-      "PROCESSING",
-      "COMPLETED",
-      "CANCELLED",
-    ],
-    default: "PENDING",
-  },
-
-  // Thời gian tạo đơn
-  createdAt: { type: Date, default: Date.now },
-});
-
-export default mongoose.model("Order", orderSchema);
+const Order = mongoose.model("Order", orderSchema);
+export default Order

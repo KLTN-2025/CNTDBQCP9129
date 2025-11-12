@@ -47,6 +47,7 @@ const CheckOut = () => {
       0
     );
   }, [cart, receiveMethod]);
+  console.log(cart);
   const handleClickRemoveProduct = async (item) => {
     try {
       await cartApi.removeCartItem(user.id, {
