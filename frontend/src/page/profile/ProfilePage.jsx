@@ -31,7 +31,7 @@ const ProfilePage = () => {
           </li>
           <li>
             <Link
-              to="/profile/orders"
+              to="/profile/orders/history"
               className={`block p-2 rounded ${
                 activePath.includes("orders")
                   ? "bg-green-700 text-white"
