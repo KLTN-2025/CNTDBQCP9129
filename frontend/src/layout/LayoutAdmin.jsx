@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Outlet } from "react-router-dom";
 import { MdWarehouse } from "react-icons/md";
 import { MdOutlineAppRegistration } from "react-icons/md";
+import { PiNotepadBold } from "react-icons/pi";
 export default function LayoutAdmin() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const activePath = location.pathname;
@@ -44,6 +45,19 @@ export default function LayoutAdmin() {
             >
               <Users className="w-5 h-5 mr-3" />
               <span>Quản lý người dùng</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/admin/orders"
+              className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
+                activePath.includes("recipes")
+                  ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              <PiNotepadBold className="w-5 h-5 mr-3" />
+              <span>Quản lý đơn hàng</span>
             </Link>
           </li>
           <li>

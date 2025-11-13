@@ -62,7 +62,7 @@ export const createOrder = async (req, res) => {
 export const getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
-      .populate("userId", "name email role") // populate thông tin user nếu cần
+      .populate("userId", "name email role") // populate thông tin user 
       .sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {

@@ -33,6 +33,8 @@ import Products from "./page/admin/Products";
 import MenuPage from "./page/menu/MenuPage";
 import Ingredients from "./page/admin/Ingredients";
 import Recipes from "./page/admin/Recipes";
+import Orders from "./page/admin/Orders";
+// store
 import useCartStore from "./store/cartStore";
 function App() {
   const navigate = useNavigate();
@@ -109,7 +111,7 @@ function App() {
             path="/profile"
             element={!user ? <Navigate to="/account/login" /> : <ProfilePage />}
           >
-            <Route path="orders" element={<OrderHistory />} />
+            <Route path="orders/history" element={<OrderHistory />} />
             <Route path="change-password" element={<ChangePassword />} />
           </Route>
           {/* admin route */}
@@ -124,6 +126,8 @@ function App() {
             <Route path="products" element={<Products/>} />
             <Route path="ingredients" element={<Ingredients/>} />
             <Route path="recipes" element={<Recipes/>} />
+            <Route path="orders" element={<Orders/>} />
+
           </Route>
           {/* blog route */}
           <Route path="/blogs">
