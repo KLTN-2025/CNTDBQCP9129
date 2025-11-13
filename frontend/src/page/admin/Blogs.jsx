@@ -52,7 +52,7 @@ export default function BlogCategory() {
               Quản lý bài viết
             </h2>
             <p className="text-gray-600 mt-1">
-              Quản lý các bài viết trên website
+              Danh sách bài viết trên website
             </p>
           </div>
           <button

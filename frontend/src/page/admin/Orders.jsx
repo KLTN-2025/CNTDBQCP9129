@@ -51,7 +51,7 @@ export default function Orders() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Quản lý đơn hàng</h2>
-            <p className="text-gray-600 mt-1">Quản lý đơn hàng của khách đặt hàng</p>
+            <p className="text-gray-600 mt-1">Danh sách đơn hàng</p>
           </div>
           <button
             // onClick={() => setIsOpenModalCreateProduct(true)}
