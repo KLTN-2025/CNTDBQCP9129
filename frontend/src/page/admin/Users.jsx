@@ -9,8 +9,7 @@ export default function Orders() {
   const [getUsersByRouter, setGetUsersByRouter] = useState("users");
   const [isOpenModalUpdateRoleUser, setIsOpenModalUpdateRoleUser] =
     useState(false);
-  const [selectedRole, setSelectedRole] = useState(null);
-  const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null)
   // Lấy danh sách user theo button
   useEffect(() => {
     const getAllUsersByButton = async () => {
@@ -19,8 +18,6 @@ export default function Orders() {
         setusers(res);
       } catch (error) {
         toast.error(error.response?.data?.message || "Lỗi khi tải người dùng");
-      } finally {
-        setIsOpenModalUpdateRoleUser(false);
       }
     };
     getAllUsersByButton();
@@ -29,14 +26,16 @@ export default function Orders() {
 
   const handleUpdateRoleUser = async () => {
     try {
-      const res = await userApi.updateUserRole(selectedUserId, {
-        role: selectedRole,
+      const res = await userApi.updateUserRole(selectedUser._id, {
+        role: selectedUser.role
       });
-      setusers((prev) => prev.map((u) => (u._id === selectedUserId ? res : u)));
+      setusers((prev) => prev.map((u) => (u._id === selectedUser._id ? res : u)));
       console.log("res", res);
       toast.success("Phân quyền thành công");
     } catch (err) {
       toast.error(err.response?.data?.message || "Lỗi khi Phân quyền");
+    } finally {
+        setIsOpenModalUpdateRoleUser(false);
     }
   };
   console.log(1);
@@ -125,9 +124,9 @@ export default function Orders() {
           </thead>
           <tbody className="bg-white divide-y">
             {users
-              // .filter((u) =>
-              //   u?.email.toLowerCase().includes(searchTerm.toLowerCase())
-              // )
+              .filter((u) =>
+                u?.email.toLowerCase().includes(searchTerm.toLowerCase())
+              )
               .map((user, index) => (
                 <tr key={user._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm">{index + 1}</td>
@@ -140,8 +139,7 @@ export default function Orders() {
                     <button
                       className="text-blue-600 hover:text-blue-800 cursor-pointer"
                       onClick={() => {
-                        setSelectedRole(user.role);
-                        setSelectedUserId(user._id);
+                        setSelectedUser(user)
                         setIsOpenModalUpdateRoleUser(true);
                       }}
                     >
@@ -157,8 +155,8 @@ export default function Orders() {
         <ModalUpdateRoleUser
           isOpenModalUpdateRoleUser={isOpenModalUpdateRoleUser}
           setIsOpenModalUpdateRoleUser={setIsOpenModalUpdateRoleUser}
-          selectedRole={selectedRole}
-          setSelectedRole={setSelectedRole}
+          selectedUser={selectedUser}
+          setSelectedUser={setSelectedUser}
           onConfirm={handleUpdateRoleUser}
         />
       )}

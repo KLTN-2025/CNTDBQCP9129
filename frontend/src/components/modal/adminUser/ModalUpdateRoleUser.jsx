@@ -3,13 +3,13 @@ import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 const ModalUpdateRoleUser = ({
   isOpenModalUpdateRoleUser,
   setIsOpenModalUpdateRoleUser,
-  selectedRole,
-  setSelectedRole,
+  selectedUser,
+  setSelectedUser,
   onConfirm,
 }) => {
   useLockBodyScroll(isOpenModalUpdateRoleUser);
     const handleChange = (e) => {
-    setSelectedRole(e.target.value);
+    setSelectedUser((prev) => ({...prev, role: e.target.value}));
   };
   return (
     <Modal
@@ -43,10 +43,18 @@ const ModalUpdateRoleUser = ({
         <div className="w-full py-3 px-4 relative border-b-1 border-b-gray-400">
           <p className="font-bold text-xl">Phân quyền người dùng</p>
         </div>
-        <div className="py-8 px-4 flex gap-x-4">
+        <div className="flex items-center mt-4 px-4 gap-x-2">
+          <p>Tên người dùng:</p>
+          <p>{selectedUser.name}</p>
+        </div>
+        <div className="flex items-center mt-2 gap-x-2 px-4">
+          <p>email:</p>
+          <p>{selectedUser.email}</p>
+        </div>
+        <div className="mt-2 px-4 flex gap-x-4">
           <p>Vai trò: </p>
           <select
-            value={selectedRole}
+            value={selectedUser.role}
             onChange={handleChange}
             className="border px-2 cursor-pointer rounded-md"
           >
@@ -63,7 +71,7 @@ const ModalUpdateRoleUser = ({
             Hủy
           </button>
           <button
-            className="bg-green-600 w-full rounded-md px-2 py-2 cursor-pointer"
+            className="bg-green-600 w-full rounded-md px-2 py-2 cursor-pointer text-white"
             onClick={onConfirm}
           >
             Cập nhật
