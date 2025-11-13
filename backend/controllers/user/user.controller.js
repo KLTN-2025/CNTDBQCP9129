@@ -8,6 +8,25 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
+// Lấy tất cả user có role = manager
+export const getManagers = async (req, res) => {
+  try {
+    const managers = await User.find({ role: "manager" }).select("-password");
+    res.status(200).json(managers);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
+
+// Lấy tất cả user có role = admin
+export const getAdmins = async (req, res) => {
+  try {
+    const admins = await User.find({ role: "admin" }).select("-password");
+    res.status(200).json(admins);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
+};
 
 // Admin cập nhật role 
 export const updateUserRole = async (req, res) => {
@@ -29,7 +48,7 @@ export const updateUserRole = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "Không tìm thấy người dùng" });
     }
-    res.status(200).json({ user: updatedUser,});
+    res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ message: "Lỗi server"});
   }
