@@ -41,17 +41,14 @@ const voucherSchema = new mongoose.Schema({
   },
   conditions: {
     minOrderValue: { type: Number, default: 0 },
-    applicableProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-    excludedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     applicableCategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" }],
     maxDiscountAmount: { type: Number, default: 0 },
   },
   status: {
     type: String,
-    enum: ["active", "inactive", "expired"],
+    enum: ["active", "inactive", "expired"], 
     default: "active",
   },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 
 export default mongoose.model("Voucher", voucherSchema);
