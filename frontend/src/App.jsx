@@ -40,7 +40,7 @@ function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const { logout, user } = useAuthStore();
-  const {cart} = useCartStore();
+  const {cart, setCart} = useCartStore();
   // Check token khi app load
   useEffect(() => {
     if (token) {
@@ -48,16 +48,18 @@ function App() {
         const { exp } = jwtDecode(token); // exp là timestamp (giây)
         if (Date.now() >= exp * 1000) {
           // Token hết hạn
+          setCart([]);
+          localStorage.removeItem("cart");
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          localStorage.removeItem("cart");
           logout();
           navigate("/account/login");
         }
       } catch {
+        setCart([]);
+        localStorage.removeItem("cart");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-          localStorage.removeItem("cart");
         logout();
         navigate("/account/login");
       }
