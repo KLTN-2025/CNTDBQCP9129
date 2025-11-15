@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import ModalCreateProduct from "../../components/modal/adminProduct/ModalCreateProduct";
-import orderApi from "../../api/orderApi";
-export default function Orders() {
+export default function Vouchers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orders, setOrders] = useState([]);
   // const [isOpenModalCreateProduct, setIsOpenModalCreateProduct] = useState(false);
@@ -14,18 +12,18 @@ export default function Orders() {
   // const [productId, setProductId] = useState(null);
 
   // Lấy danh sách sản phẩm
-  useEffect(() => {
-    const getAllOrders = async () => {
-      try {
-        const res = await orderApi.getAllOrders();
-        setOrders(res);
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Lỗi khi tải đơn hàng");
-      }
-    };
-    getAllOrders();
-  }, []);
-  console.log(orders);
+  // useEffect(() => {
+  //   const getAllOrders = async () => {
+  //     try {
+  //       const res = await orderApi.getAllOrders();
+  //       setOrders(res);
+  //     } catch (error) {
+  //       toast.error(error.response?.data?.message || "Lỗi khi tải đơn hàng");
+  //     }
+  //   };
+  //   getAllOrders();
+  // }, []);
+  // console.log(orders);
 
 // const handleToggleStatus = async (product) => {
 //   try {
@@ -50,15 +48,15 @@ export default function Orders() {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Quản lý đơn hàng</h2>
-            <p className="text-gray-600 mt-1">Danh sách đơn hàng</p>
+            <h2 className="text-2xl font-bold text-gray-800">Quản lý voucher</h2>
+            <p className="text-gray-600 mt-1">Danh sách voucher</p>
           </div>
           <button
             // onClick={() => setIsOpenModalCreateProduct(true)}
             className="flex items-center cursor-pointer space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
-            <span>Thêm sản phẩm</span>
+            <span>Thêm voucher</span>
           </button>
         </div>
 
@@ -67,7 +65,7 @@ export default function Orders() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder="Tìm kiếm email..."
+            placeholder="Tìm kiếm mã voucher..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
@@ -82,12 +80,13 @@ export default function Orders() {
             <tr>
               {[
                 "STT",
-                "Tên sản phẩm",
-                "Loại sản phẩm",
+                "Mã voucher",
+                "Mô tả (Điều kiện)",
+                "Lượt/Khách",
                 "Hình ảnh",
-                "Giá",
-                "Mô tả",
-                "Khuyến mãi",
+                "Bắt đầu",
+                "Giá trị",
+                "Số lượng mã",
                 "Tình trạng",
                 "Thao tác",
               ].map((head) => (

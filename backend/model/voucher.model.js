@@ -39,6 +39,10 @@ const voucherSchema = new mongoose.Schema({
     type: Number,
     default: 1, // mỗi user dùng tối đa 1 lần
   },
+  image: {
+      type: String,
+      required: true,
+  },
   conditions: {
     minOrderValue: { type: Number, default: 0 },
     applicableCategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" }],

@@ -5,6 +5,7 @@ import { Outlet } from "react-router-dom";
 import { MdWarehouse } from "react-icons/md";
 import { MdOutlineAppRegistration } from "react-icons/md";
 import { PiNotepadBold } from "react-icons/pi";
+import { CiGift } from "react-icons/ci";
 export default function LayoutAdmin() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const activePath = location.pathname;
@@ -86,7 +87,7 @@ export default function LayoutAdmin() {
               <span>Quản lý bài viết</span>
             </Link>
           </li>
-           <li>
+          <li>
             <Link
               to="/admin/product-category"
               className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
@@ -99,7 +100,7 @@ export default function LayoutAdmin() {
               <span>Quản lý loại sản phẩm</span>
             </Link>
           </li>
-           <li>
+          <li>
             <Link
               to="/admin/products"
               className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
@@ -110,6 +111,19 @@ export default function LayoutAdmin() {
             >
               <PenSquare className="w-5 h-5 mr-3" />
               <span>Quản lý sản phẩm</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/admin/vouchers"
+              className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
+                activePath.includes("vouchers")
+                  ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              <CiGift className="w-5 h-5 mr-3" />
+              <span>Quản lý voucher</span>
             </Link>
           </li>
           <li>
@@ -136,14 +150,13 @@ export default function LayoutAdmin() {
             >
               <MdOutlineAppRegistration className="w-5 h-5 mr-3" />
               <span>Quản lý công thức</span>
-              
             </Link>
           </li>
         </ul>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full">
         {/* Header */}
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
           <div className="flex items-center space-x-4">
@@ -151,7 +164,7 @@ export default function LayoutAdmin() {
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             >
-              <Menu className="w-6 h-6 text-gray-700"/>
+              <Menu className="w-6 h-6 text-gray-700" />
             </button>
             <h1 className="text-xl font-semibold text-gray-800">
               Danh sách quản lý
@@ -164,7 +177,8 @@ export default function LayoutAdmin() {
           {isRootProfile ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <h2 className="text-2xl font-semibold mb-2">
-                Chào mừng đến trang quản trị của COFFEE <span className="text-green-700 font-bold">GO</span>
+                Chào mừng đến trang quản trị của COFFEE{" "}
+                <span className="text-green-700 font-bold">GO</span>
               </h2>
               <p className="text-gray-500">
                 Hãy chọn một mục trong menu để bắt đầu quản lý.

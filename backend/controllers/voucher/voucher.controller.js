@@ -11,6 +11,7 @@ export const createVoucher = async (req, res) => {
       discountValue,
       startDate,
       endDate,
+      image,
       usageLimit = 0,
       perUserLimit = 1,
       applicableCategories = [],
@@ -31,6 +32,7 @@ export const createVoucher = async (req, res) => {
       endDate,
       usageLimit,
       perUserLimit,
+      image,
       conditions: {
         minOrderValue,
         applicableCategories,
