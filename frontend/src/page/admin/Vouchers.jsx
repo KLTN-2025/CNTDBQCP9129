@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ModalCreateProduct from "../../components/modal/adminProduct/ModalCreateProduct";
+import voucherApi from "../../api/voucherApi";
+import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
+import { formatDateVN } from "../../utils/formatDateVN";
 export default function Vouchers() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [orders, setOrders] = useState([]);
+  const [vouchers, setVouchers] = useState([]);
   // const [isOpenModalCreateProduct, setIsOpenModalCreateProduct] = useState(false);
   // const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] = useState(false);
   // const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
@@ -12,35 +15,35 @@ export default function Vouchers() {
   // const [productId, setProductId] = useState(null);
 
   // Lấy danh sách sản phẩm
-  // useEffect(() => {
-  //   const getAllOrders = async () => {
-  //     try {
-  //       const res = await orderApi.getAllOrders();
-  //       setOrders(res);
-  //     } catch (error) {
-  //       toast.error(error.response?.data?.message || "Lỗi khi tải đơn hàng");
-  //     }
-  //   };
-  //   getAllOrders();
-  // }, []);
-  // console.log(orders);
+  useEffect(() => {
+    const getAllVouchers = async () => {
+      try {
+        const res = await voucherApi.getAllVouchers();
+        setVouchers(res);
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Lỗi khi tải voucher");
+      }
+    };
+    getAllVouchers();
+  }, []);
+  console.log(vouchers);
 
-// const handleToggleStatus = async (product) => {
-//   try {
-//     const updatedStatus = !product.status;
-//     const res = await productApi.updateStatus(product._id, { status: updatedStatus });
+  // const handleToggleStatus = async (product) => {
+  //   try {
+  //     const updatedStatus = !product.status;
+  //     const res = await productApi.updateStatus(product._id, { status: updatedStatus });
 
-//     setProducts((prev) =>
-//       prev.map((p) =>
-//         p._id === product._id ? { ...p, status: res.status } : p
-//       )
-//     );
+  //     setProducts((prev) =>
+  //       prev.map((p) =>
+  //         p._id === product._id ? { ...p, status: res.status } : p
+  //       )
+  //     );
 
-//     toast.success("Cập nhật trạng thái thành công");
-//   } catch (err) {
-//     toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
-//   }
-// };
+  //     toast.success("Cập nhật trạng thái thành công");
+  //   } catch (err) {
+  //     toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
+  //   }
+  // };
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
@@ -48,7 +51,9 @@ export default function Vouchers() {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Quản lý voucher</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Quản lý voucher
+            </h2>
             <p className="text-gray-600 mt-1">Danh sách voucher</p>
           </div>
           <button
@@ -99,49 +104,85 @@ export default function Vouchers() {
               ))}
             </tr>
           </thead>
-          {/* <tbody className="bg-white divide-y">
-            {products
-              .filter((p) =>
-                p.name.toLowerCase().includes(searchTerm.toLowerCase())
+          <tbody className="bg-white divide-y">
+            {vouchers
+              .filter((v) =>
+                v.code.toLowerCase().includes(searchTerm.toLowerCase())
               )
-              .map((product, index) => (
-                <tr key={product._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm">{index + 1}</td>
-                  <td className="px-6 py-4 text-sm truncate max-w-[200px]">
-                    {product.name}
+              .map((voucher, index) => (
+                <tr key={voucher._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm max-w-[10px]">
+                    {index + 1}
                   </td>
-                  <td className="px-6 py-4 text-sm">
-                    {product.productCategoryId?.name || "—"}
+                  <td className="px-6 py-4 text-sm truncate max-w-[200px]">
+                    {voucher.code}
+                  </td>
+                  <td className="px-6 py-4 text-sm max-w-[300px]">
+                    {voucher.description} (đơn hàng từ{" "}
+                    {formatCurrencyVN(voucher.conditions.minOrderValue)}
+                    {voucher.discountType === "percent" &&
+                      `, giảm ${
+                        voucher.discountValue
+                      }% tối đa ${formatCurrencyVN(
+                        voucher.conditions.maxDiscountAmount
+                      )}`}
+                    {voucher.conditions.applicableCategories.length > 0
+                      ? `, cho đơn hàng có tất cả sản phẩm trong danh mục ${voucher.conditions.applicableCategories.map(
+                          (category, i) =>
+                            `${
+                              i === 1 ? " ," : ""
+                            } ${category.name.toLowerCase()}`
+                        )}`
+                      : ", áp dụng cho tất cả sản phẩm"}
+                    )
+                  </td>
+                  <td className="px-6 py-4 text-sm ">
+                    {voucher.perUserLimit} / account
                   </td>
                   <td className="px-6 py-4">
                     <img
-                      src={product.image}
-                      alt={product.name}
+                      src="ádasd"
                       className="w-16 h-16 object-cover rounded-xl"
                     />
                   </td>
-                  <td className="px-6 py-4 text-sm truncate max-w-[160px]">
-                    {formatCurrencyVN(product.price)}
+                  <td className="px-6 py-4 text-sm max-w-[240px]">
+                    {`${formatDateVN(voucher.startDate)} đến ${formatDateVN(
+                      voucher.endDate
+                    )}`}
                   </td>
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
-                    {product.description}
+                    {voucher.discountType === "percent"
+                      ? `${voucher.discountValue}%`
+                      : `${formatCurrencyVN(voucher.discountValue)}`}
                   </td>
-                  <td className="px-6 py-4 text-sm">{product.discount}%</td>
-
-                  Nút toggle tình trạng
                   <td className="px-6 py-4 text-sm">
-                    <button
-                      onClick={() => handleToggleStatus(product)}
-                      className={`${
-                        product.status ? "bg-green-600" : "bg-red-600"
-                      } text-white cursor-pointer px-4 py-2 whitespace-nowrap rounded-lg transition-colors`}
-                    >
-                      {product.status ? "Còn hàng" : "Hết hàng"}
-                    </button>
+                    {voucher.usedCount}/{voucher.usageLimit}
                   </td>
+                  {new Date() > new Date(voucher.endDate) ? (
+                    <td className="px-6 py-4 text-sm">
+                      <button className="bg-red-600 text-white cursor-pointer px-4 py-2 whitespace-nowrap rounded-lg">
+                        Đã hết hạn
+                      </button>
+                    </td>
+                  ) : (
+                    <td className="px-6 py-4 text-sm">
+                      <button
+                        // onClick={() => handleToggleStatus(product)}
+                        className={`${
+                          voucher.status === "active"
+                            ? "bg-green-600"
+                            : "bg-yellow-500"
+                        } text-white cursor-pointer px-4 py-2 whitespace-nowrap rounded-lg transition-colors`}
+                      >
+                        {voucher.status === "active"
+                          ? "Đang hoạt động"
+                          : "Không hoạt động"}
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
-          </tbody> */}
+          </tbody>
         </table>
       </div>
     </div>

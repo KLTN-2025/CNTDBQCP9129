@@ -12,7 +12,7 @@ export const createVoucher = async (req, res) => {
       startDate,
       endDate,
       image,
-      usageLimit = 0,
+      usageLimit,
       perUserLimit = 1,
       applicableCategories = [],
       minOrderValue = 0,
@@ -22,9 +22,9 @@ export const createVoucher = async (req, res) => {
     // Check code đã tồn tại chưa
     const exist = await Voucher.findOne({ code });
     if (exist) return res.status(400).json({ message: "Mã voucher đã tồn tại" });
-
+    if(!description || !discountValue || !image || !usageLimit) return res.status(400).json({ message: "Thiếu thông tin bắt buộc" });
     const voucher = new Voucher({
-      code,
+      code: code.toUpperCase(),
       description,
       discountType,
       discountValue,
@@ -50,7 +50,12 @@ export const createVoucher = async (req, res) => {
 // Lấy danh sách voucher
 export const getVouchers = async (req, res) => {
   try {
-    const vouchers = await Voucher.find().sort({ createdAt: -1 });
+    const vouchers = await Voucher.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "conditions.applicableCategories",
+        select: "name",        
+      });
     res.json(vouchers);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,7 +76,9 @@ export const applyVoucher = async (req, res) => {
 
     // Check thời gian
     const now = new Date();
-    if (now < voucher.startDate || now > voucher.endDate) return res.status(400).json({ message: "Voucher chưa đến hạn hoặc đã hết hạn" });
+    const start = new Date(voucher.startDate);
+    const end = new Date(voucher.endDate);
+    if (now < start || now > end) return res.status(400).json({ message: "Voucher chưa đến hạn hoặc đã hết hạn" });
 
     // Check minOrderValue
     if (total < voucher.conditions.minOrderValue) return res.status(400).json({ message: "Đơn hàng chưa đủ điều kiện voucher" });
