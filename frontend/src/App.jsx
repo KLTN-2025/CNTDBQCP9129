@@ -36,6 +36,7 @@ import Recipes from "./page/admin/Recipes";
 import Orders from "./page/admin/Orders";
 // store
 import useCartStore from "./store/cartStore";
+import Vouchers from "./page/admin/Vouchers";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -129,7 +130,7 @@ function App() {
             <Route path="ingredients" element={<Ingredients/>} />
             <Route path="recipes" element={<Recipes/>} />
             <Route path="orders" element={<Orders/>} />
-
+            <Route path="vouchers" element={<Vouchers/>} />
           </Route>
           {/* blog route */}
           <Route path="/blogs">

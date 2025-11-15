@@ -62,7 +62,7 @@ const handleToggleStatus = async (product) => {
 };
 
   return (
-    <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm">
+    <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
