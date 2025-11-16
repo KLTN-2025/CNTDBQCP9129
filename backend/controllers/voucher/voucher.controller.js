@@ -1,5 +1,5 @@
 import Voucher from "../../model/voucher.model.js";
-import Order from "../../model/order.model.js"; 
+import Order from "../../model/order.model.js";
 
 // Tạo voucher
 export const createVoucher = async (req, res) => {
@@ -13,26 +13,68 @@ export const createVoucher = async (req, res) => {
       endDate,
       image,
       usageLimit,
-      perUserLimit = 1,
+      perUserLimit,
       applicableCategories = [],
-      minOrderValue = 0,
+      minOrderValue,
       maxDiscountAmount = 0,
     } = req.body;
 
-    // Check code đã tồn tại chưa
-    const exist = await Voucher.findOne({ code });
-    if (exist) return res.status(400).json({ message: "Mã voucher đã tồn tại" });
-    if(!description || !discountValue || !image || !usageLimit) return res.status(400).json({ message: "Thiếu thông tin bắt buộc" });
-    const voucher = new Voucher({
-      code: code.toUpperCase(),
-      description,
-      discountType,
+    // Kiểm tra mã đã tồn tại
+    if (await Voucher.findOne({ code })) {
+      return res.status(400).json({ message: "Mã voucher đã tồn tại" });
+    }
+
+    // Check các trường bắt buộc
+    const requiredFields = {
+      code: code?.trim(),
+      description: description?.trim(),
+      discountType: discountType?.trim(),
+      image: image?.trim(),
       discountValue,
       startDate,
       endDate,
       usageLimit,
       perUserLimit,
+      minOrderValue,
+    };
+
+    for (const value of Object.values(requiredFields)) {
+      if (
+        value === undefined ||
+        value === null ||
+        (typeof value === "string" && value.trim() === "")
+      ) {
+        return res.status(400).json({ message: "Thiếu thông tin bắt buộc hoặc thông tin chưa hợp lệ" });
+      }
+    }
+
+    // Validation chi tiết số
+    if (discountValue <= 0) return res.status(400).json({ message: "Giá trị khuyến mãi phải lớn hơn 0" });
+    if (usageLimit <= 0) return res.status(400).json({ message: "Số lượng mã phải lớn hơn 0" });
+    if (perUserLimit <= 0) return res.status(400).json({ message: "Số lần sử dụng tối đa mỗi tài khoản phải lớn hơn 0" });
+    if (minOrderValue < 0) return res.status(400).json({ message: "Giá trị đơn hàng tối thiểu không được nhỏ hơn 0" });
+    if (maxDiscountAmount < 0) return res.status(400).json({ message: "Giá trị giảm tối đa không được nhỏ hơn 0" });
+
+    // Parse Date từ input frontend (datetime-local)
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+
+    // So sánh ngày giờ
+    if (start >= end) return res.status(400).json({ message: "Thời gian bắt đầu phải nhỏ hơn ngày kết thúc" });
+    if (end <= now) return res.status(400).json({ message: "Thời gian kết thúc phải lớn hơn hiện tại" });
+
+    // Tạo voucher
+    const voucher = new Voucher({
+      code: code.toUpperCase(),
+      description,
+      discountType,
+      discountValue,
+      startDate: start,
+      endDate: end,
       image,
+      usageLimit,
+      perUserLimit,
       conditions: {
         minOrderValue,
         applicableCategories,
@@ -41,21 +83,21 @@ export const createVoucher = async (req, res) => {
     });
 
     await voucher.save();
-    res.status(201).json(voucher);
+    return res.status(201).json(voucher);
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
+
 
 // Lấy danh sách voucher
 export const getVouchers = async (req, res) => {
   try {
-    const vouchers = await Voucher.find()
-      .sort({ createdAt: -1 })
-      .populate({
-        path: "conditions.applicableCategories",
-        select: "name",        
-      });
+    const vouchers = await Voucher.find().sort({ createdAt: -1 }).populate({
+      path: "conditions.applicableCategories",
+      select: "name",
+    });
     res.json(vouchers);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -69,29 +111,45 @@ export const applyVoucher = async (req, res) => {
 
     // Lấy voucher
     const voucher = await Voucher.findOne({ code: voucherCode });
-    if (!voucher) return res.status(400).json({ message: "Voucher không tồn tại" });
+    if (!voucher)
+      return res.status(400).json({ message: "Voucher không tồn tại" });
 
     // Check trạng thái
-    if (voucher.status !== "active") return res.status(400).json({ message: "Voucher không khả dụng" });
+    if (voucher.status !== "active")
+      return res.status(400).json({ message: "Voucher không khả dụng" });
 
     // Check thời gian
     const now = new Date();
     const start = new Date(voucher.startDate);
     const end = new Date(voucher.endDate);
-    if (now < start || now > end) return res.status(400).json({ message: "Voucher chưa đến hạn hoặc đã hết hạn" });
+    if (now < start || now > end)
+      return res
+        .status(400)
+        .json({ message: "Voucher chưa đến hạn hoặc đã hết hạn" });
 
     // Check minOrderValue
-    if (total < voucher.conditions.minOrderValue) return res.status(400).json({ message: "Đơn hàng chưa đủ điều kiện voucher" });
+    if (total < voucher.conditions.minOrderValue)
+      return res
+        .status(400)
+        .json({ message: "Đơn hàng chưa đủ điều kiện voucher" });
 
     // Check perUserLimit
     const usedCount = await Order.countDocuments({ userId, voucherCode });
-    if (usedCount >= voucher.perUserLimit) return res.status(400).json({ message: "Bạn đã dùng voucher này rồi" });
+    if (usedCount >= voucher.perUserLimit)
+      return res.status(400).json({ message: "Bạn đã dùng voucher này rồi" });
 
     // Check applicableCategories
-    if(voucher.conditions.applicableCategories > 0){
-      const allItemsMatch = items.every(item => voucher.conditions.applicableCategories.includes(item.category));
+    if (voucher.conditions.applicableCategories > 0) {
+      const allItemsMatch = items.every((item) =>
+        voucher.conditions.applicableCategories.includes(item.category)
+      );
       if (!allItemsMatch) {
-        return res.status(400).json({ message: "Voucher chỉ áp dụng hóa đơn có tất cả sản phẩm trong danh mục" });
+        return res
+          .status(400)
+          .json({
+            message:
+              "Voucher chỉ áp dụng hóa đơn có tất cả sản phẩm trong danh mục",
+          });
       }
     }
 
