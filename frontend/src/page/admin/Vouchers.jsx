@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import ModalCreateProduct from "../../components/modal/adminProduct/ModalCreateProduct";
 import voucherApi from "../../api/voucherApi";
+import { MdUpdateDisabled } from "react-icons/md";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
-import { formatDateVN } from "../../utils/formatDateVN";
+import {formatDatetimeVN} from "../../utils/formatDatetimeVN";
 export default function Vouchers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [vouchers, setVouchers] = useState([]);
@@ -27,7 +27,6 @@ export default function Vouchers() {
     getAllVouchers();
   }, []);
   console.log(vouchers);
-
   // const handleToggleStatus = async (product) => {
   //   try {
   //     const updatedStatus = !product.status;
@@ -146,7 +145,7 @@ export default function Vouchers() {
                     />
                   </td>
                   <td className="px-6 py-4 text-sm max-w-[240px]">
-                    {`${formatDateVN(voucher.startDate)} đến ${formatDateVN(
+                    {`${formatDatetimeVN(voucher.startDate)} đến ${formatDatetimeVN(
                       voucher.endDate
                     )}`}
                   </td>
@@ -180,6 +179,23 @@ export default function Vouchers() {
                       </button>
                     </td>
                   )}
+                                    <td className="px-6 py-4 text-sm">
+                    <div className="flex items-center space-x-4">
+                      {/* Nút sửa */}
+                      <button
+                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                        title="Sửa thông tin"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
+                        title="Vô hiệu hóa mã"
+                      >
+                        <MdUpdateDisabled className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
           </tbody>

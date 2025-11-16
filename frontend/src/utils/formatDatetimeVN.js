@@ -1,4 +1,3 @@
-// utils/formatDate.js
 export const formatDatetimeVN = (isoString) => {
   if (!isoString) return "";
   const date = new Date(isoString);
@@ -9,10 +8,10 @@ export const formatDatetimeVN = (isoString) => {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-    second: "2-digit",
-    hour12: false,       // 24h format
-    timeZone: "Asia/Ho_Chi_Minh", // múi giờ Việt Nam
+    hour12: false,             // 24h format
+    timeZone: "Asia/Ho_Chi_Minh" // giờ Việt Nam
   };
 
+  // trả về dạng dd/mm/yyyy, hh:mm
   return date.toLocaleString("vi-VN", options);
 };

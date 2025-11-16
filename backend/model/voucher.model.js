@@ -29,7 +29,7 @@ const voucherSchema = new mongoose.Schema({
   },
   usageLimit: {
     type: Number,
-    required: true, // 0 nghĩa là không giới hạn
+    required: true, 
   },
   usedCount: {
     type: Number,
@@ -44,9 +44,9 @@ const voucherSchema = new mongoose.Schema({
     required: true,
   },
   conditions: {
-    minOrderValue: { type: Number, default: 0 },
+    minOrderValue: { type: Number, required: true },
     applicableCategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" }],
-    maxDiscountAmount: { type: Number, default: 0 },
+    maxDiscountAmount: { type: Number, default: 0},
   },
   status: {
     type: String,
