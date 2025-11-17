@@ -88,11 +88,11 @@ export default function Vouchers() {
                 "STT",
                 "Mã voucher",
                 "Mô tả (Điều kiện)",
-                "Lượt/Khách",
+                "Lượt / Khách",
                 "Hình ảnh",
                 "Bắt đầu",
                 "Giá trị",
-                "Số lượng mã",
+                "Đã sử dụng / Số lượng mã",
                 "Tình trạng",
                 "Thao tác",
               ].map((head) => (
@@ -112,87 +112,101 @@ export default function Vouchers() {
               )
               .map((voucher, index) => (
                 <tr key={voucher._id} className="hover:bg-gray-50">
+                  {/* STT */}
                   <td className="px-6 py-4 text-sm max-w-[10px]">
                     {index + 1}
                   </td>
+
+                  {/* Code */}
                   <td className="px-6 py-4 text-sm truncate max-w-[200px]">
                     {voucher.code}
                   </td>
+                  {/* Mô tả */}
                   <td className="px-6 py-4 text-sm max-w-[300px]">
                     {voucher.description} (đơn hàng từ{" "}
                     {formatCurrencyVN(voucher.conditions.minOrderValue)}
-                    {voucher.discountType === "percent" &&
-                      `, giảm ${
-                        voucher.discountValue
-                      }% tối đa ${formatCurrencyVN(
-                        voucher.conditions.maxDiscountAmount
-                      )}`}
+                    {voucher.discountType === "percent"
+                      ? `, giảm ${voucher.discountValue}%${
+                          voucher.conditions.maxDiscountAmount != null &&
+                          voucher.conditions.maxDiscountAmount > 0
+                            ? `, tối đa ${formatCurrencyVN(
+                                voucher.conditions.maxDiscountAmount
+                              )}`
+                            : ""
+                        }`
+                      : `, giảm ${formatCurrencyVN(voucher.discountValue)}`}
                     {voucher.conditions.applicableCategories.length > 0
-                      ? `, cho đơn hàng có tất cả sản phẩm trong danh mục ${voucher.conditions.applicableCategories.map(
-                          (category, i) =>
-                            `${
-                              i === 1 ? " ," : ""
-                            } ${category.name.toLowerCase()}`
-                        )}`
+                      ? `, cho đơn hàng có tất cả sản phẩm trong danh mục ${voucher.conditions.applicableCategories
+                          .map((cat) => cat.name.toLowerCase())
+                          .join(", ")}`
                       : ", áp dụng cho tất cả sản phẩm"}
                     )
                   </td>
-                  <td className="px-6 py-4 text-sm ">
+
+                  {/* Per user limit */}
+                  <td className="px-6 py-4 text-sm">
                     {voucher.perUserLimit} / account
                   </td>
-                  <td className="px-6 py-4">
+
+                  {/* Image */}
+                  <td className="px-6 py-4 shrink-0">
                     <img
-                      src="ádasd"
-                      className="w-16 h-16 object-cover rounded-xl"
+                      src={voucher.image}
+                      alt={voucher.code}
+                      className="w-18 h-18 object-contain rounded-xl shrink-0"
                     />
                   </td>
+
+                  {/* Thời gian */}
                   <td className="px-6 py-4 text-sm max-w-[240px]">
                     {`${formatDatetimeVN(
                       voucher.startDate
                     )} đến ${formatDatetimeVN(voucher.endDate)}`}
                   </td>
-                  <td className="px-6 py-4 text-sm truncate max-w-[160px]">
+
+                  {/* Giá trị giảm */}
+                  <td className="px-6 py-4 text-sm">
                     {voucher.discountType === "percent"
-                      ? `${voucher.discountValue}%`
-                      : `${formatCurrencyVN(voucher.discountValue)}`}
+                      ? `${voucher.discountValue}% ${
+                          voucher.conditions.maxDiscountAmount > 0 &&
+                          `(tối đa ${formatCurrencyVN(
+                            voucher.conditions.maxDiscountAmount
+                          )})`
+                        }`
+                      : formatCurrencyVN(voucher.discountValue)}
                   </td>
+
+                  {/* Số lần dùng / tổng */}
                   <td className="px-6 py-4 text-sm">
                     {voucher.usedCount}/{voucher.usageLimit}
                   </td>
-                  {voucher.status === "upcoming" ||
-                  voucher.status === "expired" ? (
-                    <td className="px-6 py-4 text-sm">
-                      <button
-                        className={`${
-                          voucher.status === "upcoming"
-                            ? "bg-blue-600"
-                            : "bg-yellow-600"
-                        } text-white px-4 py-2 whitespace-nowrap rounded-lg `}
-                      >
-                        {voucher.status === "upcoming"
-                          ? "Chưa tới ngày"
-                          : "Đã hết hạn"}
-                      </button>
-                    </td>
-                  ) : (
-                    <td className="px-6 py-4 text-sm">
-                      <button
-                        // onClick={() => handleToggleStatus(product)}
-                        className={`${
-                          voucher.status === "active"
-                            ? "bg-green-600"
-                            : "bg-red-600"
-                        } text-white px-4 py-2 whitespace-nowrap rounded-lg `}
-                      >
-                        {voucher.status === "active"
-                          ? "Đang hoạt động"
-                          : "Vô hiệu hóa"}
-                      </button>
-                    </td>
-                  )}
+
+                  {/* Trạng thái */}
+                  <td className="px-6 py-4 text-sm">
+                    <button
+                      className={`${
+                        voucher.status === "upcoming"
+                          ? "bg-blue-600"
+                          : voucher.status === "expired"
+                          ? "bg-yellow-600"
+                          : voucher.status === "active"
+                          ? "bg-green-600"
+                          : "bg-red-600"
+                      } text-white px-4 py-2 whitespace-nowrap rounded-lg`}
+                    >
+                      {voucher.status === "upcoming"
+                        ? "Chưa tới ngày"
+                        : voucher.status === "expired"
+                        ? "Đã hết hạn"
+                        : voucher.status === "active"
+                        ? "Đang hoạt động"
+                        : "Vô hiệu hóa"}
+                    </button>
+                  </td>
+
+                  {/* Hành động */}
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
-                      {/* Nút sửa */}
                       <button
                         className="text-blue-600 hover:text-blue-800 cursor-pointer"
                         title="Sửa thông tin"

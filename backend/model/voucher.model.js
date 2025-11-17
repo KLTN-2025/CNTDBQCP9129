@@ -46,7 +46,7 @@ const voucherSchema = new mongoose.Schema({
   conditions: {
     minOrderValue: { type: Number, required: true },
     applicableCategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" }],
-    maxDiscountAmount: { type: Number, default: 0},
+    maxDiscountAmount: { type: Number, default: null},
   },
   status: {
     type: String,
