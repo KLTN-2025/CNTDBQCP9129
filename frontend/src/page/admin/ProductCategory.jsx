@@ -136,7 +136,7 @@ export default function ProductCategory() {
           </div>
           <button
             onClick={() => setIsOpenModalCreateCategory(true)}
-            className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            className="flex items-center space-x-2 cursor-pointer bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             <span>Thêm loại sản phẩm</span>
