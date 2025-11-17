@@ -157,10 +157,16 @@ export default function Vouchers() {
                   <td className="px-6 py-4 text-sm">
                     {voucher.usedCount}/{voucher.usageLimit}
                   </td>
-                  {new Date() > new Date(voucher.endDate) ? (
+                  {voucher.status === "upcoming" || voucher.status === "expired" ? (
                     <td className="px-6 py-4 text-sm">
-                      <button className="bg-red-600 text-white cursor-pointer px-4 py-2 whitespace-nowrap rounded-lg">
-                        Đã hết hạn
+                      <button  className={`${
+                          voucher.status === "upcoming"
+                            ? "bg-blue-600"
+                            : "bg-yellow-600"
+                        } text-white px-4 py-2 whitespace-nowrap rounded-lg `}>
+                           {voucher.status === "upcoming"
+                          ? "Chưa tới ngày"
+                          : "Đã hết hạn"}
                       </button>
                     </td>
                   ) : (
@@ -170,12 +176,12 @@ export default function Vouchers() {
                         className={`${
                           voucher.status === "active"
                             ? "bg-green-600"
-                            : "bg-yellow-500"
-                        } text-white cursor-pointer px-4 py-2 whitespace-nowrap rounded-lg transition-colors`}
+                            : "bg-red-600"
+                        } text-white px-4 py-2 whitespace-nowrap rounded-lg `}
                       >
                         {voucher.status === "active"
                           ? "Đang hoạt động"
-                          : "Không hoạt động"}
+                          : "Vô hiệu hóa"}
                       </button>
                     </td>
                   )}

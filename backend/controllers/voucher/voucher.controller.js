@@ -98,11 +98,26 @@ export const getVouchers = async (req, res) => {
       path: "conditions.applicableCategories",
       select: "name",
     });
-    res.json(vouchers);
+
+    const now = new Date();
+
+    const result = vouchers.map(v => {
+      let status = v.status;
+
+      if (now < v.startDate) status = "upcoming";
+      else if (now > v.endDate) status = "expired";
+      else if (v.status === "inactive") status = "inactive";
+      else status = "active";
+
+      return { ...v.toObject(), status };
+    });
+
+    res.json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Áp dụng voucher
 export const applyVoucher = async (req, res) => {
