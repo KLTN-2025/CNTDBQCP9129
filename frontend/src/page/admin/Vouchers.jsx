@@ -4,11 +4,13 @@ import { toast } from "react-toastify";
 import voucherApi from "../../api/voucherApi";
 import { MdUpdateDisabled } from "react-icons/md";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
-import {formatDatetimeVN} from "../../utils/formatDatetimeVN";
+import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
+import ModalCreateVoucher from "../../components/modal/adminVoucher/ModalCreateVoucher";
 export default function Vouchers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [vouchers, setVouchers] = useState([]);
-  // const [isOpenModalCreateProduct, setIsOpenModalCreateProduct] = useState(false);
+  const [isOpenModalCreateVoucher, setIsOpenModalCreateVoucher] =
+    useState(false);
   // const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] = useState(false);
   // const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
   // const [productSelected, setProductSelected] = useState(null);
@@ -56,7 +58,7 @@ export default function Vouchers() {
             <p className="text-gray-600 mt-1">Danh sách voucher</p>
           </div>
           <button
-            // onClick={() => setIsOpenModalCreateProduct(true)}
+            onClick={() => setIsOpenModalCreateVoucher(true)}
             className="flex items-center cursor-pointer space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -145,9 +147,9 @@ export default function Vouchers() {
                     />
                   </td>
                   <td className="px-6 py-4 text-sm max-w-[240px]">
-                    {`${formatDatetimeVN(voucher.startDate)} đến ${formatDatetimeVN(
-                      voucher.endDate
-                    )}`}
+                    {`${formatDatetimeVN(
+                      voucher.startDate
+                    )} đến ${formatDatetimeVN(voucher.endDate)}`}
                   </td>
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
                     {voucher.discountType === "percent"
@@ -157,14 +159,17 @@ export default function Vouchers() {
                   <td className="px-6 py-4 text-sm">
                     {voucher.usedCount}/{voucher.usageLimit}
                   </td>
-                  {voucher.status === "upcoming" || voucher.status === "expired" ? (
+                  {voucher.status === "upcoming" ||
+                  voucher.status === "expired" ? (
                     <td className="px-6 py-4 text-sm">
-                      <button  className={`${
+                      <button
+                        className={`${
                           voucher.status === "upcoming"
                             ? "bg-blue-600"
                             : "bg-yellow-600"
-                        } text-white px-4 py-2 whitespace-nowrap rounded-lg `}>
-                           {voucher.status === "upcoming"
+                        } text-white px-4 py-2 whitespace-nowrap rounded-lg `}
+                      >
+                        {voucher.status === "upcoming"
                           ? "Chưa tới ngày"
                           : "Đã hết hạn"}
                       </button>
@@ -185,7 +190,7 @@ export default function Vouchers() {
                       </button>
                     </td>
                   )}
-                                    <td className="px-6 py-4 text-sm">
+                  <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
                       {/* Nút sửa */}
                       <button
@@ -207,6 +212,13 @@ export default function Vouchers() {
           </tbody>
         </table>
       </div>
+      {isOpenModalCreateVoucher && (
+        <ModalCreateVoucher
+          isOpenModalCreateVoucher={isOpenModalCreateVoucher}
+          setIsOpenModalCreateVoucher={setIsOpenModalCreateVoucher}
+          setVouchers={setVouchers}
+        />
+      )}
     </div>
   );
 }

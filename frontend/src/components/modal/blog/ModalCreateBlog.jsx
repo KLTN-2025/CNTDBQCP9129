@@ -11,18 +11,21 @@ import blogApi from "../../../api/blogAPI";
 const ModalCreateBlog = ({
   isOpenModalCreateBlog,
   setIsOpenModalCreateBlog,
-  setAllBlogs
+  setAllBlogs,
 }) => {
   useLockBodyScroll(isOpenModalCreateBlog);
 
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState({_id: "", name: ""});
+  const [selectedCategory, setSelectedCategory] = useState({
+    _id: "",
+    name: "",
+  });
   const [title, setTitle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const { selectedFile, handleImageChange, setSelectedFile } =
     usePreviewImage(3);
-  const {handleImageUpload} = useUpAndGetLinkImage()
+  const { handleImageUpload } = useUpAndGetLinkImage();
   const [introHighlight, setIntroHighlight] = useState("");
   const [bodyHighlight, setBodyHighlight] = useState("");
   const [conclusionHighlight, setConclusionHighlight] = useState("");
@@ -36,7 +39,7 @@ const ModalCreateBlog = ({
     const newSelectedFile = selectedFile.filter((_, i) => i !== indexImage);
     setSelectedFile(newSelectedFile);
   };
-  
+
   // Lấy tất cả danh mục của blog
   useEffect(() => {
     const fetchBlogCategories = async () => {
@@ -49,10 +52,10 @@ const ModalCreateBlog = ({
     };
     fetchBlogCategories();
   }, []);
-  
+
   // Hàm thêm blog
-  const handleSubmit = async() => {
-    if(isLoading) return
+  const handleSubmit = async () => {
+    if (isLoading) return;
     if (
       !title.trim() ||
       !selectedCategory._id ||
@@ -90,15 +93,20 @@ const ModalCreateBlog = ({
         },
       };
       const newBlog = await blogApi.create(dataBlog);
-      if(!newBlog.message){
+      if (!newBlog.message) {
         toast.success("Thêm bài viết thành công");
-        setAllBlogs((blogs) => [...blogs, {...newBlog, categoryId: selectedCategory}]);
+        setAllBlogs((blogs) => [
+          ...blogs,
+          { ...newBlog, categoryId: selectedCategory },
+        ]);
         setIsOpenModalCreateBlog(false);
-      }else {
+      } else {
         toast.error(newBlog.message || "Đã có lỗi xảy ra vui lòng thử lại");
       }
-    } catch(error) {
-      toast.error(error?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -132,11 +140,12 @@ const ModalCreateBlog = ({
         },
       }}
     >
-      <div className="bg-color-dash overflow-hidden rounded-md w-full flex flex-col select-none p-4">
-        <h2 className="text-xl font-bold mb-4">Thêm bài viết mới</h2>
-
+      <div className="overflow-hidden rounded-md w-full flex flex-col select-none">
+        <div className="w-full bg-green-600 text-white py-3 px-4 relative border-b-1 border-b-gray-400">
+          <p className="font-bold text-xl">Thêm danh loại sản phẩm mới</p>
+        </div>
         {/* Tiêu đề */}
-        <div className="mb-4">
+        <div className="mb-4 p-4">
           <label className="font-medium">Tiêu đề*</label>
           <input
             type="text"
@@ -148,14 +157,14 @@ const ModalCreateBlog = ({
         </div>
 
         {/* Danh mục */}
-        <div className="mb-4">
+        <div className="mb-4 p-4">
           <label className="font-medium">Danh mục*</label>
           <select
             className="w-full border px-3 py-2 rounded"
             value={selectedCategory.id}
-            onChange={(e) => { 
+            onChange={(e) => {
               const cate = categories.find((cat) => cat._id === e.target.value);
-              setSelectedCategory(cate || {_id: "", name: ""});
+              setSelectedCategory(cate || { _id: "", name: "" });
             }}
           >
             <option value="">-- Chọn danh mục --</option>
@@ -168,7 +177,7 @@ const ModalCreateBlog = ({
         </div>
 
         {/* Upload ảnh */}
-        <div className="mb-4">
+        <div className="mb-4 p-4">
           <label className="font-medium">Ảnh bài viết</label>
           <p className="text-xs">Tối đa 3 ảnh, 1 ảnh chính và 2 ảnh phụ</p>
           <input
@@ -198,7 +207,7 @@ const ModalCreateBlog = ({
         </div>
 
         {/* Intro */}
-        <div className="mb-4">
+        <div className="mb-4 p-4">
           <label className="font-medium">Intro - highlight</label>
           <input
             type="text"
@@ -216,7 +225,7 @@ const ModalCreateBlog = ({
         </div>
 
         {/* Body */}
-        <div className="mb-4">
+        <div className="mb-4 p-4">
           <label className="font-medium">Body - highlight</label>
           <input
             type="text"
@@ -234,7 +243,7 @@ const ModalCreateBlog = ({
         </div>
 
         {/* Conclusion */}
-        <div className="mb-4">
+        <div className="mb-4 p-4">
           <label className="font-medium">Conclusion - highlight</label>
           <input
             type="text"
@@ -252,7 +261,7 @@ const ModalCreateBlog = ({
         </div>
 
         {/* Button */}
-        <div className="flex gap-4 mt-4 w-full justify-end ">
+        <div className="flex gap-4 mt-4 w-full justify-end p-4">
           <button
             className=" border px-4 py-2 rounded-md  cursor-pointer"
             onClick={() => setIsOpenModalCreateBlog(false)}
@@ -264,14 +273,14 @@ const ModalCreateBlog = ({
             onClick={handleSubmit}
           >
             {isLoading ? (
-                <img
-                  className="object-cover w-7 h-7 rounded-full"
-                  src="/loading.gif"
-                  alt="đang tải"
-                />
-              ) : (
-                <p>Thêm mới</p>
-              )}
+              <img
+                className="object-cover w-7 h-7 rounded-full"
+                src="/loading.gif"
+                alt="đang tải"
+              />
+            ) : (
+              <p>Thêm mới</p>
+            )}
           </button>
         </div>
       </div>
