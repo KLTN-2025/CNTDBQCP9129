@@ -6,8 +6,15 @@ const orderSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true
+      required: true,
     },
+
+    // Voucher áp dụng (nếu có)
+    voucherCode: {
+      type: String,
+      default: null,
+    },
+
     // Danh sách món
     items: [
       {
@@ -15,10 +22,10 @@ const orderSchema = new mongoose.Schema(
         name: { type: String, required: true },
         quantity: { type: Number, required: true },
         price: { type: Number, required: true },
-        note: { type: String, default:""},
-
+        note: { type: String, default: "" },
       },
     ],
+
     totalPrice: { type: Number, required: true },
 
     // Thông tin giao hàng
@@ -28,7 +35,9 @@ const orderSchema = new mongoose.Schema(
       address: { type: String, default: null },
       note: { type: String, default: "" },
     },
+
     orderType: { type: String, enum: ["ONLINE", "OFFLINE"], required: true },
+
     // Phương thức thanh toán
     paymentMethod: { type: String, enum: ["CASH", "VNPAY"], required: true },
     paymentStatus: {
@@ -42,6 +51,7 @@ const orderSchema = new mongoose.Schema(
     vnp_TransactionNo: { type: String, default: null },
     vnp_PayDate: { type: String, default: null },
     vnp_Amount: { type: Number, default: null },
+
     // Trạng thái đơn hàng
     status: {
       type: String,
@@ -52,5 +62,7 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Compound index để truy vấn nhanh userId + voucherCode
+orderSchema.index({ userId: 1, voucherCode: 1 });
 const Order = mongoose.model("Order", orderSchema);
-export default Order
+export default Order;
