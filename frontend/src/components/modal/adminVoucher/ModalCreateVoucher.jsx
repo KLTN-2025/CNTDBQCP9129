@@ -278,11 +278,13 @@ const ModalCreateVoucher = ({
               rules={{ required: "Ảnh sản phẩm bắt buộc" }}
               render={({ field }) => {
                 const handleFileChange = (e) => {
-                  handleImageChange(e); // cập nhật selectedFile trong hook
-                  if (e.target.files.length > 0) {
-                    field.onChange(e.target.files[0]); // cập nhật giá trị useForm
+                  const file = e.target.files[0];
+                  if (file) {
+                    field.onChange(file);        // <-- QUAN TRỌNG: đặt file vào RHF
+                    handleImageChange(e);        // tạo preview
                   } else {
-                    field.onChange(""); // xóa nếu bỏ chọn
+                    field.onChange(null);
+                    setSelectedFile([]);
                   }
                 };
 
