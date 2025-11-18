@@ -8,7 +8,7 @@ const voucherSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    default: "",
+    required: true,
   },
   discountType: {
     type: String,
@@ -29,7 +29,7 @@ const voucherSchema = new mongoose.Schema({
   },
   usageLimit: {
     type: Number,
-    default: 0, // 0 nghĩa là không giới hạn
+    required: true, 
   },
   usedCount: {
     type: Number,
@@ -37,21 +37,22 @@ const voucherSchema = new mongoose.Schema({
   },
   perUserLimit: {
     type: Number,
-    default: 1, // mỗi user dùng tối đa 1 lần
+    required: true 
+  },
+  image: {
+    type: String,
+    required: true,
   },
   conditions: {
-    minOrderValue: { type: Number, default: 0 },
-    applicableProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-    excludedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    minOrderValue: { type: Number, required: true },
     applicableCategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" }],
-    maxDiscountAmount: { type: Number, default: 0 },
+    maxDiscountAmount: { type: Number, default: null},
   },
   status: {
     type: String,
-    enum: ["active", "inactive", "expired"],
+    enum: ["active", "inactive"], 
     default: "active",
   },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, { timestamps: true });
 
 export default mongoose.model("Voucher", voucherSchema);

@@ -7,7 +7,6 @@ const axiosClient = axios.create({
   },
 });
 
-
 axiosClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -32,8 +31,6 @@ axiosClient.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       console.warn("Token hết hạn hoặc không hợp lệ, vui lòng đăng nhập lại.");
       localStorage.removeItem("token");
-      // có thể redirect tới /login nếu muốn
-      // window.location.href = "/login";
     }
     return Promise.reject(error);
   }

@@ -1,0 +1,233 @@
+import Voucher from "../../model/voucher.model.js";
+import Order from "../../model/order.model.js";
+
+// Tạo voucher
+export const createVoucher = async (req, res) => {
+  try {
+    const {
+      code,
+      description,
+      discountType,
+      discountValue,
+      startDate,
+      endDate,
+      image,
+      usageLimit,
+      perUserLimit,
+      applicableCategories = [],
+      minOrderValue,
+      maxDiscountAmount,
+    } = req.body;
+
+    // Kiểm tra mã đã tồn tại
+    if (await Voucher.findOne({ code })) {
+      return res.status(400).json({ message: "Mã voucher đã tồn tại" });
+    }
+    // Check các trường bắt buộc
+    const requiredFields = {
+      code: code?.trim(),
+      description: description?.trim(),
+      discountType: discountType?.trim(),
+      image: image?.trim(),
+      discountValue,
+      startDate,
+      endDate,
+      usageLimit,
+      perUserLimit,
+      minOrderValue,
+    };
+
+    for (const value of Object.values(requiredFields)) {
+      if (
+        value === undefined ||
+        value === null ||
+        (typeof value === "string" && value.trim() === "")
+      ) {
+        return res.status(400).json({
+          message: "Thiếu thông tin bắt buộc hoặc thông tin chưa hợp lệ",
+        });
+      }
+    }
+    const codeRegex = /^[a-zA-Z0-9_-]{6,20}$/;
+    if (!codeRegex.test(code)) {
+      return res.status(400).json({
+        message:
+          "Mã voucher phải từ 6 đến 20 ký tự, không được chứa dấu hoặc ký tự đặc biệt",
+      });
+    }
+    // check số liệu
+    if (discountValue <= 0)
+      return res.status(400).json({
+        message: "Giá trị khuyến mãi phải lớn hơn 0",
+      });
+
+    if (usageLimit <= 0)
+      return res.status(400).json({
+        message: "Số lượng mã phải lớn hơn 0",
+      });
+
+    if (perUserLimit <= 0)
+      return res.status(400).json({
+        message: "Số lần sử dụng tối đa mỗi tài khoản phải lớn hơn 0",
+      });
+
+    if (usageLimit < perUserLimit)
+      return res.status(400).json({
+        message:
+          "Số lần sử dụng tối đa mỗi tài khoản không được lớn hơn số lượng mã",
+      });
+
+    if (minOrderValue < 0)
+      return res.status(400).json({
+        message: "Giá trị đơn hàng tối thiểu không được nhỏ hơn 0",
+      });
+
+    if (maxDiscountAmount != null && maxDiscountAmount <= 0)
+      return res.status(400).json({
+        message: "Giá trị giảm tối đa phải lớn hơn",
+      });
+
+    // check loại discount
+    if (discountType === "percent") {
+      if (discountValue <= 0 || discountValue > 100) {
+        return res.status(400).json({
+          message: "Giảm phần trăm phải từ 1 đến 100",
+        });
+      }
+    }
+    // check thời gian
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+
+    // So sánh ngày giờ
+    if (start >= end)
+      return res
+        .status(400)
+        .json({ message: "Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc" });
+    if (end <= now)
+      return res
+        .status(400)
+        .json({ message: "Thời gian kết thúc phải lớn hơn hiện tại" });
+
+    // Tạo voucher
+    const voucher = new Voucher({
+      code: code.toUpperCase(),
+      description,
+      discountType,
+      discountValue,
+      startDate: start,
+      endDate: end,
+      image,
+      usageLimit,
+      perUserLimit,
+      conditions: {
+        minOrderValue,
+        applicableCategories,
+        maxDiscountAmount,
+      },
+    });
+
+    await voucher.save();
+    const populatedVoucher = await Voucher.findById(voucher._id).populate(
+      "conditions.applicableCategories",
+      "name"
+    );
+    return res.status(201).json(populatedVoucher);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Lấy danh sách voucher
+export const getVouchers = async (req, res) => {
+  try {
+    const vouchers = await Voucher.find().sort({ createdAt: -1 }).populate({
+      path: "conditions.applicableCategories",
+      select: "name",
+    });
+
+    const now = new Date();
+
+    const result = vouchers.map((v) => {
+      let status = v.status;
+
+      if (now < v.startDate) status = "upcoming";
+      else if (now > v.endDate) status = "expired";
+      else if (v.status === "inactive") status = "inactive";
+      else status = "active";
+
+      return { ...v.toObject(), status };
+    });
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Áp dụng voucher
+export const applyVoucher = async (req, res) => {
+  try {
+    const { voucherCode, items, total, userId } = req.body;
+
+    // Lấy voucher
+    const voucher = await Voucher.findOne({ code: voucherCode });
+    if (!voucher)
+      return res.status(400).json({ message: "Voucher không tồn tại" });
+
+    // Check trạng thái
+    if (voucher.status !== "active")
+      return res.status(400).json({ message: "Voucher không khả dụng" });
+
+    // Check thời gian
+    const now = new Date();
+    const start = new Date(voucher.startDate);
+    const end = new Date(voucher.endDate);
+    if (now < start)
+      return res.status(400).json({ message: "Voucher chưa đến hạn" });
+    if (now > end)
+      return res.status(400).json({ message: "Voucher đã hết hạn" });
+    // Check minOrderValue
+    if (total < voucher.conditions.minOrderValue)
+      return res
+        .status(400)
+        .json({ message: "Đơn hàng chưa đủ điều kiện voucher" });
+
+    // Check perUserLimit
+    const usedCount = await Order.countDocuments({ userId, voucherCode });
+    if (usedCount >= voucher.perUserLimit)
+      return res.status(400).json({ message: "Bạn đã dùng voucher này rồi" });
+
+    // Check applicableCategories
+    if (voucher.conditions.applicableCategories > 0) {
+      const allItemsMatch = items.every((item) =>
+        voucher.conditions.applicableCategories.includes(item.category)
+      );
+      if (!allItemsMatch) {
+        return res.status(400).json({
+          message:
+            "Voucher chỉ áp dụng hóa đơn có tất cả sản phẩm trong danh mục",
+        });
+      }
+    }
+
+    // Tính discount
+    let discount = 0;
+    if (voucher.discountType === "percent") {
+      discount = total * (voucher.discountValue / 100);
+      if (
+        voucher.conditions.maxDiscountAmount != null &&
+        voucher.conditions.maxDiscountAmount > 0
+      ) {
+        discount = Math.min(discount, voucher.conditions.maxDiscountAmount);
+      }
+      discount = Math.min(discount, total);
+    } else {
+      discount = Math.min(voucher.discountValue, total);
+    }
+    res.json({ discount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

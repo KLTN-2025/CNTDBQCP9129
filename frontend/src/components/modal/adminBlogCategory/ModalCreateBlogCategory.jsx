@@ -37,8 +37,8 @@ const ModalCreateBlogCategory = ({
         },
       }}
     >
-      <div className="bg-color-dash overflow-hidden rounded-md w-full flex flex-col select-none">
-        <div className="w-full bg-color-dash py-3 px-4 relative border-b-1 border-b-gray-400">
+      <div className="overflow-hidden rounded-md w-full flex flex-col select-none">
+        <div className="w-full bg-green-600 text-white py-3 px-4 relative border-b-1 border-b-gray-400">
           <p className="font-bold text-xl">Thêm danh mục mới</p>
         </div>
         <div className="py-8 px-4 space-y-4">
@@ -59,7 +59,7 @@ const ModalCreateBlogCategory = ({
             Hủy
           </button>
           <button
-            className="bg-green-700 w-full rounded-md px-2 py-2 cursor-pointer"
+            className="bg-green-700 w-full text-white rounded-md px-2 py-2 cursor-pointer"
             onClick={onConfirm}
           >
             Thêm mới
