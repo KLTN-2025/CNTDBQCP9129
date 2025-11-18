@@ -31,12 +31,30 @@ export const getAdmins = async (req, res) => {
 // Admin cập nhật role 
 export const updateUserRole = async (req, res) => {
   try {
-    const { id } = req.params;   
-    const { role } = req.body;      
+    const { id } = req.params;
+    const { role } = req.body;
 
     const validRoles = ["customer", "manager", "admin"];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ message: "Giá trị role không hợp lệ" });
+    }
+
+    // Lấy user hiện tại
+    const currentUser = await User.findById(id);
+    if (!currentUser) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    }
+
+    // Nếu user hiện tại là admin
+    if (currentUser.role === "admin") {
+      const countAdmins = await User.countDocuments({ role: "admin" });
+
+      // Chỉ có 1 admin và đang định đổi role → cấm
+      if (countAdmins === 1 && role !== "admin") {
+        return res.status(400).json({
+          message: "Không thể thay đổi vai trò. Hệ thống cần ít nhất 1 admin."
+        });
+      }
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -45,11 +63,9 @@ export const updateUserRole = async (req, res) => {
       { new: true }
     ).select("-password");
 
-    if (!updatedUser) {
-      return res.status(404).json({ message: "Không tìm thấy người dùng" });
-    }
-    res.status(200).json(updatedUser);
+    return res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: "Lỗi server"});
+    return res.status(500).json({ message: "Lỗi server" });
   }
 };
+
