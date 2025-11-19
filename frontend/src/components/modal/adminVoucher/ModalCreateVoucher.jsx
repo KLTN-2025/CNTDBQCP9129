@@ -23,7 +23,7 @@ const ModalCreateVoucher = ({
   const { selectedFile, handleImageChange, setSelectedFile } =
     usePreviewImage(1);
   const { handleImageUpload } = useUpAndGetLinkImage();
-
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -40,7 +40,7 @@ const ModalCreateVoucher = ({
       discountValue: "",
       startDate: "",
       endDate: "",
-      image: "",
+      image: null,
       usageLimit: "",
       perUserLimit: "",
       minOrderValue: "",
@@ -62,7 +62,9 @@ const ModalCreateVoucher = ({
   }, [isOpenModalCreateVoucher]);
 
   const onSubmit = async (data) => {
+    if(isLoading) return
     try {
+      setIsLoading(true);
       data.discountValue = Number(data.discountValue);
       data.usageLimit = Number(data.usageLimit);
       data.perUserLimit = Number(data.perUserLimit);
@@ -87,6 +89,8 @@ const ModalCreateVoucher = ({
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Lỗi khi thêm voucher");
+    } finally {
+      setIsLoading(false)
     }
   };
 
@@ -276,57 +280,49 @@ const ModalCreateVoucher = ({
               name="image"
               control={control}
               rules={{ required: "Ảnh sản phẩm bắt buộc" }}
-              render={({ field }) => {
-                const handleFileChange = (e) => {
-                  handleImageChange(e); // cập nhật selectedFile trong hook
-                  if (e.target.files.length > 0) {
-                    field.onChange(e.target.files[0]); // cập nhật giá trị useForm
-                  } else {
-                    field.onChange(""); // xóa nếu bỏ chọn
-                  }
-                };
+              render={({ field }) => (
+                <>
+                  <input
+                    type="file"
+                    ref={inputRef}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      handleImageChange(e);
+                      field.onChange(file || null); 
+                    }}
+                    className="hidden"
+                  />
 
-                return (
-                  <>
-                    <input
-                      type="file"
-                      ref={inputRef}
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                    <FaImage
-                      className="text-3xl cursor-pointer mt-2"
-                      onClick={() => inputRef.current.click()}
-                    />
-                    {selectedFile.length > 0 && (
-                      <div className="relative inline-block mt-2">
-                        <img
-                          src={selectedFile[0]}
-                          alt="Ảnh sản phẩm"
-                          className="w-16 h-16 object-cover rounded"
-                        />
-                        <IoIosRemoveCircle
-                          onClick={() => {
-                            setSelectedFile([]);
-                            field.onChange(""); // xóa giá trị trong useForm
-                          }}
-                          className="absolute -top-2 -right-2 w-6 h-6 cursor-pointer bg-black text-white rounded-full hover:bg-red-500 transition"
-                        />
-                      </div>
-                    )}
-                    {errors.image && (
-                      <p className="text-red-500 text-sm">
-                        {errors.image.message}
-                      </p>
-                    )}
-                  </>
-                );
-              }}
+                  <FaImage
+                    className="text-3xl cursor-pointer mt-2"
+                    onClick={() => inputRef.current.click()}
+                  />
+
+                  {selectedFile.length > 0 && (
+                    <div className="relative inline-block mt-2">
+                      <img
+                        src={selectedFile[0]}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <IoIosRemoveCircle
+                        onClick={() => {
+                          setSelectedFile([]);
+                          field.onChange(null); 
+                        }}
+                        className="absolute -top-2 -right-2 w-6 h-6 cursor-pointer 
+            bg-black text-white rounded-full hover:bg-red-500 transition"
+                      />
+                    </div>
+                  )}
+
+                  {errors.image && (
+                    <p className="text-red-500 text-sm">
+                      {errors.image.message}
+                    </p>
+                  )}
+                </>
+              )}
             />
-
-            {errors.image && (
-              <p className="text-red-500 text-sm">{errors.image.message}</p>
-            )}
           </div>
 
           <div className="grid grid-cols-3 gap-2">
@@ -423,12 +419,22 @@ const ModalCreateVoucher = ({
             >
               Hủy
             </button>
-            <button
-              type="submit"
-              className="bg-green-700 w-full text-white flex items-center justify-center rounded-md px-4 py-2 cursor-pointer"
-            >
-              Thêm voucher
-            </button>
+          <button
+            className="bg-green-600 w-full text-white rounded-md px-2 py-2 cursor-pointer"
+            onClick={handleSubmit}
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <img
+                src="/loading.gif"
+                alt="Đang tải..."
+                className="w-7 h-7 mx-auto"
+              />
+            ) : (
+              "Thêm mới"
+            )}
+          </button>
           </div>
         </form>
       </div>

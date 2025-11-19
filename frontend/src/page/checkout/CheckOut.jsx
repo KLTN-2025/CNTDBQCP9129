@@ -14,7 +14,6 @@ import ModalUpdateProduct from "../../components/modal/customerProduct/ModalUpda
 const CheckOut = () => {
   const { user } = useAuthStore();
   const [timeSlots, setTimeSlots] = useState([]);
-  const [time, setTime] = useState("");
   const [name, setName] = useState(user?.name);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [deliveryNote, setDeliveryNote] = useState("");
@@ -22,6 +21,7 @@ const CheckOut = () => {
   const { cart, setCart } = useCartStore();
   const [itemUpdate, setItemUpdate] = useState();
   const [isOpenModalUpdateItem, setIsOpenModalUpdateItem] = useState(false);
+  const [voucherCode, setVoucherCode] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
     setTimeSlots(["Càng sớm càng tốt", ...getDeliverySlots()]);
@@ -249,7 +249,7 @@ const CheckOut = () => {
               <p className="text-xl font-semibold px-4 pr-6">Tổng cộng</p>
               <hr className="w-[3rem] border-2 border-orange-600 ml-4" />
               <div className="pt-4 flex w-full justify-between px-4 pr-6">
-                <p className="text-gray-600">Thành tiền:</p>
+                <p className="text-gray-600">Tạm tính:</p>
                 <p className="font-bold">{formatCurrencyVN(subTotal)}</p>
               </div>
               {receiveMethod === "delivery" && (
@@ -258,6 +258,12 @@ const CheckOut = () => {
                   <p className="font-bold">{formatCurrencyVN(20000)}</p>
                 </div>
               )}
+              <div className="flex items-center gap-x-4 px-4 mt-4">
+                <input type="text" className="border py-2 rounded-sm w-full border-gray-300 pl-2 focus:border-orange-600 focus:outline-none"
+                 onChange={(e) => setVoucherCode(e.target.value)}
+                />
+                <button className={`${voucherCode.trim().length > 0 ? "bg-orange-600" : "bg-orange-300"} text-white px-4 py-2 whitespace-nowrap rounded-sm cursor-pointer`}>Áp dụng</button>
+              </div>
               <div className="mt-6 rounded-bl-lg rounded-br-lg px-4 items-center py-2 flex w-full justify-between bg-orange-500 text-white">
                 <div>
                   <p>Thành tiền</p>
