@@ -29,6 +29,7 @@ export default function Vouchers() {
     getAllVouchers();
   }, []);
   console.log(vouchers);
+
   // const handleToggleStatus = async (product) => {
   //   try {
   //     const updatedStatus = !product.status;
@@ -168,10 +169,10 @@ export default function Vouchers() {
                   <td className="px-6 py-4 text-sm">
                     {voucher.discountType === "percent"
                       ? `${voucher.discountValue}% ${
-                          voucher.conditions.maxDiscountAmount > 0 &&
+                      voucher.conditions.maxDiscountAmount > 0 ?
                           `(tối đa ${formatCurrencyVN(
                             voucher.conditions.maxDiscountAmount
-                          )})`
+                          )})` : ""
                         }`
                       : formatCurrencyVN(voucher.discountValue)}
                   </td>

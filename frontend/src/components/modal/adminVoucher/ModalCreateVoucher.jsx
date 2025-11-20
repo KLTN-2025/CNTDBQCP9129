@@ -84,8 +84,6 @@ const ModalCreateVoucher = ({
         setVouchers((prev) => [newVoucher, ...prev]);
         setIsOpenModalCreateVoucher(false);
         reset();
-      } else {
-        toast.error(response.message);
       }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Lỗi khi thêm voucher");
@@ -256,7 +254,7 @@ const ModalCreateVoucher = ({
                     label: c.name,
                   }))}
                   isMulti
-                  placeholder="Chọn danh mục..."
+                  placeholder="Tất cả sản phẩm"
                   className="basic-multi-select"
                   menuPortalTarget={document.body}
                   styles={{

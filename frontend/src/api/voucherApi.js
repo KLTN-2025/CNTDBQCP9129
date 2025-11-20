@@ -9,5 +9,9 @@ const voucherApi = {
     const res = await axiosClient.post('/vouchers', data);
     return res.data;
   },
+  applyVoucher: async(data) => {
+    const res = await axiosClient.post('/vouchers/check-voucher', data);
+    return res.data;
+  }
 }
 export default voucherApi;

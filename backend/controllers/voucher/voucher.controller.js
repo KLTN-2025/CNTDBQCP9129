@@ -170,7 +170,7 @@ export const getVouchers = async (req, res) => {
 export const applyVoucher = async (req, res) => {
   try {
     const { voucherCode, items, total, userId } = req.body;
-
+    console.log(items);
     // Lấy voucher
     const voucher = await Voucher.findOne({ code: voucherCode });
     if (!voucher)
@@ -200,9 +200,9 @@ export const applyVoucher = async (req, res) => {
       return res.status(400).json({ message: "Bạn đã dùng voucher này rồi" });
 
     // Check applicableCategories
-    if (voucher.conditions.applicableCategories > 0) {
-      const allItemsMatch = items.every((item) =>
-        voucher.conditions.applicableCategories.includes(item.category)
+    if (voucher.conditions.applicableCategories.length > 0) {
+      const allItemsMatch = items.every((productCategoryId) =>
+        voucher.conditions.applicableCategories.includes(productCategoryId)
       );
       if (!allItemsMatch) {
         return res.status(400).json({
@@ -226,7 +226,7 @@ export const applyVoucher = async (req, res) => {
     } else {
       discount = Math.min(voucher.discountValue, total);
     }
-    res.json({ discount });
+    res.json({voucherCode, discount});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

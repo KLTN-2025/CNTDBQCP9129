@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PiNotepadFill } from "react-icons/pi";
 import getDeliverySlots from "../../hooks/deliveryTime";
 import useAuthStore from "../../store/authStore";
@@ -11,6 +11,10 @@ import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import { toast } from "react-toastify";
 import cartApi from "../../api/cartApi";
 import ModalUpdateProduct from "../../components/modal/customerProduct/ModalUpdateProduct";
+import voucherApi from "../../api/voucherApi";
+import { BsFillTagFill } from "react-icons/bs";
+import { IoMdRemoveCircleOutline } from "react-icons/io";
+
 const CheckOut = () => {
   const { user } = useAuthStore();
   const [timeSlots, setTimeSlots] = useState([]);
@@ -22,6 +26,9 @@ const CheckOut = () => {
   const [itemUpdate, setItemUpdate] = useState();
   const [isOpenModalUpdateItem, setIsOpenModalUpdateItem] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
+  const [error, setError] = useState("");
+  const [discount, setDiscount] = useState(0);
+  const [voucherUsed, setVoucherUsed] = useState("");
   const navigate = useNavigate();
   useEffect(() => {
     setTimeSlots(["Càng sớm càng tốt", ...getDeliverySlots()]);
@@ -29,7 +36,10 @@ const CheckOut = () => {
   const subTotal = useMemo(() => {
     return cart.reduce(
       (sum, item) =>
-        sum + item.productId.price * (1 - item.productId.discount / 100) * item.quantity,
+        sum +
+        item.productId.price *
+          (1 - item.productId.discount / 100) *
+          item.quantity,
       0
     );
   }, [cart]);
@@ -37,17 +47,28 @@ const CheckOut = () => {
     if (receiveMethod === "delivery") {
       return cart.reduce(
         (sum, item) =>
-          sum + item.productId.price * (1 - item.productId.discount / 100) * item.quantity,
+          sum +
+          item.productId.price *
+            (1 - item.productId.discount / 100) *
+            item.quantity,
         20000
       );
     }
     return cart.reduce(
       (sum, item) =>
-        sum + item.productId.price * (1 - item.productId.discount / 100) * item.quantity ,
+        sum +
+        item.productId.price *
+          (1 - item.productId.discount / 100) *
+          item.quantity,
       0
     );
   }, [cart, receiveMethod]);
   console.log(cart);
+  useEffect(() => {
+    if (voucherCode.trim() === "") {
+      setError("");
+    }
+  }, [voucherCode]);
   const handleClickRemoveProduct = async (item) => {
     try {
       await cartApi.removeCartItem(user.id, {
@@ -57,8 +78,8 @@ const CheckOut = () => {
       const newCart = cart.filter(
         (product) => product.productId._id !== item.productId._id
       );
-      if(newCart.length === 0){
-        navigate('/menu')
+      if (newCart.length === 0) {
+        navigate("/menu");
       }
       setCart(newCart);
       localStorage.setItem("cart", JSON.stringify(newCart));
@@ -66,6 +87,29 @@ const CheckOut = () => {
       toast.error(error.response.data.message);
     }
   };
+  const handleClickApplyVoucher = async () => {
+    try {
+      if (voucherCode.trim() === "") return;
+      const data = {
+        voucherCode,
+        items: cart.map((item) => item.productId.productCategoryId),
+        total: subTotal,
+        userId: user.id,
+      };
+      const res = await voucherApi.applyVoucher(data);
+      setVoucherCode("");
+      setDiscount(res.discount);
+      setVoucherUsed(res.voucherCode);
+      setError("");
+    } catch (err) {
+      setError(err.response.data.message || "Lỗi áp dụng voucher");
+      console.log(err);
+    }
+  };
+  const handleClickRemoveVoucher = () => {
+    setDiscount(0);
+    setVoucherUsed("");
+  }
   return (
     <div className="mx-auto max-lg:px-4 px-40 py-10 w-full">
       <div className="w-full flex items-center justify-center gap-x-2">
@@ -226,11 +270,11 @@ const CheckOut = () => {
                           className="text-xl text-orange-500 cursor-pointer"
                           title="Chỉnh sửa sản phẩm"
                         >
-                          <MdModeEdit 
-                           onClick={() => {
-                            setItemUpdate(item);
-                            setIsOpenModalUpdateItem(true);
-                           }}
+                          <MdModeEdit
+                            onClick={() => {
+                              setItemUpdate(item);
+                              setIsOpenModalUpdateItem(true);
+                            }}
                           />
                         </button>
                       </div>
@@ -238,7 +282,8 @@ const CheckOut = () => {
                     <div className="w-[100px] font-bold">
                       {formatCurrencyVN(
                         item.productId.price *
-                          (1 - item.productId.discount / 100) * item.quantity
+                          (1 - item.productId.discount / 100) *
+                          item.quantity
                       )}
                     </div>
                   </div>
@@ -258,16 +303,45 @@ const CheckOut = () => {
                   <p className="font-bold">{formatCurrencyVN(20000)}</p>
                 </div>
               )}
-              <div className="flex items-center gap-x-4 px-4 mt-4">
-                <input type="text" className="border py-2 rounded-sm w-full border-gray-300 pl-2 focus:border-orange-600 focus:outline-none"
-                 onChange={(e) => setVoucherCode(e.target.value)}
-                />
-                <button className={`${voucherCode.trim().length > 0 ? "bg-orange-600" : "bg-orange-300"} text-white px-4 py-2 whitespace-nowrap rounded-sm cursor-pointer`}>Áp dụng</button>
+              <div className="flex flex-col px-4 mt-4">
+                <div className="flex items-center gap-x-4">
+                  <input
+                    type="text"
+                    value={voucherCode}
+                    className={`border-2 py-2 rounded-sm w-full ${error ? "border-red-700" : "border-gray-300"}  pl-2 focus:border-orange-500 focus:outline-none`}
+                    onChange={(e) => setVoucherCode(e.target.value)}
+                    onPaste={(e) => setVoucherCode(e.target.value)}
+                  />
+                  <button
+                    className={`${
+                      voucherCode.trim() === ""
+                        ? "bg-orange-300"
+                        : "bg-orange-600"
+                    } text-white px-4 py-2 whitespace-nowrap rounded-sm cursor-pointer`}
+                    onClick={handleClickApplyVoucher}
+                  >
+                    Áp dụng
+                  </button>
+                </div>
+                {error && (
+                  <p className="text-red-600">{error}</p>
+                )}
+                {voucherUsed && (
+                  <div className="pl-4 pr-2 flex relative gap-x-2 py-2 max-w-[200px] bg-gray-300 rounded-sm mt-4">
+                    <BsFillTagFill className="text-xl mt-1" />
+                    <p>{voucherUsed}</p>
+                    <IoMdRemoveCircleOutline className=" cursor-pointer right-1 absolute" 
+                     onClick={handleClickRemoveVoucher}
+                    />
+                  </div>
+                )}
               </div>
               <div className="mt-6 rounded-bl-lg rounded-br-lg px-4 items-center py-2 flex w-full justify-between bg-orange-500 text-white">
                 <div>
                   <p>Thành tiền</p>
-                  <p className="font-bold">{formatCurrencyVN(total)}</p>
+                  <p className="font-bold">
+                    {formatCurrencyVN(total - discount)}
+                  </p>
                 </div>
                 <button className="px-5 py-2 bg-white text-orange-500 rounded-full cursor-pointer">
                   Đặt hàng

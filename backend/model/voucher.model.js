@@ -5,6 +5,7 @@ const voucherSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    minlength: 6,
   },
   description: {
     type: String,
@@ -18,6 +19,7 @@ const voucherSchema = new mongoose.Schema({
   discountValue: {
     type: Number,
     required: true,
+    min: 1
   },
   startDate: {
     type: Date,
@@ -29,7 +31,8 @@ const voucherSchema = new mongoose.Schema({
   },
   usageLimit: {
     type: Number,
-    required: true, 
+    required: true,
+    min: 1 
   },
   usedCount: {
     type: Number,
@@ -37,14 +40,15 @@ const voucherSchema = new mongoose.Schema({
   },
   perUserLimit: {
     type: Number,
-    required: true 
+    required: true,
+    min: 0 
   },
   image: {
     type: String,
     required: true,
   },
   conditions: {
-    minOrderValue: { type: Number, required: true },
+    minOrderValue: { type: Number, required: true, min: 0 },
     applicableCategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "ProductCategory" }],
     maxDiscountAmount: { type: Number, default: null},
   },
