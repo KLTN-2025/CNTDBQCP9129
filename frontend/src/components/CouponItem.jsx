@@ -6,7 +6,7 @@ const CouponItem = ({ voucher }) => {
   const [isOpenModalConditionsVoucher, setIsOpenModalConditionsVoucher] =
     useState(false);
   return (
-    <div className="flex items-stretch gap-x-4 p-4 max-w-sm rounded-lg w-full bg-white shadow-sm">
+    <div className="flex items-stretch gap-x-4 p-4 max-w-sm rounded-lg w-full bg-white shadow-sm shrink-0">
       <img
         src={voucher.image}
         className="w-24 h-24 rounded-lg object-cover"
@@ -39,7 +39,7 @@ const CouponItem = ({ voucher }) => {
             {!copied ? "Sao chép mã" : "Đã sao chép"}
           </button>
 
-          <button className="text-sm text-blue-600 cursor-pointer"
+          <button className="text-sm text-blue-800 cursor-pointer"
            onClick={() => setIsOpenModalConditionsVoucher(true)}
           >
             Điều kiện

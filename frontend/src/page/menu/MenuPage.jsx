@@ -68,7 +68,7 @@ const MenuPage = () => {
     <div className="mx-auto px-20 max-sm:px-4 pt-4 w-full bg-gradient-to-b bg-amber-100 to-white">
       
       {vouchers.length > 0 && (
-        <div className="w-full flex items-center justify-between px-20 mt-10">
+        <div className="w-full flex max-xl:flex-col max-xl:gap-y-4 gap-x-4 items-center justify-between mx-auto mt-10">
           {vouchers.map((voucher) => (
            <CouponItem voucher={voucher}/>
           ))}
@@ -112,8 +112,10 @@ const MenuPage = () => {
             products.map((product) => (
               <div className="w-full relative flex sm:flex-col sm:max-w-[230px] max-sm:gap-x-6 gap-y-4 rounded-xl px-4 py-4 shadow-xl cursor-pointer"
                onClick={() => {
-                setProductDetail(product);
-                setIsOpenModalDetailProduct(true);
+                if(product.status){
+                 setProductDetail(product);
+                 setIsOpenModalDetailProduct(true);
+                }
                }}
               >
                 {!product.status && (
