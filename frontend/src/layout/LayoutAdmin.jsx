@@ -34,7 +34,7 @@ export default function LayoutAdmin() {
         </div>
 
         {/* Menu Items */}
-        <ul className="space-y-3 mt-10 whitespace-nowrap shrink-0">
+        <ul className="space-y-3 mt-10 whitespace-nowrap shrink-0 h-screen overflow-y-auto pb-10">
           <li>
             <Link
               to="/admin/users"
