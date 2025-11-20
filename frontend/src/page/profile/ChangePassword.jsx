@@ -46,10 +46,12 @@ const ChangePassword = () => {
     }
   };
   return (
-    <div className="flex max-w-sm">
+    <div className="flex w-full flex-col">
+      <h2 className='text-xl font-bold text-center'>Đổi mật khẩu</h2>
+
       <form
         onSubmit={handleChangePassword}
-        className="flex flex-col gap-4 pt-4"
+        className="flex flex-col gap-4 pt-4 max-w-xl"
       >
         <label
           className={` ${error ? "opacity-100 text-red-700" : "opacity-100 text-green-700"} h-8`}
@@ -96,7 +98,7 @@ const ChangePassword = () => {
 
         <button
           type="submit"
-          className="mt-2 bg-green-600  flex justify-center h-10 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-all cursor-pointer"
+          className="mt-2 max-w-[180px] bg-blue-600  flex justify-center h-10 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all cursor-pointer"
         >
           {isLoading ? (
             <img
