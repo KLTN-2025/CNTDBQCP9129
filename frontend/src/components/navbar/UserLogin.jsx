@@ -1,4 +1,3 @@
-import { FaRegUserCircle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import useCartStore from "../../store/cartStore";
@@ -15,8 +14,8 @@ const UserLogin = () => {
     navigate("/");
   };
   return (
-    <div className="flex items-center gap-x-4">
-      <FaRegUserCircle className="text-3xl text-green-700" />
+    <div className="flex items-center gap-x-2 mr-10">
+      <img src="user.png" className="w-8 h-8 object-cover mt-1" alt="tài khoản" />
       <div className="flex flex-col font-normal">
         <Link to="/profile">
           <button className="text-sm hover:text-green-700 cursor-pointer font-semibold">
