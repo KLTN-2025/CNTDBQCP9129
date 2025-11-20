@@ -6,11 +6,14 @@ import { useParams } from "react-router-dom";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN.js";
 import { Link } from "react-router-dom";
 import ModalDetailProduct from "../../components/modal/customerProduct/ModalDetailProduct.jsx";
+import voucherApi from "../../api/voucherApi.js";
+import CouponItem from "../../components/CouponItem.jsx";
 const MenuPage = () => {
   const [products, setProducts] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
   const { categorySlug } = useParams();
-  const [productDetail, setProductDetail] = useState(null)
+  const [productDetail, setProductDetail] = useState(null);
+  const [vouchers, setVouchers] = useState([]);
   const [isOpenModalDetailProduct, setIsOpenModalDetailProduct] =
     useState(false);
   // lấy 10 sản phẩm random
@@ -50,10 +53,28 @@ const MenuPage = () => {
       getProductByCategory();
     }
   }, [categorySlug]);
-
+  useEffect(() => {
+    const getAvailableVouchers = async() => {
+      try {
+        const data = await voucherApi.getAvailableVouchers();
+        setVouchers(data);
+      } catch (error) {
+        toast.error(error.response.data.message);
+      }
+    }
+    getAvailableVouchers();
+  }, []);
   return (
     <div className="mx-auto px-20 max-sm:px-4 pt-4 w-full bg-gradient-to-b bg-amber-100 to-white">
-      <h1 className="text-2xl font-bold text-center">Sản phẩm từ Nhà</h1>
+      
+      {vouchers.length > 0 && (
+        <div className="w-full flex items-center justify-between px-20 mt-10">
+          {vouchers.map((voucher) => (
+           <CouponItem voucher={voucher}/>
+          ))}
+        </div>  
+      )} 
+      <h1 className="text-2xl font-bold text-center mt-10">Sản phẩm từ Nhà</h1>
       <div className="flex flex-col justify-center items-center mt-10 gap-y-20 max-sm:gap-y-10">
         <div className="flex justify-start gap-x-10 gap-y-4 overflow-x-auto w-full py-2 px-2 md:justify-center max-w-4xl md:flex-wrap">
           {productCategories.map((category) => (

@@ -231,3 +231,26 @@ export const applyVoucher = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const getAvailableVouchers = async (req, res) => {
+  try {
+    const now = new Date();
+
+    const vouchers = await Voucher.find({
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      status: { $ne: "inactive" },
+      $expr: { $lt: ["$usedCount", "$usageLimit"] } 
+    })
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .populate({
+        path: "conditions.applicableCategories",
+        select: "name",
+      });
+
+    return res.json(vouchers);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
