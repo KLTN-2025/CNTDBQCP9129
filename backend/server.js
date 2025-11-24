@@ -16,6 +16,7 @@ import cartRouter from './router/cart.router.js';
 import orderRouter from './router/order.router.js';
 import userRouter from './router/user.router.js';
 import voucherRouter from './router/voucher.router.js';
+import contactRouter from './router/contact.router.js';
 // import orderRouter from './router/order.router.js';
 
 dotenv.config();
@@ -47,7 +48,8 @@ app.use("/api/recipes", recipeRouter);
 app.use("/api/carts", cartRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/users", userRouter);
-app.use("/api/vouchers", voucherRouter)
+app.use("/api/vouchers", voucherRouter);
+app.use("/api/contacts", contactRouter)
 // app.use("/api/orders", orderRouter); 
 
 // Socket kết nối
