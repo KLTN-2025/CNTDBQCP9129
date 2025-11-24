@@ -271,4 +271,22 @@ export const deactivateVoucher = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+export const deleteVoucher = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const voucher = await Voucher.findById(id);
+    if (!voucher) {
+      return res.status(404).json({ message: "Voucher không tồn tại" });
+    }
+    if (voucher.usedCount > 0) {
+      return res.status(400).json({
+        message: `Voucher đã được sử dụng ${voucher.usedCount} lần, không thể xóa`,
+      });
+    }
+    await Voucher.findByIdAndDelete(id);
+    return res.json({ message: "Xóa voucher thành công" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

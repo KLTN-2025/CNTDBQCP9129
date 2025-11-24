@@ -20,6 +20,10 @@ const voucherApi = {
   deactivateVoucher: async(id) => {
     const res = await axiosClient.patch(`/vouchers/deactivateVoucher/${id}`);
     return res.data
+  },
+  deleteVoucher: async(id) => {
+     const res = await axiosClient.delete(`/vouchers/deleteVoucher/${id}`);
+     return res.data
   }
 }
 export default voucherApi;

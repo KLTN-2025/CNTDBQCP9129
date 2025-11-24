@@ -39,7 +39,7 @@ const ModalConfirmDelete = ({
     >
       <div
         transition={{ duration: 0.2 }}
-        className="bg-color-dash overflow-hidden rounded-2xl w-full flex flex-col items-center gap-y-2 select-none"
+        className="overflow-hidden rounded-2xl w-full flex flex-col items-center gap-y-2 select-none"
       >
         {/* Nội dung thông báo */}
         <div className="w-full border-b-2 py-4 text-center px-4">

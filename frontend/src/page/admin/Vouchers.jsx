@@ -7,6 +7,7 @@ import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import ModalCreateVoucher from "../../components/modal/adminVoucher/ModalCreateVoucher";
 import ModalConfirmDeativateVoucher from "../../components/modal/adminVoucher/ModalConfirmDeativateVoucher";
+import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import { MdDelete } from "react-icons/md";
 export default function Vouchers() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,8 +21,9 @@ export default function Vouchers() {
   ] = useState(false);
   const [deativateVoucherSelected, setDeativateVoucherSelected] =
     useState(null);
-  // const [productId, setProductId] = useState(null);
-
+  const [voucherSelected, setVoucherSelected] = useState(null);
+  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] =
+    useState(false);
   // Lấy danh sách sản phẩm
   useEffect(() => {
     const getAllVouchers = async () => {
@@ -47,9 +49,24 @@ export default function Vouchers() {
       );
 
       toast.success("Vô hiệu hóa voucher thành công");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Lỗi khi vô hiệu hóa voucher");
+    } finally {
+      setIsOpenModalConfirmDeativateVoucher(false);
+    }
+  };
+    const handleClickDeleteVoucher = async (voucherId) => {
+    try {
+      await voucherApi.deleteVoucher(voucherId);
+      setVouchers((prev) =>
+        prev.filter((v) => v._id !== voucherId)
+      );
+      toast.success("Xóa voucher thành công");
       setIsOpenModalConfirmDeativateVoucher(false);
     } catch (err) {
       toast.error(err.response?.data?.message || "Lỗi khi vô hiệu hóa voucher");
+    } finally {
+      setIsOpenModalConfirmDelete(false);
     }
   };
 
@@ -231,10 +248,15 @@ export default function Vouchers() {
                       >
                         <MdUpdateDisabled className="w-4 h-4" />
                       </button>
-                      <button className="text-yellow-600  cursor-pointer"
-                       title="Xóa voucher"
+                      <button
+                        className="text-yellow-600  cursor-pointer"
+                        title="Xóa voucher"
+                        onClick={() => {
+                          setVoucherSelected(voucher);
+                          setIsOpenModalConfirmDelete(true);
+                        }}
                       >
-                        <MdDelete className="text-xl"/>
+                        <MdDelete className="text-xl" />
                       </button>
                     </div>
                   </td>
@@ -258,8 +280,18 @@ export default function Vouchers() {
           setIsOpenModalConfirmDeativateVoucher={
             setIsOpenModalConfirmDeativateVoucher
           }
-          onConfirm={() => handleClickDeactivateVoucher(deativateVoucherSelected._id)}
+          onConfirm={() =>
+            handleClickDeactivateVoucher(deativateVoucherSelected._id)
+          }
           deativateVoucherSelected={deativateVoucherSelected}
+        />
+      )}
+      {isOpenModalConfirmDelete && (
+        <ModalConfirmDelete
+          isOpenConfirmDelete={isOpenModalConfirmDelete}
+          setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
+          content={`Bạn có chắc chắn muốn xóa voucher ${voucherSelected.code}`}
+          onConfirm={() =>handleClickDeleteVoucher(voucherSelected._id)}
         />
       )}
     </div>
