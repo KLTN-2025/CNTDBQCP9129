@@ -233,12 +233,6 @@ export default function Vouchers() {
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
                       <button
-                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                        title="Sửa thông tin"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
                         className="text-red-600 hover:text-red-800 cursor-pointer"
                         title="Vô hiệu hóa voucher"
                         onClick={() => {
