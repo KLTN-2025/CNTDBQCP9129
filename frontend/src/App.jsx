@@ -34,6 +34,7 @@ import MenuPage from "./page/menu/MenuPage";
 import Ingredients from "./page/admin/Ingredients";
 import Recipes from "./page/admin/Recipes";
 import Orders from "./page/admin/Orders";
+import Contacts from "./page/admin/Contacts"
 // store
 import useCartStore from "./store/cartStore";
 import Vouchers from "./page/admin/Vouchers";
@@ -131,6 +132,7 @@ function App() {
             <Route path="recipes" element={<Recipes/>} />
             <Route path="orders" element={<Orders/>} />
             <Route path="vouchers" element={<Vouchers/>} />
+            <Route path="contacts" element={<Contacts/>} />
           </Route>
           {/* blog route */}
           <Route path="/blogs">
