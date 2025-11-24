@@ -99,7 +99,6 @@ export const createVoucher = async (req, res) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const now = new Date();
-
     // So sánh ngày giờ
     if (start >= end)
       return res
@@ -146,15 +145,12 @@ export const getVouchers = async (req, res) => {
       path: "conditions.applicableCategories",
       select: "name",
     });
-
     const now = new Date();
-
     const result = vouchers.map((v) => {
       let status = v.status;
-
-      if (now < v.startDate) status = "upcoming";
+      if (v.status === "inactive") status = "inactive";
+      else if (now < v.startDate) status = "upcoming";
       else if (now > v.endDate) status = "expired";
-      else if (v.status === "inactive") status = "inactive";
       else status = "active";
 
       return { ...v.toObject(), status };
@@ -249,6 +245,28 @@ export const getAvailableVouchers = async (req, res) => {
       });
 
     return res.json(vouchers);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+export const deactivateVoucher = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const voucher = await Voucher.findById(id);
+    if (!voucher) {
+      return res.status(404).json({ message: "Voucher không tồn tại" });
+    }
+
+    // Nếu đã inactive thì không cần update
+    if (voucher.status === "inactive") {
+      return res.status(400).json({ message: "Voucher đã bị vô hiệu hóa" });
+    }
+    // Cập nhật status
+    voucher.status = "inactive";
+    await voucher.save();
+
+    return res.json(voucher);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
