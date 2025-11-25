@@ -1,20 +1,15 @@
 import { useEffect, useState } from "react";
-import {  Search,  Trash2 } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
-// import ModalCreateBlogCategory from "../../components/modal/adminBlogCategory/ModalCreateBlogCategory";
-// import ModalUpdateBlogCategory from "../../components/modal/adminBlogCategory/ModalUpdateBlogCategory";
-// import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
+import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import contactApi from "../../api/contactApi";
-
+import { FcReading } from "react-icons/fc";
 export default function Contacts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [contacts, setContacts] = useState([]);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
-  const [isOpenModalUpdateCategory, setIsOpenModalUpdateCategory] =
-    useState(false);
-  const [createNameCategory, setCreateNameCategory] = useState('');
-
+  const [contactId, setContactId] = useState(null);
   useEffect(() => {
     const fetchContacts = async () => {
       try {
@@ -27,21 +22,39 @@ export default function Contacts() {
     };
     fetchContacts();
   }, []);
-    // console.log(contacts);
 
-  // const handleDeleteCategory = async (id) => {
-  //   try {
-  //     const res = await blogCategoryApi.delete(id);
-  //     setCategories((prev) => prev.filter((cat) => cat._id !== id));
-  //     toast.success(res.message);
-  //   } catch (err) {
-  //     toast.error(err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại");
-  //   } finally {
-  //     setIsOpenConfirmDelete(false);
-  //     setDeleteCategoryId(null);
-  //   }
-  // };
-  
+  const handleDeleteContact = async (id) => {
+    try {
+      const res = await contactApi.deleteContact(id);
+      setContacts((prev) => prev.filter((contact) => contact._id !== id));
+      toast.success(res.message);
+    } catch (err) {
+      toast.error(
+        err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại"
+      );
+    } finally {
+      setIsOpenConfirmDelete(false);
+      setContactId(null);
+    }
+  };
+  const handleMarkAsRead = async (id) => {
+    try {
+      const res = await contactApi.markAsRead(id);
+      setContacts((prev) =>
+        prev.map((contact) =>
+          contact._id === id ? res : contact
+        )
+      );
+      toast.success("Đã đánh dấu đã đọc");
+    } catch (err) {
+      toast.error(
+        err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại"
+      );
+    } finally {
+      setIsOpenConfirmDelete(false);
+      setContactId(null);
+    }
+  };
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
       <div className="p-6 border-b border-gray-200">
@@ -50,9 +63,7 @@ export default function Contacts() {
             <h2 className="text-2xl font-bold text-gray-800">
               Quản lý lời nhắn khách hàng
             </h2>
-            <p className="text-gray-600 mt-1">
-              Danh sách lời nhắn khách hàng
-            </p>
+            <p className="text-gray-600 mt-1">Danh sách lời nhắn khách hàng</p>
           </div>
         </div>
 
@@ -87,7 +98,10 @@ export default function Contacts() {
                 Nội dung
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Ngày tạo
+                Ngày gửi
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Trạng thái
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Thao tác
@@ -107,26 +121,47 @@ export default function Contacts() {
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">
                     {contact.name}
                   </td>
-                                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
                     {contact.email}
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900 max-w-md">
                     {contact.message}
                   </td>
+
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {formatDatetimeVN(contact.createdAt)}
+                  </td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900 max-w-md">
+                    <button
+                      className={`px-4 py-2 rounded-md text-white whitespace-nowrap ${
+                        contact.status === "read"
+                          ? "bg-yellow-600"
+                          : "bg-blue-600"
+                      }`}
+                    >
+                      {contact.status === "read" ? "Đã đọc" : "Chưa đọc"}
+                    </button>
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-6">
                       <button
-                        // onClick={() => {
-                        //   setDeleteCategoryId(category._id);
-                        //   setIsOpenConfirmDelete(true);
-                        // }}
+                        onClick={() => {
+                          setContactId(contact._id);
+                          setIsOpenConfirmDelete(true);
+                        }}
                         className="text-red-600 hover:text-red-800 transition-colors cursor-pointer"
                         title="Xóa"
                       >
                         <Trash2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          handleMarkAsRead(contact._id)
+                        }}
+                        className="text-red-600 hover:text-red-800 transition-colors cursor-pointer"
+                        title="Đánh dấu đã đọc"
+                      >
+                        <FcReading className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -136,14 +171,14 @@ export default function Contacts() {
         </table>
       </div>
 
-      {/* {isOpenConfirmDelete && (
+      {isOpenConfirmDelete && (
         <ModalConfirmDelete
           content="Bạn có chắc chắn muốn xóa danh mục này?"
           isOpenConfirmDelete={isOpenConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenConfirmDelete}
-          onConfirm={() => handleDeleteCategory(deleteCategoryId)}
+          onConfirm={() => handleDeleteContact(contactId)}
         />
-      )} */}
+      )}
     </div>
   );
 }

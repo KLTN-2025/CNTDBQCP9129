@@ -37,6 +37,7 @@
     "react-toastify": "^11.0.5",
     "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.8.1",
+    "sweetalert2": "^11.26.3",
     "swiper": "^12.0.2",
     "tailwindcss": "^4.1.14",
     "toaster": "^0.1.2",

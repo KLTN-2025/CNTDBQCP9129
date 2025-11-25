@@ -1,17 +1,40 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-
+import Swal from "sweetalert2";
+import contactApi from "../../api/contactApi";
 const ContactPage = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Form data:", data);
-    alert("Gửi thành công!");
-  };
+ const onSubmit = async (data) => {
+  console.log(data);
+  
+  try {
+    await contactApi.createContact(data)
+    Swal.fire({
+      title: "Thành công!",
+      text: "Bạn đã gửi thông tin!",
+      icon: "success",
+      confirmButtonText: "OK",
+    });
+  } catch (error) {
+    console.error(error);
+
+    Swal.fire({
+      title: "Lỗi!",
+      text: "Đã xảy ra lỗi! Vui lòng thử lại.",
+      icon: "error",
+      confirmButtonText: "Thử lại",
+    });
+  } finally {
+    reset();
+  }
+};
+
   return (
     <div className="mx-auto w-full ">
       <div className="w-full">
