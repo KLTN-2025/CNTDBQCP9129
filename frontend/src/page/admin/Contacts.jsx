@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
-import ModalCreateBlogCategory from "../../components/modal/adminBlogCategory/ModalCreateBlogCategory";
-import ModalUpdateBlogCategory from "../../components/modal/adminBlogCategory/ModalUpdateBlogCategory";
-import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
+// import ModalCreateBlogCategory from "../../components/modal/adminBlogCategory/ModalCreateBlogCategory";
+// import ModalUpdateBlogCategory from "../../components/modal/adminBlogCategory/ModalUpdateBlogCategory";
+// import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import contactApi from "../../api/contactApi";
 
 export default function Contacts() {
