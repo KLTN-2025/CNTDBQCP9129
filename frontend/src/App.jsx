@@ -23,6 +23,7 @@ import BlogDetailPage from "./page/Blog/BlogDetailPage";
 import NewsPage from "./page/news/NewsPage";
 import AboutMePage from "./page/about/AboutMePage";
 import CheckOut from "./page/checkout/CheckOut";
+import ContactPage from "./page/contact/ContactPage";
 // admin page
 import BlogCategory from "./page/admin/BlogCategory";
 import Users from "./page/admin/Users";
@@ -139,6 +140,8 @@ function App() {
              <Route path=":categorySlug/:nameBlogSlug" element={<BlogDetailPage/>}/>
              <Route path=":categorySlug" element={<NewsPage/>}/>
           </Route>
+          {/* about me route */}
+          <Route path="contact" element={<ContactPage/>} />
           {/* about me route */}
           <Route path="/about-me" element={<AboutMePage/>}/>
           {/* shop route */}
