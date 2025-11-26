@@ -1,16 +1,31 @@
-import {generateVerifyToken} from '../../helpers/generateVerifyToken.helper.js'
+import { generateVerifyToken } from "../../helpers/generateVerifyToken.helper.js";
 import User from "../../model/user.model.js";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer"; 
+import nodemailer from "nodemailer";
 dotenv.config();
 
 // Đăng kí
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-      const existingUser = await User.findOne({ email });
+    const nameRegex = /^[A-Za-zÀ-ỹ\s]+$/;
+    if (!nameRegex.test(name.trim())) {
+      return res
+        .status(400)
+        .json({ message: "Tên không được chứa số hoặc ký tự đặc biệt" });
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({ message: "Email không hợp lệ" });
+    }
+    if (!password || password.trim().length < 8) {
+      return res
+        .status(400)
+        .json({ message: "Mật khẩu phải có ít nhất 8 ký tự" });
+    }
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "Email đã được sử dụng" });
     }
@@ -18,9 +33,9 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password,
-      expiresIn: "15m"
+      expiresIn: "15m",
     });
-   const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
@@ -41,11 +56,11 @@ export const registerUser = async (req, res) => {
       `,
     };
 
-      await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 
-      res.status(200).json({
-        message: "Email xác thực đã được gửi. Vui lòng kiểm tra hộp thư của bạn!",
-      });
+    res.status(200).json({
+      message: "Email xác thực đã được gửi. Vui lòng kiểm tra hộp thư của bạn!",
+    });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -68,11 +83,16 @@ export const loginUser = async (req, res) => {
       id: user._id,
       name: user.name,
       role: user.role,
-      expiresIn: "1d"
+      expiresIn: "1d",
     });
     res.status(200).json({
       message: "Đăng nhập thành công",
-      user: { id: user._id, name: user.name, role:user.role, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+      },
       token,
     });
   } catch (error) {
@@ -91,8 +111,8 @@ export const forgotPassword = async (req, res) => {
     const resetToken = generateVerifyToken({
       id: user._id,
       email: user.email,
-      expiresIn: "15m"
-    })
+      expiresIn: "15m",
+    });
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -126,12 +146,16 @@ export const forgotPassword = async (req, res) => {
 // Đặt lại mật khẩu
 export const resetPassword = async (req, res) => {
   try {
-    const { token } = req.query
-    const {newPassword} = req.body
+    const { token } = req.query;
+    const { newPassword } = req.body;
 
     // Xác thực token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+    if (!newPassword || newPassword.trim().length < 8) {
+      return res
+        .status(400)
+        .json({ message: "Mật khẩu phải có ít nhất 8 ký tự" });
+    }
     // Tìm user trong database
     const user = await User.findById(decoded.id);
     if (!user) return res.status(404).json({ message: "email không tồn tại" });
@@ -152,7 +176,7 @@ export const resetPassword = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
   try {
-    const { token } = req.query; 
+    const { token } = req.query;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { name, email, password } = decoded;
@@ -160,7 +184,9 @@ export const verifyEmail = async (req, res) => {
     // Kiểm tra nếu user đã tồn tại
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Tài khoản đã được xác thực trước đó" });
+      return res
+        .status(400)
+        .json({ message: "Tài khoản đã được xác thực trước đó" });
     }
 
     // Hash mật khẩu
@@ -171,7 +197,12 @@ export const verifyEmail = async (req, res) => {
 
     res.status(201).json({
       message: "Xác thực email thành công. Tài khoản của bạn đã được tạo!",
-      user: { id: user._id, name: user.name, role:user.role, email: user.email },
+      user: {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+      },
     });
   } catch (error) {
     res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
@@ -183,7 +214,8 @@ export const changePassword = async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
+    if (!user)
+      return res.status(404).json({ message: "Không tìm thấy người dùng" });
 
     // So sánh mật khẩu cũ
     const isMatch = await bcrypt.compare(oldPassword, user.password);
@@ -200,4 +232,3 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ message: "Lỗi server", error: error.message });
   }
 };
-
