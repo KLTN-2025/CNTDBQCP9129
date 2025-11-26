@@ -10,10 +10,11 @@ export default function Contacts() {
   const [contacts, setContacts] = useState([]);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
   const [contactId, setContactId] = useState(null);
+  const [getContactByRouter, setGetContactByRouter] = useState('contacts')
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const data = await contactApi.getAll();
+        const data = await contactApi.getAllByRouter(getContactByRouter);
         console.log(data);
         setContacts(data);
       } catch (err) {
@@ -21,7 +22,7 @@ export default function Contacts() {
       }
     };
     fetchContacts();
-  }, []);
+  }, [getContactByRouter]);
 
   const handleDeleteContact = async (id) => {
     try {
@@ -77,6 +78,41 @@ export default function Contacts() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           />
+        </div>
+                <div className="flex items-center gap-x-4 mt-4">
+          <button
+            className={`px-4 py-1 rounded-sm text-white cursor-pointer 
+      ${
+        getContactByRouter === "contacts"
+          ? "bg-green-600"
+          : "bg-green-600 shadow-inner opacity-60"
+      }`}
+            onClick={() => setGetContactByRouter("contacts")}
+          >
+            Tất cả
+          </button>
+          <button
+            className={`px-4 py-1 rounded-sm text-white cursor-pointer 
+      ${
+        getContactByRouter === "contacts/unread"
+          ? "bg-blue-600"
+          : "bg-blue-600 shadow-inner opacity-60"
+      }`}
+            onClick={() => setGetContactByRouter("contacts/unread")}
+          >
+            Chưa đọc
+          </button>
+          <button
+            className={`px-4 py-1 rounded-sm text-white cursor-pointer 
+      ${
+        getContactByRouter === "contacts/read"
+          ? "bg-orange-600"
+          : "bg-orange-600 shadow-inner opacity-60"
+      }`}
+            onClick={() => setGetContactByRouter("contacts/read")}
+          >
+            Đã đọc
+          </button>
         </div>
       </div>
 
@@ -173,7 +209,7 @@ export default function Contacts() {
 
       {isOpenConfirmDelete && (
         <ModalConfirmDelete
-          content="Bạn có chắc chắn muốn xóa danh mục này?"
+          content="Bạn có chắc chắn muốn xóa lời nhắn này"
           isOpenConfirmDelete={isOpenConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenConfirmDelete}
           onConfirm={() => handleDeleteContact(contactId)}

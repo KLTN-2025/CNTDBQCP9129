@@ -1,7 +1,7 @@
 import axiosClient from "./axiosClient";
 const contactApi = {
-  getAll: async() => {
-    const res = await axiosClient.get('/contacts');
+  getAllByRouter: async(router) => {
+    const res = await axiosClient.get(`/${router}`);
     return res.data;
   },
   createContact: async(data) => {
