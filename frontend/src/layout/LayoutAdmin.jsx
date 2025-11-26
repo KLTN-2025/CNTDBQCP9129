@@ -18,7 +18,6 @@ export default function LayoutAdmin() {
           isSidebarOpen ? "w-64" : "w-0"
         } overflow-hidden`}
       >
-        {/* Logo */}
         <div className="flex items-center px-6 border-b border-gray-200">
           <div className="flex items-center shrink-0 space-x-4">
             <Link to="/">
@@ -170,7 +169,6 @@ export default function LayoutAdmin() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col w-full">
-        {/* Header */}
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
           <div className="flex items-center space-x-4">
             <button
@@ -189,10 +187,13 @@ export default function LayoutAdmin() {
         <main className="flex-1 overflow-scroll p-6">
           {isRootProfile ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
+              <div className="flex">
               <h2 className="text-2xl font-semibold mb-2">
-                Chào mừng đến trang quản trị của COFFEE{" "}
-                <span className="text-green-700 font-bold">GO</span>
+                Chào mừng đến trang quản trị của 
               </h2>
+              <img src="/coffee-go-contact.png" className="mt-[-5px] object-cover w-[300px] h-[40px]" alt="coffee go" />
+              </div>
+
               <p className="text-gray-500">
                 Hãy chọn một mục trong menu để bắt đầu quản lý.
               </p>
