@@ -28,7 +28,7 @@ const LayoutPage = ({ children }) => {
       >
         <Sidebar />
       </div>
-      <div className="w-full pb-20 min-h-screen">{children}</div>
+      <div className={`w-full pb-20 min-h-screen ${!isAdminRoute ? "pt-20" : "pt-0"} `}>{children}</div>
       {!isAdminRoute && (
         <div>
           <Footer />

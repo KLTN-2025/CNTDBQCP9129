@@ -22,7 +22,7 @@ const BlogDetailPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" }); // Cuộn lên đầu mượt
   }, [nameBlogSlug]);
   return (
-    <div className="w-full flex flex-col items-center text-lg gap-y-10 p-4 select-none px-20 max-sm:px-4 pt-20">
+    <div className="w-full flex flex-col bg-gradient-to-b bg-yellow-100 to-white items-center text-lg gap-y-10 p-4 select-none px-20 max-sm:px-4 pt-20">
       {dataBlog && (
         <>
           <div>

@@ -2,7 +2,6 @@ import axiosClient from "./axiosClient";
 
 const userApi = {
   getAllUsers: async(router) => {
-    console.log(router);
     const res = await axiosClient.get(`/${router}`);
     return res.data
   },

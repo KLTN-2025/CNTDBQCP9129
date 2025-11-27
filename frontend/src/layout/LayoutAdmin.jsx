@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Menu, User, Users, FileCog, PenSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Outlet } from "react-router-dom";
@@ -18,7 +18,6 @@ export default function LayoutAdmin() {
           isSidebarOpen ? "w-64" : "w-0"
         } overflow-hidden`}
       >
-        {/* Logo */}
         <div className="flex items-center px-6 border-b border-gray-200">
           <div className="flex items-center shrink-0 space-x-4">
             <Link to="/">
@@ -34,7 +33,7 @@ export default function LayoutAdmin() {
         </div>
 
         {/* Menu Items */}
-        <ul className="space-y-3 mt-10 whitespace-nowrap shrink-0">
+        <ul className="space-y-3 mt-10 whitespace-nowrap shrink-0 h-screen overflow-y-auto pb-10">
           <li>
             <Link
               to="/admin/users"
@@ -152,12 +151,24 @@ export default function LayoutAdmin() {
               <span>Quản lý công thức</span>
             </Link>
           </li>
+           <li>
+            <Link
+              to="/admin/contacts"
+              className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
+                activePath.includes("contacts")
+                  ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                  : "text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              <Users className="w-5 h-5 mr-3" />
+              <span>Quản lý lời nhắn</span>
+            </Link>
+          </li>
         </ul>
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col w-full">
-        {/* Header */}
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
           <div className="flex items-center space-x-4">
             <button
@@ -176,10 +187,13 @@ export default function LayoutAdmin() {
         <main className="flex-1 overflow-scroll p-6">
           {isRootProfile ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
+              <div className="flex">
               <h2 className="text-2xl font-semibold mb-2">
-                Chào mừng đến trang quản trị của COFFEE{" "}
-                <span className="text-green-700 font-bold">GO</span>
+                Chào mừng đến trang quản trị của 
               </h2>
+              <img src="/coffee-go-contact.png" className="mt-[-5px] object-cover w-[300px] h-[40px]" alt="coffee go" />
+              </div>
+
               <p className="text-gray-500">
                 Hãy chọn một mục trong menu để bắt đầu quản lý.
               </p>

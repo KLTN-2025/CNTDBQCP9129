@@ -8,9 +8,8 @@ import Contact from "./Contact";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { Link } from "react-router-dom";
 const NavbarHeader = ({ isOpenSidebar, setIsOpenSidebar }) => {
-  
   return (
-    <div className="w-full bg-white max-lg:py-2 py-4 flex whitespace-nowrap relative  h-[80px] shadow-md">
+    <div className="w-full bg-white max-lg:py-2 py-4 flex whitespace-nowrap h-[80px] fixed z-50 shadow-md">
       <div className="flex gap-x-5 items-center max-lg:justify-center max-lg:relative w-full xl:px-30 px-10">
         <div className="flex flex-items-center font-bold gap-x-10 max-lg:hidden w-full">
           <AboutMe />

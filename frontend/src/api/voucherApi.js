@@ -16,6 +16,14 @@ const voucherApi = {
   getAvailableVouchers: async() => {
     const res = await axiosClient.get('/vouchers/availableVouchers');
     return res.data;
+  },
+  deactivateVoucher: async(id) => {
+    const res = await axiosClient.patch(`/vouchers/deactivateVoucher/${id}`);
+    return res.data
+  },
+  deleteVoucher: async(id) => {
+     const res = await axiosClient.delete(`/vouchers/deleteVoucher/${id}`);
+     return res.data
   }
 }
 export default voucherApi;

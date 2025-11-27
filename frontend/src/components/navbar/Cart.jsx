@@ -7,7 +7,7 @@ const Cart = () => {
   return (
     <Link to="/checkout">
       <div className="border-2 border-green-700 rounded-md flex px-4 pr-10 cursor-pointer py-2 gap-x-2 items-center group">
-        <img src="carts.png" className="h-5 w-5 object-cover" alt="giỏ hàng" />
+        <img src="/carts.png" className="h-5 w-5 object-cover" alt="giỏ hàng" />
         <span className="font-semibold group-hover:text-green-700">
           Giỏ hàng
         </span>

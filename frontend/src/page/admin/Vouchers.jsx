@@ -1,21 +1,29 @@
 import { useEffect, useState } from "react";
-import { Plus, Search, Edit2, Trash2 } from "lucide-react";
+import { Plus, Search, Edit2 } from "lucide-react";
 import { toast } from "react-toastify";
 import voucherApi from "../../api/voucherApi";
 import { MdUpdateDisabled } from "react-icons/md";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import ModalCreateVoucher from "../../components/modal/adminVoucher/ModalCreateVoucher";
+import ModalConfirmDeativateVoucher from "../../components/modal/adminVoucher/ModalConfirmDeativateVoucher";
+import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
+import { MdDelete } from "react-icons/md";
 export default function Vouchers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [vouchers, setVouchers] = useState([]);
   const [isOpenModalCreateVoucher, setIsOpenModalCreateVoucher] =
     useState(false);
   // const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] = useState(false);
-  // const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
-  // const [productSelected, setProductSelected] = useState(null);
-  // const [productId, setProductId] = useState(null);
-
+  const [
+    isOpenModalConfirmDeativateVoucher,
+    setIsOpenModalConfirmDeativateVoucher,
+  ] = useState(false);
+  const [deativateVoucherSelected, setDeativateVoucherSelected] =
+    useState(null);
+  const [voucherSelected, setVoucherSelected] = useState(null);
+  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] =
+    useState(false);
   // Lấy danh sách sản phẩm
   useEffect(() => {
     const getAllVouchers = async () => {
@@ -30,22 +38,37 @@ export default function Vouchers() {
   }, []);
   console.log(vouchers);
 
-  // const handleToggleStatus = async (product) => {
-  //   try {
-  //     const updatedStatus = !product.status;
-  //     const res = await productApi.updateStatus(product._id, { status: updatedStatus });
+  const handleClickDeactivateVoucher = async (voucherId) => {
+    console.log(voucherId);
+    try {
+      const res = await voucherApi.deactivateVoucher(voucherId);
+      setVouchers((prev) =>
+        prev.map((v) =>
+          v._id === voucherId ? { ...v, status: res.status } : v
+        )
+      );
 
-  //     setProducts((prev) =>
-  //       prev.map((p) =>
-  //         p._id === product._id ? { ...p, status: res.status } : p
-  //       )
-  //     );
-
-  //     toast.success("Cập nhật trạng thái thành công");
-  //   } catch (err) {
-  //     toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
-  //   }
-  // };
+      toast.success("Vô hiệu hóa voucher thành công");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Lỗi khi vô hiệu hóa voucher");
+    } finally {
+      setIsOpenModalConfirmDeativateVoucher(false);
+    }
+  };
+    const handleClickDeleteVoucher = async (voucherId) => {
+    try {
+      await voucherApi.deleteVoucher(voucherId);
+      setVouchers((prev) =>
+        prev.filter((v) => v._id !== voucherId)
+      );
+      toast.success("Xóa voucher thành công");
+      setIsOpenModalConfirmDeativateVoucher(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Lỗi khi vô hiệu hóa voucher");
+    } finally {
+      setIsOpenModalConfirmDelete(false);
+    }
+  };
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
@@ -169,10 +192,11 @@ export default function Vouchers() {
                   <td className="px-6 py-4 text-sm">
                     {voucher.discountType === "percent"
                       ? `${voucher.discountValue}% ${
-                      voucher.conditions.maxDiscountAmount > 0 ?
-                          `(tối đa ${formatCurrencyVN(
-                            voucher.conditions.maxDiscountAmount
-                          )})` : ""
+                          voucher.conditions.maxDiscountAmount > 0
+                            ? `(tối đa ${formatCurrencyVN(
+                                voucher.conditions.maxDiscountAmount
+                              )})`
+                            : ""
                         }`
                       : formatCurrencyVN(voucher.discountValue)}
                   </td>
@@ -209,16 +233,24 @@ export default function Vouchers() {
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
                       <button
-                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                        title="Sửa thông tin"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
                         className="text-red-600 hover:text-red-800 cursor-pointer"
-                        title="Vô hiệu hóa mã"
+                        title="Vô hiệu hóa voucher"
+                        onClick={() => {
+                          setIsOpenModalConfirmDeativateVoucher(true);
+                          setDeativateVoucherSelected(voucher);
+                        }}
                       >
                         <MdUpdateDisabled className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="text-yellow-600  cursor-pointer"
+                        title="Xóa voucher"
+                        onClick={() => {
+                          setVoucherSelected(voucher);
+                          setIsOpenModalConfirmDelete(true);
+                        }}
+                      >
+                        <MdDelete className="text-xl" />
                       </button>
                     </div>
                   </td>
@@ -232,6 +264,28 @@ export default function Vouchers() {
           isOpenModalCreateVoucher={isOpenModalCreateVoucher}
           setIsOpenModalCreateVoucher={setIsOpenModalCreateVoucher}
           setVouchers={setVouchers}
+        />
+      )}
+      {isOpenModalConfirmDeativateVoucher && (
+        <ModalConfirmDeativateVoucher
+          isOpenModalConfirmDeativateVoucher={
+            isOpenModalConfirmDeativateVoucher
+          }
+          setIsOpenModalConfirmDeativateVoucher={
+            setIsOpenModalConfirmDeativateVoucher
+          }
+          onConfirm={() =>
+            handleClickDeactivateVoucher(deativateVoucherSelected._id)
+          }
+          deativateVoucherSelected={deativateVoucherSelected}
+        />
+      )}
+      {isOpenModalConfirmDelete && (
+        <ModalConfirmDelete
+          isOpenConfirmDelete={isOpenModalConfirmDelete}
+          setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
+          content={`Bạn có chắc chắn muốn xóa voucher ${voucherSelected.code}`}
+          onConfirm={() =>handleClickDeleteVoucher(voucherSelected._id)}
         />
       )}
     </div>

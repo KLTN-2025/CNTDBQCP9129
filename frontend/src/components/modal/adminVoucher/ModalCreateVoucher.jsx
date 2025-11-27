@@ -76,15 +76,19 @@ const ModalCreateVoucher = ({
       const imageURLs = await handleImageUpload(selectedFile);
       data.image = imageURLs[0];
       const response = await voucherApi.createVoucher(data);
-      if (!response.message) {
-        const now = new Date();
-        const newVoucher = { ...response };
-        newVoucher.status = now < newVoucher.startDate ? "upcoming" : "active";
-        toast.success("Thêm voucher thành công!");
-        setVouchers((prev) => [newVoucher, ...prev]);
-        setIsOpenModalCreateVoucher(false);
-        reset();
-      }
+if (!response.message) {
+  const newVoucher = { ...response };
+
+  const now = new Date();
+  const start = new Date(newVoucher.startDate);
+
+  newVoucher.status = now < start ? "upcoming" : "active";
+
+  toast.success("Thêm voucher thành công!");
+  setVouchers((prev) => [newVoucher, ...prev]);
+  setIsOpenModalCreateVoucher(false);
+  reset();
+}
     } catch (err) {
       toast.error(err?.response?.data?.message || "Lỗi khi thêm voucher");
     } finally {

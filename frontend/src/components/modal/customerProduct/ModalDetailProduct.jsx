@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import cartApi from "../../../api/cartApi";
 import useAuthStore from "../../../store/authStore";
 import useCartStore from "../../../store/cartStore";
-
+import { useLocation, useNavigate } from "react-router-dom";
 const ModalDetailProduct = ({
   isOpenModalDetailProduct,
   setIsOpenModalDetailProduct,
@@ -24,8 +24,10 @@ const ModalDetailProduct = ({
   const shouldShowToggle = description.length > charLimit;
   const [isLoading, setIsLoading] = useState(false);
   const [note, setNote] = useState("");
-  const {user} = useAuthStore();
-  const {setCart} = useCartStore();
+  const { user } = useAuthStore();
+  const { setCart } = useCartStore();
+  const navigate = useNavigate();
+  const location = useLocation();
   const displayedText =
     !isExpanded && shouldShowToggle
       ? description.slice(0, charLimit) + "..."
@@ -40,17 +42,26 @@ const ModalDetailProduct = ({
   };
   const handleClickAddToCart = async () => {
     try {
-      if(isLoading) return 
+      if (!user) {
+        // Lấy full path + query string hiện tại
+        const currentPath = location.pathname + location.search;
+        // Chuyển hướng đến login kèm redirect
+        navigate(`/account/login?redirect=${encodeURIComponent(currentPath)}`, {
+          replace: true,
+        });
+        return; // Dừng hàm ngay lập tức
+      }
+      if (isLoading) return;
       setIsLoading(true);
-      if(note.length > 100) return toast.error("Ghi chú quá dài");
-      if(count < 1) return toast.error("Số lượng nhỏ hơn 1");
+      if (note.length > 100) return toast.error("Ghi chú quá dài");
+      if (count < 1) return toast.error("Số lượng nhỏ hơn 1");
       const data = {
         productId: productDetail._id,
         quantity: count,
-        note: note?.trim()
-      }
+        note: note?.trim(),
+      };
       const res = await cartApi.addToCart(user.id, data);
-      if(res && !res.message){  
+      if (res && !res.message) {
         setCart(res.items);
         toast.success("Đã thêm sản phẩm vào giỏ hàng");
         localStorage.setItem("cart", JSON.stringify(res.items));
@@ -61,7 +72,7 @@ const ModalDetailProduct = ({
     } finally {
       setIsLoading(false);
     }
-  }
+  };
   return (
     <Modal
       appElement={document.getElementById("root")}
@@ -153,9 +164,12 @@ const ModalDetailProduct = ({
             placeholder="Nhập ghi chú cho món này"
           />
         </div>
-        <button className="py-2 w-full text-center bg-orange-400 text-white rounded-md font-bold cursor-pointer"
-         onClick={handleClickAddToCart}
-        >Thêm món vào giỏ hàng</button>
+        <button
+          className="py-2 w-full text-center bg-orange-400 text-white rounded-md font-bold cursor-pointer"
+          onClick={handleClickAddToCart}
+        >
+          Thêm món vào giỏ hàng
+        </button>
       </div>
     </Modal>
   );
