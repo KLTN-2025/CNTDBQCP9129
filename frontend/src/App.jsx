@@ -78,8 +78,13 @@ function App() {
   };
   const redirectTo = new URLSearchParams(location.search).get("redirect") || "/profile";
   const GuestRoute = ({ children }) => {
+    const { user } = useAuthStore();
+    if (user) return <Navigate to={redirectTo} replace />; 
+    return children;
+  };
+  const GuestOnly = ({ children }) => {
   const { user } = useAuthStore();
-  if (user) return <Navigate to={redirectTo} replace />; 
+  if (user) return <Navigate to="/profile" replace />;
   return children;
 };
   return (
@@ -100,6 +105,7 @@ function App() {
 
           {/* auth route */}
           <Route path="/account">
+          <Route index element={<Navigate to="/account/login" replace />} />
             <Route
               path="login"
               element={
@@ -116,9 +122,9 @@ function App() {
                 </GuestRoute>
               }
             />
-            <Route path="forgot-password" element={<ForgotPassword />} />
-            <Route path="reset-password" element={<ResetPassword />} />
-            <Route path="verify-email" element={<VerifyEmailPage />} />
+            <Route path="forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
+            <Route path="reset-password" element={<GuestOnly><ResetPassword /></GuestOnly>} />
+            <Route path="verify-email" element={<GuestOnly><VerifyEmailPage /></GuestOnly>} />
           </Route>
           {/* profile route */}
           <Route
