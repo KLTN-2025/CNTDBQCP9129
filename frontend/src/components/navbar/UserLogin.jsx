@@ -24,11 +24,11 @@ const UserLogin = () => {
         </Link>
 
         {!user ? (
-          <Link to="/account/login">
-            <button className="text-xs hover:text-green-700 cursor-pointer">
-              Đăng nhập
-            </button>
-          </Link>
+        <Link to={`/account/login?redirect=${location.pathname}${location.search}`}>
+          <button className="text-xs hover:text-green-700 cursor-pointer">
+            Đăng nhập
+          </button>
+        </Link>
         ) : (
           <button
             className="text-xs hover:text-green-700 cursor-pointer"

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import { authApi } from "../../api/authApi";
 import cartApi from "../../api/cartApi";
@@ -11,16 +11,9 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const redirectTo = new URLSearchParams(location.search).get("redirect") || "/";
-  const { user, login } = useAuthStore();
+  const { login } = useAuthStore();
   const { setCart } = useCartStore();
-  useEffect(() => {
-    if (user) {
-      navigate(redirectTo, { replace: true });
-    }
-  }, [user, navigate, redirectTo]);
+ 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,9 +34,7 @@ const LoginPage = () => {
           localStorage.setItem("cart", JSON.stringify(resCart.items));
           setCart(resCart.items);
         }
-
         login(res.user);
-        navigate(redirectTo, { replace: true });
       } else {
         setError(res.message);
       }

@@ -106,8 +106,8 @@ export default function Contacts() {
             className={`px-4 py-1 rounded-sm text-white cursor-pointer 
       ${
         getContactByRouter === "contacts/read"
-          ? "bg-orange-600"
-          : "bg-orange-600 shadow-inner opacity-60"
+          ? "bg-yellow-600"
+          : "bg-yellow-600 shadow-inner opacity-60"
       }`}
             onClick={() => setGetContactByRouter("contacts/read")}
           >
