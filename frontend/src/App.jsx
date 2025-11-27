@@ -1,7 +1,7 @@
 import "./App.css";
 import LayoutPage from "./layout/LayoutPage";
 import { useEffect } from "react";
-import { Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate, Navigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { ToastContainer } from "react-toastify";
 import { ParallaxProvider } from "react-scroll-parallax";
@@ -35,7 +35,7 @@ import MenuPage from "./page/menu/MenuPage";
 import Ingredients from "./page/admin/Ingredients";
 import Recipes from "./page/admin/Recipes";
 import Orders from "./page/admin/Orders";
-import Contacts from "./page/admin/Contacts"
+import Contacts from "./page/admin/Contacts";
 // store
 import useCartStore from "./store/cartStore";
 import Vouchers from "./page/admin/Vouchers";
@@ -43,7 +43,8 @@ function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const { logout, user } = useAuthStore();
-  const {cart, setCart} = useCartStore();
+  const { cart, setCart } = useCartStore();
+  const location = useLocation();
   // Check token khi app load
   useEffect(() => {
     if (token) {
@@ -75,6 +76,12 @@ function App() {
     if (!token) return <Navigate to="/account/login" replace />;
     return children;
   };
+  const redirectTo = new URLSearchParams(location.search).get("redirect") || "/profile";
+  const GuestRoute = ({ children }) => {
+  const { user } = useAuthStore();
+  if (user) return <Navigate to={redirectTo} replace />; 
+  return children;
+};
   return (
     <ParallaxProvider>
       <LayoutPage>
@@ -95,20 +102,22 @@ function App() {
           <Route path="/account">
             <Route
               path="login"
-              element={user ? <Navigate to="/" /> : <LoginPage />}
+              element={
+                <GuestRoute>
+                  <LoginPage />
+                </GuestRoute>
+              }
             />
             <Route
               path="register"
-              element={user ? <Navigate to="/" /> : <RegisterPage />}
+              element={
+                <GuestRoute>
+                  <RegisterPage />
+                </GuestRoute>
+              }
             />
-            <Route
-              path="forgot-password"
-              element={user ? <Navigate to="/" /> : <ForgotPassword />}
-            />
-            <Route
-              path="reset-password"
-              element={user ? <Navigate to="/" /> : <ResetPassword />}
-            />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
             <Route path="verify-email" element={<VerifyEmailPage />} />
           </Route>
           {/* profile route */}
@@ -122,32 +131,46 @@ function App() {
           {/* admin route */}
           <Route
             path="/admin"
-            element={user?.role === "customer" ? <Navigate to="/error" /> : <LayoutAdmin />}
+            element={
+              user?.role === "customer" ? (
+                <Navigate to="/error" />
+              ) : (
+                <LayoutAdmin />
+              )
+            }
           >
             <Route path="users" element={<Users />} />
             <Route path="blog-category" element={<BlogCategory />} />
             <Route path="blogs" element={<Blogs />} />
             <Route path="product-category" element={<ProductCategory />} />
-            <Route path="products" element={<Products/>} />
-            <Route path="ingredients" element={<Ingredients/>} />
-            <Route path="recipes" element={<Recipes/>} />
-            <Route path="orders" element={<Orders/>} />
-            <Route path="vouchers" element={<Vouchers/>} />
-            <Route path="contacts" element={<Contacts/>} />
+            <Route path="products" element={<Products />} />
+            <Route path="ingredients" element={<Ingredients />} />
+            <Route path="recipes" element={<Recipes />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="vouchers" element={<Vouchers />} />
+            <Route path="contacts" element={<Contacts />} />
           </Route>
           {/* blog route */}
           <Route path="/blogs">
-             <Route path=":categorySlug/:nameBlogSlug" element={<BlogDetailPage/>}/>
-             <Route path=":categorySlug" element={<NewsPage/>}/>
+            <Route
+              path=":categorySlug/:nameBlogSlug"
+              element={<BlogDetailPage />}
+            />
+            <Route path=":categorySlug" element={<NewsPage />} />
           </Route>
           {/* about me route */}
-          <Route path="contact" element={<ContactPage/>} />
+          <Route path="contact" element={<ContactPage />} />
           {/* about me route */}
-          <Route path="/about-me" element={<AboutMePage/>}/>
+          <Route path="/about-me" element={<AboutMePage />} />
           {/* shop route */}
-          <Route path='/shop' element={<ShopPage/>}/>
+          <Route path="/shop" element={<ShopPage />} />
           {/* check out route */}
-          <Route path='/checkout' element={cart?.length > 0 && user ? <CheckOut/> : <Navigate to="/menu"/>}/>
+          <Route
+            path="/checkout"
+            element={
+              cart?.length > 0 && user ? <CheckOut /> : <Navigate to="/menu" />
+            }
+          />
           {/* menu route */}
           <Route path="/menu/:categorySlug?" element={<MenuPage />} />
           <Route path="*" element={<ErrorPage />} />

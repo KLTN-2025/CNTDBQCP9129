@@ -1,46 +1,59 @@
-import { useState } from "react";
-import { authApi } from "../../api/authApi";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
+import { authApi } from "../../api/authApi";
 import cartApi from "../../api/cartApi";
 import useCartStore from "../../store/cartStore";
+
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const login = useAuthStore((state) => state.login);
-  const {setCart} = useCartStore();
-const handleLogin = async (e) => {
-  e.preventDefault();
-  if (!email || !password || isLoading) return;
-  
-  setError("");
-  setIsLoading(true); 
 
-  try {
-    const res = await authApi.loginUser(email, password);
-    const resCart = await cartApi.getCart(res.user.id);
-    if (res.token) {
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("user", JSON.stringify(res.user));
-      if(!resCart.message){
-       localStorage.setItem("cart", JSON.stringify(resCart.items));
-       setCart(resCart.items);
-      }
-      login(res.user);
-      navigate("/");
-    } else {
-      setError(res.message);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = new URLSearchParams(location.search).get("redirect") || "/";
+  const { user, login } = useAuthStore();
+  const { setCart } = useCartStore();
+  useEffect(() => {
+    if (user) {
+      navigate(redirectTo, { replace: true });
     }
-  } catch (error) {
-    setError(error.response.data.message);
-  } finally {
-    setIsLoading(false); // tắt loading
-  }
-};
+  }, [user, navigate, redirectTo]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!email || !password || isLoading) return;
+    setError("");
+    setIsLoading(true);
+    try {
+      const res = await authApi.loginUser(email, password);
+      const resCart = await cartApi.getCart(res.user.id);
+
+      if (res.token) {
+        // Lưu token + user
+        localStorage.setItem("token", res.token);
+        localStorage.setItem("user", JSON.stringify(res.user));
+
+        // Lưu cart nếu có
+        if (!resCart.message) {
+          localStorage.setItem("cart", JSON.stringify(resCart.items));
+          setCart(resCart.items);
+        }
+
+        login(res.user);
+        navigate(redirectTo, { replace: true });
+      } else {
+        setError(res.message);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Đăng nhập thất bại");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center justify-center pt-10">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
@@ -56,7 +69,9 @@ const handleLogin = async (e) => {
           </Link>
         </p>
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
-         <label className={`text-red-700 ${error ? "opacity-100" : "opacity-0"} h-8`}>{error}</label>
+          <label className={`text-red-700 ${error ? "opacity-100" : "opacity-0"} h-8`}>
+            {error}
+          </label>
           {/* Email */}
           <div>
             <label className="block font-medium mb-1 text-gray-700">
@@ -70,7 +85,6 @@ const handleLogin = async (e) => {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-
           {/* Mật khẩu */}
           <div>
             <label className="block font-medium mb-1 text-gray-700">
@@ -86,7 +100,7 @@ const handleLogin = async (e) => {
           </div>
 
           <div className="flex items-center justify-between text-sm text-gray-600">
-            <Link to='/account/forgot-password'>
+            <Link to="/account/forgot-password">
               <span className="hover:underline cursor-pointer text-red-600">
                 Quên mật khẩu?
               </span>
@@ -97,16 +111,11 @@ const handleLogin = async (e) => {
             type="submit"
             className="mt-2 bg-red-600 flex justify-center text-white py-2 rounded-lg font-semibold hover:bg-red-700 h-10 transition-all cursor-pointer"
           >
-             {isLoading ? (
-                <img
-                  className="object-cover w-7 h-7 rounded-full"
-                  src="/loading.gif"
-                  alt="đang tải"
-                />
-              ) : (
-                <p>Đăng nhập</p>
-              )}
-            
+            {isLoading ? (
+              <img className="object-cover w-7 h-7 rounded-full" src="/loading.gif" alt="đang tải" />
+            ) : (
+              <p>Đăng nhập</p>
+            )}
           </button>
         </form>
       </div>
