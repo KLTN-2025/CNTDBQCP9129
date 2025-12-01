@@ -55,7 +55,7 @@ const orderSchema = new mongoose.Schema(
     // Trạng thái đơn hàng
     status: {
       type: String,
-      enum: ["PENDING", "CONFIRMED", "PROCESSING", "COMPLETED", "CANCELLED"],
+      enum: ["PROCESSING", "COMPLETED", "CANCELLED"],
       default: "PENDING",
     },
   },

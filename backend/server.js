@@ -17,7 +17,7 @@ import orderRouter from './router/order.router.js';
 import userRouter from './router/user.router.js';
 import voucherRouter from './router/voucher.router.js';
 import contactRouter from './router/contact.router.js';
-
+import paymentRouter from './router/payment.router.js';
 dotenv.config();
 
 const app = express();
@@ -52,6 +52,8 @@ app.use("/api/orders", orderRouter);
 app.use("/api/users", userRouter);
 app.use("/api/vouchers", voucherRouter);
 app.use("/api/contacts", contactRouter);
+app.use("/api/payment", paymentRouter);
+
 
 // ---- Socket.IO logic ----
 io.on("connection", (socket) => {
