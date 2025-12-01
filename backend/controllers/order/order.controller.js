@@ -4,16 +4,14 @@ import Order from "../../model/order.model.js";
 // Tạo order mới
 export const createOrder = async (req, res) => {
   try {
-    const { userId, items, delivery, orderType, paymentMethod } = req.body;
-    if (
-      !delivery.name ||
-      !delivery.phone ||
-      !userId ||
-      !paymentMethod ||
-      !orderType
-    ) {
+    const { userId, items, delivery, orderType, paymentMethod, voucherId } = req.body;
+
+    // Validate dữ liệu bắt buộc
+    if (!delivery.name || !delivery.phone || !userId || !paymentMethod || !orderType) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
+
+    // Validate item
     const invalidItem = items.some(
       (item) =>
         !item.productId._id ||
@@ -22,15 +20,14 @@ export const createOrder = async (req, res) => {
         !item.productId.name
     );
     if (invalidItem) {
-      return res
-        .status(400)
-        .json({ message: "Có sản phẩm thiếu dữ liệu bắt buộc" });
+      return res.status(400).json({ message: "Có sản phẩm thiếu dữ liệu bắt buộc" });
     }
 
+    // Tính tổng tiền
     let total = items.reduce((sum, i) => sum + i.quantity * i.productId.price, 0);
-    if (delivery.address) {
-      total += 20000;
-    }
+    if (delivery.address) total += 20000;
+
+    // Format items
     const itemsFormat = items.map((item) => ({
       productId: item.productId._id,
       name: item.productId.name,
@@ -38,6 +35,8 @@ export const createOrder = async (req, res) => {
       price: item.productId.price,
       note: item.note || "",
     }));
+
+    // Tạo order
     const order = await Order.create({
       userId,
       items: itemsFormat,
@@ -45,12 +44,13 @@ export const createOrder = async (req, res) => {
       delivery,
       orderType,
       paymentMethod,
+      voucher: voucherId || null, 
     });
 
-    // Nếu req.io đã được gắn socket, emit realtime cho admin
     if (req.io) {
-      req.io.emit("newOrder", order);
+      req.io.to("admin_room").emit("newOrder", order);
     }
+
     res.status(201).json(order);
   } catch (err) {
     console.error(err);

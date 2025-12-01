@@ -6,6 +6,7 @@ import { MdWarehouse } from "react-icons/md";
 import { MdOutlineAppRegistration } from "react-icons/md";
 import { PiNotepadBold } from "react-icons/pi";
 import { CiGift } from "react-icons/ci";
+import { MdOutlineMessage } from "react-icons/md";
 export default function LayoutAdmin() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const activePath = location.pathname;
@@ -160,7 +161,7 @@ export default function LayoutAdmin() {
                   : "text-gray-700 hover:bg-gray-50"
               }`}
             >
-              <Users className="w-5 h-5 mr-3" />
+              <MdOutlineMessage className="w-5 h-5 mr-3" />
               <span>Quản lý lời nhắn</span>
             </Link>
           </li>

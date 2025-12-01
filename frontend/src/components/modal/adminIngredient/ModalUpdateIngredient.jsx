@@ -7,16 +7,18 @@ import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 const ModalUpdateIngredient = ({
   isOpenModalUpdateIngredient,
   setIsOpenModalUpdateIngredient,
-  selectedIngredient, 
-  setIngredients, 
+  selectedIngredient,
+  setIngredients,
 }) => {
   useLockBodyScroll(isOpenModalUpdateIngredient);
 
   const [formData, setFormData] = useState({
     name: "",
     unit: "",
-    quantity: "",
-    totalCost: "",
+    quantity: "",       // tồn kho cũ
+    totalCost: "",      // tổng tiền cũ
+    backupQuantity: "", // số lượng nhập thêm
+    backupCost: "",     // tổng tiền nhập thêm
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +31,8 @@ const ModalUpdateIngredient = ({
         unit: selectedIngredient.unit || "",
         quantity: selectedIngredient.quantity || "",
         totalCost: selectedIngredient.totalCost || "",
+        backupQuantity: "",
+        backupCost: "",
       });
     }
   }, [selectedIngredient]);
@@ -47,20 +51,26 @@ const ModalUpdateIngredient = ({
     if (
       !formData.name.trim() ||
       !formData.unit.trim() ||
-      !formData.quantity ||
-      !formData.totalCost
+      !formData.backupQuantity ||
+      !formData.backupCost
     ) {
-      toast.error("Vui lòng nhập đầy đủ thông tin nguyên liệu");
+      toast.error("Vui lòng nhập đầy đủ thông tin");
       return;
     }
+
+    const newQuantity =
+      Number(formData.quantity) + Number(formData.backupQuantity);
+
+    const newTotalCost =
+      Number(formData.totalCost) + Number(formData.backupCost);
 
     try {
       setIsLoading(true);
       const response = await ingredientApi.update(selectedIngredient._id, {
         name: formData.name,
         unit: formData.unit,
-        quantity: Number(formData.quantity),
-        totalCost: Number(formData.totalCost),
+        quantity: newQuantity,
+        totalCost: newTotalCost,
       });
 
       if (!response.message) {
@@ -149,29 +159,55 @@ const ModalUpdateIngredient = ({
             </select>
           </div>
 
+          {/* Tồn kho cũ (readonly) */}
           <div>
-            <p className="font-medium">Số lượng *</p>
+            <p className="font-medium">Tồn kho hiện tại</p>
             <input
               type="number"
               name="quantity"
               value={formData.quantity}
-              min="1"
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-              placeholder="Nhập số lượng"
+              readOnly
+              className="w-full px-3 py-2 bg-gray-100 border rounded-lg"
             />
           </div>
 
+          {/* Tổng tiền hiện tại (readonly) */}
           <div>
-            <p className="font-medium">Tổng tiền *</p>
+            <p className="font-medium">Tổng tiền hiện tại</p>
             <input
               type="number"
               name="totalCost"
               value={formData.totalCost}
+              readOnly
+              className="w-full px-3 py-2 bg-gray-100 border rounded-lg"
+            />
+          </div>
+
+          {/* Nhập số lượng thêm */}
+          <div>
+            <p className="font-medium">Nhập thêm số lượng *</p>
+            <input
+              type="number"
+              name="backupQuantity"
+              value={formData.backupQuantity}
+              min="1"
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
+              placeholder="Nhập số lượng muốn nhập thêm"
+            />
+          </div>
+
+          {/* Tổng tiền nhập thêm */}
+          <div>
+            <p className="font-medium">Tổng tiền nhập thêm *</p>
+            <input
+              type="number"
+              name="backupCost"
+              value={formData.backupCost}
               min="0"
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-              placeholder="Nhập tổng tiền nhập"
+              placeholder="Nhập tổng tiền cho số lượng nhập thêm"
             />
           </div>
         </div>
