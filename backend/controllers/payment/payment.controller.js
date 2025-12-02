@@ -1,111 +1,175 @@
-// controllers/payment.controller.js
-import crypto from "crypto";
-import qs from "qs";
-import { createOrder } from "../order/order.controller.js";
-import axios from "axios"; // dùng cho refund VNPAY
+import { VNPay, ignoreLogger, ProductCode, VnpLocale, dateFormat } from 'vnpay';
+import Product from "../../model/product.model.js";
+import { calculateVoucherDiscount } from '../voucher/voucher.controller.js';
 
-// ===== Tạo QR VNPAY =====
+const vnpay = new VNPay({
+  tmnCode: '6Z3TSPO9',
+  secureSecret: '40YYRRUMS9DEF74CWS38QO5DL68TOUI5',
+  vnpayHost: 'https://sandbox.vnpayment.vn',
+  testMode: true,
+  hashAlgorithm: 'SHA512',
+  enableLog: true,
+  loggerFn: ignoreLogger,
+});
+
+// Helper: Chuyển IPv6 localhost thành IPv4
+const getIPv4 = (ip) => {
+  if (ip === '::1' || ip === '::ffff:127.0.0.1') {
+    return '127.0.0.1';
+  }
+  // Loại bỏ IPv6 prefix nếu có
+  return ip.replace('::ffff:', '');
+};
+
 export const createPayment = async (req, res) => {
   try {
-    const { items, total, orderType, userId } = req.body;
-    if (!items || !items.length) return res.status(400).json({ message: "Giỏ hàng trống" });
+    const { items, userId, delivery, voucherCode } = req.body;
 
-    const vnpUrl = createVnpayUrl({ amount: total, orderInfo: "Thanh toán đơn hàng", orderType, userId });
-    res.status(200).json({ vnpUrl });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Tạo QR thất bại" });
-  }
-};
-
-// ===== Callback IPN =====
-export const handleVnpayIPN = async (req, res) => {
-  try {
-    const { userId, items, delivery, orderType, paymentMethod, voucherId, total, vnpInfo } = req.body;
-
-    // Khi IPN về → gọi createOrder
-    await createOrder({
-      body: { userId, items, delivery, orderType, paymentMethod, voucherId, total, vnpInfo },
-      io: req.io,
-    }, res);
-
-  } catch (err) {
-    console.error(err);
-
-    // Nếu lỗi do nguyên liệu không đủ → refund VNPAY
-    if (err.message.includes("nguyên liệu không đủ")) {
-      try {
-        await refundVnpay(vnpInfo.vnp_TxnRef, vnpInfo.vnp_Amount);
-        return res.status(400).json({ message: "Nguyên liệu không đủ, tiền đã được hoàn về" });
-      } catch (refundErr) {
-        console.error("Refund thất bại:", refundErr);
-        return res.status(500).json({ message: "Nguyên liệu không đủ, refund thất bại" });
-      }
+    if (!items || !items.length) {
+      return res.status(400).json({ message: "Giỏ hàng trống" });
     }
 
-    res.status(500).json({ message: "Xử lý IPN thất bại" });
+    // Tính tổng
+    let total = 0;
+    const detailedItems = [];
+
+    for (const item of items) {
+      const product = await Product.findById(item.productId);
+      if (!product) {
+        return res.status(400).json({ 
+          message: `Sản phẩm ${item.productId} không tồn tại` 
+        });
+      }
+
+      const itemTotal = product.price * item.quantity;
+      total += itemTotal;
+
+      detailedItems.push({
+        productId: product._id,
+        name: product.name,
+        price: product.price,
+        quantity: item.quantity,
+        note: item.note || "",
+      });
+    }
+
+    // Phí vận chuyển
+    let shippingFee = 0;
+    if (delivery?.address) {
+      shippingFee = 20000;
+      total += shippingFee;
+    }
+
+    // Áp dụng voucher
+    let discount = 0;
+    let voucherId = null;
+    if (voucherCode) {
+      const result = await calculateVoucherDiscount({
+        voucherCode,
+        items: items.map(i => i.productId.productCategoryId),
+        total,
+        userId,
+      });
+      discount = result.discount;
+      voucherId = result.voucherId;
+      total -= discount;
+      if (total < 0) total = 0;
+    }
+
+    // Làm tròn total
+    total = Math.round(total);
+
+    const orderData = {
+      userId,
+      items: detailedItems,
+      delivery,
+      orderType: "ONLINE",
+      paymentMethod: "VNPAY",
+      voucherId,
+      shippingFee,
+      discount,
+      total,
+    };
+
+    // Tạo txnRef unique
+    const txnRef = Date.now().toString();
+
+    // LƯU Ý: Nên lưu orderData vào database hoặc Redis với key = txnRef
+    // để sau này callback có thể lấy ra xử lý
+    // Ví dụ: await redis.setex(txnRef, 900, JSON.stringify(orderData));
+
+    // Tạo URL thanh toán
+    const vnpayResponse = await vnpay.buildPaymentUrl({
+      vnp_Amount: total,  
+      vnp_IpAddr: getIPv4(req.ip || '127.0.0.1'),
+      vnp_TxnRef: txnRef,
+      vnp_OrderInfo: `Thanh toan don hang ${txnRef}`, 
+      vnp_OrderType: ProductCode.Other,
+      vnp_ReturnUrl: 'http://localhost:5000/api/payment/ipn',
+      vnp_Locale: VnpLocale.VN,
+      vnp_CreateDate: dateFormat(new Date()),
+    });
+
+    return res.status(200).json({
+      vnpUrl: vnpayResponse,
+      txnRef,
+      total,
+      shippingFee,
+      discount,
+      items: detailedItems,
+    });
+
+  } catch (err) {
+    console.error("CREATE PAYMENT ERROR:", err);
+    res.status(500).json({ 
+      message: "Tạo thanh toán thất bại", 
+      error: err.message 
+    });
   }
 };
 
-// ===== Utils tạo URL VNPAY =====
-export const createVnpayUrl = ({ amount, orderInfo, orderType, userId }) => {
-  const tmnCode = process.env.VNP_TMNCODE;
-  const secretKey = process.env.VNP_HASHSECRET;
-  const vnpUrl = process.env.VNP_URL;
-  const returnUrl = process.env.VNP_RETURNURL;
+export const handleVnpayReturn = async (req, res) => {
+  try {
+    console.log(" VNPay callback received:", req.query);
 
-  const date = new Date();
-  const createDate = date.toISOString().replace(/[-:]/g, "").slice(0, 14);
-  const orderId = Date.now();
+    // Verify chữ ký từ VNPay
+    const verify = vnpay.verifyReturnUrl(req.query);
+    
+    if (!verify.isVerified) {
+      return res.status(400).json({ 
+        message: "Chữ ký không hợp lệ",
+        code: '97' 
+      });
+    }
 
-  const vnp_Params = {
-    vnp_Version: "2.1.0",
-    vnp_Command: "pay",
-    vnp_TmnCode: tmnCode,
-    vnp_Amount: amount * 100,
-    vnp_CurrCode: "VND",
-    vnp_TxnRef: orderId,
-    vnp_OrderInfo: orderInfo,
-    vnp_OrderType: orderType,
-    vnp_Locale: "vn",
-    vnp_ReturnUrl: returnUrl,
-    vnp_CreateDate: createDate,
-  };
+    if (!verify.isSuccess) {
+      return res.status(400).json({ 
+        message: "Giao dịch thất bại",
+        code: verify.vnp_ResponseCode 
+      });
+    }
 
-  const sortedParams = {};
-  Object.keys(vnp_Params).sort().forEach(key => { sortedParams[key] = vnp_Params[key]; });
+    // Lấy thông tin đơn hàng từ txnRef
+    const txnRef = verify.vnp_TxnRef;
+    // const orderData = await redis.get(txnRef); // Lấy từ cache/DB
 
-  const signData = qs.stringify(sortedParams, { encode: false });
-  const hmac = crypto.createHmac("sha512", secretKey);
-  const secureHash = hmac.update(signData).digest("hex");
-  return `${vnpUrl}?${qs.stringify(sortedParams)}&vnp_SecureHash=${secureHash}`;
-};
+    // TODO: Lưu order vào database
+    // const order = await Order.create({...orderData, status: 'PAID'});
 
-// ===== Utils refund VNPAY =====
-export const refundVnpay = async (txnRef, amount) => {
-  const refundUrl = process.env.VNP_REFUND_URL;
-  const tmnCode = process.env.VNP_TMNCODE;
-  const secretKey = process.env.VNP_HASHSECRET;
+    return res.status(200).json({
+      message: "Thanh toán thành công",
+      code: '00',
+      txnRef: verify.vnp_TxnRef,
+      amount: verify.vnp_Amount / 100, // Chuyển từ xu về VND
+      bankCode: verify.vnp_BankCode,
+      transactionNo: verify.vnp_TransactionNo,
+    });
 
-  const refundParams = {
-    vnp_Version: "2.1.0",
-    vnp_Command: "refund",
-    vnp_TmnCode: tmnCode,
-    vnp_TxnRef: txnRef,
-    vnp_Amount: amount * 100,
-    vnp_CreateDate: new Date().toISOString().replace(/[-:]/g, "").slice(0, 14),
-  };
-
-  const sortedParams = {};
-  Object.keys(refundParams).sort().forEach(key => { sortedParams[key] = refundParams[key]; });
-
-  const signData = qs.stringify(sortedParams, { encode: false });
-  const hmac = crypto.createHmac("sha512", secretKey);
-  const secureHash = hmac.update(signData).digest("hex");
-
-  sortedParams.vnp_SecureHash = secureHash;
-
-  const res = await axios.post(refundUrl, null, { params: sortedParams });
-  if (res.data.RspCode !== "00") throw new Error("Refund thất bại VNPAY");
-  return res.data;
+  } catch (err) {
+    console.error(" VNPAY CALLBACK ERROR:", err);
+    res.status(500).json({ 
+      message: "Xử lý callback thất bại",
+      error: err.message 
+    });
+  }
 };

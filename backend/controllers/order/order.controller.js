@@ -3,7 +3,7 @@ import Order from "../../model/order.model.js";
 import Recipe from "../../model/recipe.model.js";
 import Ingredient from "../../model/ingredient.model.js";
 // Tạo order mới
-export const createOrder = async (req, res) => {
+export const createOrderOnline = async (req, res) => {
   const session = await mongoose.startSession();
   try {
     const { userId, items, delivery, orderType, paymentMethod, voucherId, vnpInfo } = req.body;
@@ -78,7 +78,7 @@ export const createOrder = async (req, res) => {
           delivery,
           orderType,
           paymentMethod,
-          voucher: voucherId || null,
+          voucherId: voucherId || null,
           status: "PROCESSING",         // mặc định sau khi thanh toán thành công
           paymentStatus: "SUCCESS",
           vnp_TxnRef: vnpInfo?.vnp_TxnRef || null,

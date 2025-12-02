@@ -166,67 +166,51 @@ export const getVouchers = async (req, res) => {
 export const applyVoucher = async (req, res) => {
   try {
     const { voucherCode, items, total, userId } = req.body;
-    console.log(items);
-    // Lấy voucher
-    const voucher = await Voucher.findOne({ code: voucherCode });
-    if (!voucher)
-      return res.status(400).json({ message: "Voucher không tồn tại" });
-
-    // Check trạng thái
-    if (voucher.status !== "active")
-      return res.status(400).json({ message: "Voucher không khả dụng" });
-
-    // Check thời gian
-    const now = new Date();
-    const start = new Date(voucher.startDate);
-    const end = new Date(voucher.endDate);
-    if (now < start)
-      return res.status(400).json({ message: "Voucher chưa đến hạn" });
-    if (now > end)
-      return res.status(400).json({ message: "Voucher đã hết hạn" });
-    // Check minOrderValue
-    if (total < voucher.conditions.minOrderValue)
-      return res
-        .status(400)
-        .json({ message: "Đơn hàng chưa đủ điều kiện voucher" });
-
-    // Check perUserLimit
-    const usedCount = await Order.countDocuments({ userId, voucherCode });
-    if (usedCount >= voucher.perUserLimit)
-      return res.status(400).json({ message: "Bạn đã dùng voucher này rồi" });
-
-    // Check applicableCategories
-    if (voucher.conditions.applicableCategories.length > 0) {
-      const allItemsMatch = items.every((productCategoryId) =>
-        voucher.conditions.applicableCategories.includes(productCategoryId)
-      );
-      if (!allItemsMatch) {
-        return res.status(400).json({
-          message:
-            "Voucher chỉ áp dụng hóa đơn có tất cả sản phẩm trong danh mục",
-        });
-      }
-    }
-
-    // Tính discount
-    let discount = 0;
-    if (voucher.discountType === "percent") {
-      discount = total * (voucher.discountValue / 100);
-      if (
-        voucher.conditions.maxDiscountAmount != null &&
-        voucher.conditions.maxDiscountAmount > 0
-      ) {
-        discount = Math.min(discount, voucher.conditions.maxDiscountAmount);
-      }
-      discount = Math.min(discount, total);
-    } else {
-      discount = Math.min(voucher.discountValue, total);
-    }
-    res.json({voucherCode, discount});
+    const { discount } = await calculateVoucherDiscount({ voucherCode, items, total, userId });
+    res.json({ voucherCode, discount });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 };
+// Hàm tính discount của voucher
+export const calculateVoucherDiscount = async ({ voucherCode, items, total, userId }) => {
+  const voucher = await Voucher.findOne({ code: voucherCode });
+  if (!voucher) throw new Error("Voucher không tồn tại");
+  if (voucher.status !== "active") throw new Error("Voucher không khả dụng");
+  console.log(items);
+  const now = new Date();
+  if (now < new Date(voucher.startDate)) throw new Error("Voucher chưa đến hạn");
+  if (now > new Date(voucher.endDate)) throw new Error("Voucher đã hết hạn");
+
+  if (total < voucher.conditions.minOrderValue)
+    throw new Error("Đơn hàng chưa đủ điều kiện voucher");
+
+  const usedCount = await Order.countDocuments({ userId, voucherCode });
+  if (usedCount >= voucher.perUserLimit) throw new Error("Bạn đã hết lượt dùng cho voucher này");
+
+  if (voucher.conditions.applicableCategories.length > 0) {
+    const allItemsMatch = items.every(productCategoryId =>
+      voucher.conditions.applicableCategories.includes(productCategoryId)
+    );
+    if (!allItemsMatch) throw new Error(
+      "Có sản phẩm không thuộc trong danh mục khuyến mãi của voucher"
+    );
+  }
+
+  let discount = 0;
+  if (voucher.discountType === "percent") {
+    discount = total * (voucher.discountValue / 100);
+    if (voucher.conditions.maxDiscountAmount != null && voucher.conditions.maxDiscountAmount > 0) {
+      discount = Math.min(discount, voucher.conditions.maxDiscountAmount);
+    }
+    discount = Math.min(discount, total);
+  } else {
+    discount = Math.min(voucher.discountValue, total);
+  }
+
+  return { voucherCode, discount };
+};
+
 export const getAvailableVouchers = async (req, res) => {
   try {
     const now = new Date();

@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema(
     },
 
     // Voucher áp dụng (nếu có)
-     voucher: {
+     voucherId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voucher",
       default: null,
@@ -56,13 +56,13 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["PROCESSING", "COMPLETED", "CANCELLED"],
-      default: "PENDING",
+      default: "PROCESSING",
     },
   },
   { timestamps: true }
 );
 
 // Compound index để truy vấn nhanh userId + voucherCode
-orderSchema.index({ userId: 1, voucherCode: 1 });
+orderSchema.index({ userId: 1, voucherId: 1 });
 const Order = mongoose.model("Order", orderSchema);
 export default Order;

@@ -1,7 +1,7 @@
 import express from 'express';
-import { createPayment, handleVnpayIPN } from '../controllers/payment/payment.controller.js';
+import { createPayment, handleVnpayReturn } from '../controllers/payment/payment.controller.js';
 
 const router = express.Router();
 router.post("/create", createPayment);
-router.post("/ipn", handleVnpayIPN);
+router.get("/ipn", handleVnpayReturn);
 export default router;
