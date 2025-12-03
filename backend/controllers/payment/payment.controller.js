@@ -23,31 +23,29 @@ const getIPv4 = (ip) => {
 
 export const createPayment = async (req, res) => {
   try {
-    const { items, userId, delivery, voucherCode } = req.body;
+    const { cartItems, userId, delivery, voucherCode } = req.body;
 
-    if (!items || !items.length) {
+    if (!cartItems || !cartItems.length) {
       return res.status(400).json({ message: "Giỏ hàng trống" });
     }
 
     // Tính tổng
     let total = 0;
     const detailedItems = [];
-
-    for (const item of items) {
-      const product = await Product.findById(item.productId);
+    console.log("aaa", cartItems);
+    for (const item of cartItems) {
+      const product = await Product.findById(item.productId._id);
       if (!product) {
-        return res.status(400).json({ 
-          message: `Sản phẩm ${item.productId} không tồn tại` 
-        });
+        return res.status(400).json({ message: `Sản phẩm không tồn tại` });
       }
-
+      console.log(cartItems);
       const itemTotal = product.price * item.quantity;
       total += itemTotal;
 
       detailedItems.push({
         productId: product._id,
         name: product.name,
-        price: product.price,
+        price: product.price * (1 - product.discount / 100),
         quantity: item.quantity,
         note: item.note || "",
       });
@@ -66,7 +64,7 @@ export const createPayment = async (req, res) => {
     if (voucherCode) {
       const result = await calculateVoucherDiscount({
         voucherCode,
-        items: items.map(i => i.productId.productCategoryId),
+        items: cartItems.map(i => i.productId.productCategoryId),
         total,
         userId,
       });

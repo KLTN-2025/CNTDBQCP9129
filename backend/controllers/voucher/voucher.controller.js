@@ -208,7 +208,7 @@ export const calculateVoucherDiscount = async ({ voucherCode, items, total, user
     discount = Math.min(voucher.discountValue, total);
   }
 
-  return { voucherCode, discount };
+  return { voucherId: voucher._id, voucherCode, discount};
 };
 
 export const getAvailableVouchers = async (req, res) => {
