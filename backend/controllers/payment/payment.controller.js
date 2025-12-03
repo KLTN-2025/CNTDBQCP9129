@@ -32,14 +32,12 @@ export const createPayment = async (req, res) => {
     // Tính tổng
     let total = 0;
     const detailedItems = [];
-    console.log("aaa", cartItems);
     for (const item of cartItems) {
       const product = await Product.findById(item.productId._id);
       if (!product) {
         return res.status(400).json({ message: `Sản phẩm không tồn tại` });
       }
-      console.log(cartItems);
-      const itemTotal = product.price * item.quantity;
+      const itemTotal = product.price * (1 - product.discount / 100) * item.quantity;
       total += itemTotal;
 
       detailedItems.push({
@@ -68,6 +66,7 @@ export const createPayment = async (req, res) => {
         total,
         userId,
       });
+      console.log("discount", result.discount);
       discount = result.discount;
       voucherId = result.voucherId;
       total -= discount;
@@ -79,14 +78,13 @@ export const createPayment = async (req, res) => {
 
     const orderData = {
       userId,
+      voucherId,
       items: detailedItems,
+      voucherDiscount: discount,
       delivery,
       orderType: "ONLINE",
       paymentMethod: "VNPAY",
-      voucherId,
-      shippingFee,
-      discount,
-      total,
+      totalPrice: total,
     };
 
     // Tạo txnRef unique

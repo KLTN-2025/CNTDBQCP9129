@@ -167,7 +167,7 @@ export const applyVoucher = async (req, res) => {
   try {
     const { voucherCode, items, total, userId } = req.body;
     const { discount } = await calculateVoucherDiscount({ voucherCode, items, total, userId });
-    res.json({ voucherCode, discount });
+    res.json({voucherCode, discount });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

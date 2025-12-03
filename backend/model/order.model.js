@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema(
     },
 
     // Voucher áp dụng (nếu có)
-     voucherId: {
+    voucherId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Voucher",
       default: null,
