@@ -156,7 +156,7 @@ export const handleVnpayReturn = async (req, res) => {
       message: "Thanh toán thành công",
       code: '00',
       txnRef: verify.vnp_TxnRef,
-      amount: verify.vnp_Amount / 100, // Chuyển từ xu về VND
+      amount: verify.vnp_Amount,
       bankCode: verify.vnp_BankCode,
       transactionNo: verify.vnp_TransactionNo,
     });
