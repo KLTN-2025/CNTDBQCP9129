@@ -15,6 +15,11 @@ const orderSchema = new mongoose.Schema(
       ref: "Voucher",
       default: null,
     },
+    // Voucher discount (nếu có)
+    voucherDiscount: {
+      type: Number,
+      default: 0,
+    },
     // Danh sách món
     items: [
       {
