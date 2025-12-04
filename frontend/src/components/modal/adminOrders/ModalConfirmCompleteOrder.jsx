@@ -24,7 +24,7 @@ const ModalConfirmCompleteOrder = ({
           zIndex: 50,
         },
         content: {
-          top: "15rem",
+          top: "5rem",
           left: "auto",
           right: "auto",
           bottom: "auto",
