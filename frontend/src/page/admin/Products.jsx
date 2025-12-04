@@ -14,7 +14,6 @@ export default function Products() {
   const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] = useState(false);
   const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
   const [productSelected, setProductSelected] = useState(null);
-  const [productId, setProductId] = useState(null);
 
   // Lấy danh sách sản phẩm
   useEffect(() => {
@@ -34,12 +33,11 @@ export default function Products() {
     try {
       await productApi.delete(id);
       setProducts((prev) => prev.filter((p) => p._id !== id));
-      setIsOpenModalConfirmDelete(false);
       toast.success("Xóa sản phẩm thành công");
     } catch (error) {
       toast.error(error.response?.data?.message || "Lỗi khi xóa sản phẩm");
     } finally {
-      setProductId(null);
+      setIsOpenModalConfirmDelete(false);
     }
   };
 
@@ -175,7 +173,7 @@ const handleToggleStatus = async (product) => {
                       <button
                         className="text-red-600 hover:text-red-800 cursor-pointer"
                         onClick={() => {
-                          setProductId(product._id);
+                          setProductSelected(product);
                           setIsOpenModalConfirmDelete(true);
                         }}
                       >
@@ -211,10 +209,10 @@ const handleToggleStatus = async (product) => {
       {/* Modal xác nhận xóa */}
       {isOpenModalConfirmDelete && (
         <ModalConfirmDelete
-          content="Bạn có chắn chắn muốn xóa sản phẩm này?"
+          content={`Bạn có chắn chắn muốn xóa sản phẩm ${productSelected.name}?`}
           isOpenConfirmDelete={isOpenModalConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
-          onConfirm={() => handleRemoveProduct(productId)}
+          onConfirm={() => handleRemoveProduct(productSelected._id)}
         />
       )}
     </div>

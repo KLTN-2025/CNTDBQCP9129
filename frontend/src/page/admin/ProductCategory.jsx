@@ -209,6 +209,7 @@ export default function ProductCategory() {
                       <button
                         onClick={() => {
                           setDeleteCategoryId(category._id);
+                          setUpdateCategoryName(category.name);
                           setIsOpenConfirmDelete(true);
                         }}
                         className="text-red-600 hover:text-red-800 cursor-pointer"
@@ -258,7 +259,7 @@ export default function ProductCategory() {
       {/* Modal xác nhận xóa */}
       {isOpenConfirmDelete && (
         <ModalConfirmDelete
-          content="Bạn có chắc chắn muốn xóa danh mục này?"
+          content={`Bạn có chắc chắn muốn xóa danh mục ${updateCategoryName}?`}
           isOpenConfirmDelete={isOpenConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenConfirmDelete}
           onConfirm={() => handleDeleteCategory(deleteCategoryId)}

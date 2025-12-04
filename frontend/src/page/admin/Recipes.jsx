@@ -13,8 +13,7 @@ export default function Recipes() {
   const [isOpenModalCreateRecipe, setIsOpenModalCreateRecipe] = useState(false);
   const [isOpenModalUpdateRecipe, setIsOpenModalUpdateRecipe] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  const [recipeId, setRecipeId] = useState(null);
-
+  console.log(selectedRecipe)
   // Lấy danh sách công thức
   useEffect(() => {
     const getAllProducts = async () => {
@@ -33,12 +32,11 @@ export default function Recipes() {
     try {
       await recipeApi.delete(id);
       setRecipes((prev) => prev.filter((p) => p._id !== id));
-      setIsOpenModalConfirmDelete(false);
       toast.success("Xóa công thức thành công");
     } catch (error) {
       toast.error(error.response?.data?.message || "Lỗi khi xóa công thức");
     } finally {
-      setRecipeId(null);
+      setIsOpenModalConfirmDelete(false);
     }
   };
 
@@ -136,7 +134,7 @@ export default function Recipes() {
                       <button
                         className="text-red-600 hover:text-red-800 cursor-pointer"
                         onClick={() => {
-                          setRecipeId(recipe._id);
+                          setSelectedRecipe(recipe);
                           setIsOpenModalConfirmDelete(true);
                         }}
                       >
@@ -168,14 +166,13 @@ export default function Recipes() {
           selectedRecipe={selectedRecipe}
         />
       )}
-
       {/* Modal xác nhận xóa */}
       {isOpenModalConfirmDelete && (
         <ModalConfirmDelete
-          content="Bạn có chắn chắn muốn xóa nguyên liệu này?"
+          content={`Bạn có chắn chắn muốn xóa công thức ${selectedRecipe.productId.name}?`}
           isOpenConfirmDelete={isOpenModalConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
-          onConfirm={() => handleRemoveProduct(recipeId)}
+          onConfirm={() => handleRemoveProduct(selectedRecipe._id)}
         />
       )}
     </div>

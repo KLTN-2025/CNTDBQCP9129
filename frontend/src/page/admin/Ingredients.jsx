@@ -17,8 +17,6 @@ export default function Ingredients() {
   const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] =
     useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState(null);
-  const [ingredientId, setIngredientId] = useState(null);
-  // const [productId, setProductId] = useState(null);
 
   // Lấy danh sách nguyên liệu trong kho
   useEffect(() => {
@@ -40,14 +38,13 @@ export default function Ingredients() {
     try {
       await ingredientApi.delete(id);
       setIngredients((prev) => prev.filter((p) => p._id !== id));
-      setIsOpenModalConfirmDelete(false);
       toast.success("Xóa nguyên liệu trong kho thành công");
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Lỗi khi xóa nguyên liệu trong kho"
       );
     } finally {
-      setIngredientId(null);
+      setIsOpenModalConfirmDelete(false);
     }
   };
 
@@ -184,7 +181,7 @@ export default function Ingredients() {
                       <button
                         className="text-red-600 hover:text-red-800 cursor-pointer"
                         onClick={() => {
-                          setIngredientId(ingredient._id);
+                          setSelectedIngredient(ingredient);
                           setIsOpenModalConfirmDelete(true);
                         }}
                       >
@@ -220,10 +217,10 @@ export default function Ingredients() {
       {/* Modal xác nhận xóa */}
       {isOpenModalConfirmDelete && (
         <ModalConfirmDelete
-          content="Bạn có chắn chắn muốn xóa nguyên liệu này?"
+          content={`Bạn có chắn chắn muốn xóa nguyên liệu ${selectedIngredient.name}?`}
           isOpenConfirmDelete={isOpenModalConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenModalConfirmDelete}
-          onConfirm={() => handleRemoveProduct(ingredientId)}
+          onConfirm={() => handleRemoveProduct(selectedIngredient._id)}
         />
       )}
     </div>
