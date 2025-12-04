@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import Product from "../../model/product.model.js";
 import Order from "../../model/order.model.js";
 import Voucher from "../../model/voucher.model.js";
-import Recipe from "../../model/recipe.model.js"; // Model công thức
-import Ingredient from "../../model/ingredient.model.js"; // Model nguyên liệu
+import Recipe from "../../model/recipe.model.js"; 
+import Ingredient from "../../model/ingredient.model.js"; 
 import { calculateVoucherDiscount } from "../voucher/voucher.controller.js";
 
 const vnpay = new VNPay({
@@ -204,7 +204,7 @@ export const createPayment = async (req, res) => {
 
     // Commit transaction - ĐÃ GIỮ NGUYÊN LIỆU THÀNH CÔNG
     await session.commitTransaction();
-    
+
     // Đặt lịch tự động hủy nếu không thanh toán
     scheduleOrderCancellation(newOrder._id);
 

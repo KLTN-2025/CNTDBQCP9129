@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
-import ModalCreateProduct from "../../components/modal/adminProduct/ModalCreateProduct";
 import orderApi from "../../api/orderApi";
+import { io } from 'socket.io-client';
 export default function Orders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orders, setOrders] = useState([]);
+  const socket = io('http://localhost:5000');
   // const [isOpenModalCreateProduct, setIsOpenModalCreateProduct] = useState(false);
   // const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] = useState(false);
   // const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
@@ -14,7 +14,6 @@ export default function Orders() {
   // const [productId, setProductId] = useState(null);
 
   // Lấy danh sách sản phẩm
-  useEffect(() => {
     const getAllOrders = async () => {
       try {
         const res = await orderApi.getAllOrders();
@@ -23,10 +22,24 @@ export default function Orders() {
         toast.error(error.response?.data?.message || "Lỗi khi tải đơn hàng");
       }
     };
-    getAllOrders();
-  }, []);
-  console.log(orders);
+   useEffect(() => {
+    socket.emit('join_admin');
+    getAllOrders(); 
+    socket.on('order_changed', (change) => {
+      if (change.type === 'insert') {
+        setOrders(prev => [change.data, ...prev]);
+        
+      } else if (change.type === 'update') {
+        getAllOrders();
+        
+      } else if (change.type === 'delete') {
+        setOrders(prev => prev.filter(o => o._id !== change.orderId));
+      }
+    });
 
+    return () => socket.disconnect();
+  }, []);
+  console.log("danh sách orders", orders);
 // const handleToggleStatus = async (product) => {
 //   try {
 //     const updatedStatus = !product.status;
