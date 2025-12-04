@@ -9,29 +9,31 @@ import playTingSound from "../../utils/playTingSound";
 import { AiOutlineEye } from "react-icons/ai";
 import { BsClipboardCheckFill } from "react-icons/bs";
 import ModalOrderDetail from "../../components/modal/adminOrders/ModalDetailOrder";
+import ModalConfirmCompleteOrder from "../../components/modal/adminOrders/ModalConfirmCompleteOrder";
 export default function Orders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orders, setOrders] = useState([]);
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [isOpenModalDetail, setIsOpenModalDetail] = useState(false);
-  const [orderData, setOrderData] = useState(null)
+  const [orderData, setOrderData] = useState(null);
+  const [isOpenConfirmComplete, setIsOpenConfirmComplete] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const observer = useRef();
   const loadOrders = async (pageNum, isInitial = false) => {
     if (loading) return;
-    
+
     try {
       setLoading(true);
       const res = await orderApi.getAllOrders({ page: pageNum, limit: 5 });
-      
+
       if (isInitial) {
         setOrders(res.orders); // Lần đầu thì replace
       } else {
-        setOrders(prev => [...prev, ...res.orders]); // Append thêm
+        setOrders((prev) => [...prev, ...res.orders]); // Append thêm
       }
-      
+
       setHasMore(res.hasMore);
     } catch (error) {
       toast.error(error.response?.data?.message || "Lỗi khi tải đơn hàng");
@@ -40,18 +42,21 @@ export default function Orders() {
     }
   };
 
-  const lastOrderRef = useCallback(node => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
-    
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        setPage(prev => prev + 1);
-      }
-    });
-    
-    if (node) observer.current.observe(node);
-  }, [loading, hasMore]);
+  const lastOrderRef = useCallback(
+    (node) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prev) => prev + 1);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
   // Load orders khi page thay đổi
   useEffect(() => {
@@ -74,25 +79,23 @@ export default function Orders() {
         setOrders((prev) => [change.data, ...prev]); // Thêm vào đầu
         playTingSound();
         if (document.hidden) {
-          setNewOrderCount(prev => prev + 1);
+          setNewOrderCount((prev) => prev + 1);
         }
         toast.success("🎉 Có đơn hàng mới!");
-      } 
-      else if (change.type === "update") {
-        setOrders((prev) => (
+      } else if (change.type === "update") {
+        setOrders((prev) =>
           prev.map((o) => {
-            if(o._id === change.orderId){
-              if(change.updatedFields.paymentStatus === 'FAILED'){
-                return {...o, paymentStatus: "FAILED", status:"CANCELLED"}
-              }else if(change.updatedFields.paymentStatus === "SUCCESS") {
-                return {...o, paymentStatus: "SUCCESS"}
+            if (o._id === change.orderId) {
+              if (change.updatedFields.paymentStatus === "FAILED") {
+                return { ...o, paymentStatus: "FAILED", status: "CANCELLED" };
+              } else if (change.updatedFields.paymentStatus === "SUCCESS") {
+                return { ...o, paymentStatus: "SUCCESS" };
               }
             }
             return o;
           })
-        ));
-      } 
-      else if (change.type === "delete") {
+        );
+      } else if (change.type === "delete") {
         setOrders((prev) => prev.filter((o) => o._id !== change.orderId));
       }
     });
@@ -122,7 +125,8 @@ export default function Orders() {
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   // Filter orders theo search
@@ -188,10 +192,10 @@ export default function Orders() {
           </thead>
           <tbody className="bg-white divide-y">
             {filteredOrders.map((order, index) => (
-              <tr 
-                key={order._id} 
+              <tr
+                key={order._id}
                 className="hover:bg-gray-50"
-                ref={index === filteredOrders.length - 1 ? lastOrderRef : null} 
+                ref={index === filteredOrders.length - 1 ? lastOrderRef : null}
               >
                 <td className="px-6 py-4 text-sm">{index + 1}</td>
                 <td className="px-6 py-4 text-sm">
@@ -224,10 +228,7 @@ export default function Orders() {
                 <td className="px-6 py-4 text-sm max-w-[350px]">
                   <div className="flex flex-col space-y-1">
                     {order.items.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="p-1 border rounded bg-gray-50"
-                      >
+                      <div key={idx} className="p-1 border rounded bg-gray-50">
                         <p>
                           <strong>Tên món:</strong> {item.name}
                         </p>
@@ -244,8 +245,16 @@ export default function Orders() {
                 <td className="px-6 py-4 text-sm">
                   <span
                     className={`
-                      ${order.paymentStatus === "PENDING" ? "text-yellow-500" : ""}
-                      ${order.paymentStatus === "SUCCESS" ? "text-green-600" : ""}
+                      ${
+                        order.paymentStatus === "PENDING"
+                          ? "text-yellow-500"
+                          : ""
+                      }
+                      ${
+                        order.paymentStatus === "SUCCESS"
+                          ? "text-green-600"
+                          : ""
+                      }
                       ${order.paymentStatus === "FAILED" ? "text-red-600" : ""}
                       font-semibold
                     `}
@@ -259,9 +268,21 @@ export default function Orders() {
                   <span
                     className={`
                       px-4 py-2 rounded-lg inline-block whitespace-nowrap
-                      ${order.status === "PROCESSING" ? "bg-yellow-100 text-yellow-800" : ""}
-                      ${order.status === "COMPLETED" ? "bg-green-100 text-green-800" : ""}
-                      ${order.status === "CANCELLED" ? "bg-red-100 text-red-800" : ""}
+                      ${
+                        order.status === "PROCESSING"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : ""
+                      }
+                      ${
+                        order.status === "COMPLETED"
+                          ? "bg-green-100 text-green-800"
+                          : ""
+                      }
+                      ${
+                        order.status === "CANCELLED"
+                          ? "bg-red-100 text-red-800"
+                          : ""
+                      }
                     `}
                   >
                     {order.status === "PROCESSING" && "Đang xử lý"}
@@ -269,30 +290,30 @@ export default function Orders() {
                     {order.status === "CANCELLED" && "Đã hủy"}
                   </span>
                 </td>
-                      <td className="px-6 py-4 text-sm">
-                    <div className="flex items-center space-x-3">
-                      <button
-                        className="text-orange-600 hover:text-orange-800 transition-colors cursor-pointer"
-                        title="Xem chi tiết đơn hàng"
-                        onClick={() => {
-                          setOrderData(order);
-                          setIsOpenModalDetail(true);
-                        }}
-                      >
-                        <AiOutlineEye className="w-6 h-6" />
-                      </button>
-                      <button
-                        className="text-green-600 hover:text-green-800 transition-colors cursor-pointer"
-                        title="Hoàn thành đơn hàng"
-                        // onClick={() => {
-                        //   setBlogToUpdate(blog);
-                        //   setIsOpenModalUpdateBlog(true);
-                        // }}
-                      >
-                        <BsClipboardCheckFill className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+                <td className="px-6 py-4 text-sm">
+                  <div className="flex items-center space-x-3">
+                    <button
+                      className="text-orange-600 hover:text-orange-800 transition-colors cursor-pointer"
+                      title="Xem chi tiết đơn hàng"
+                      onClick={() => {
+                        setOrderData(order);
+                        setIsOpenModalDetail(true);
+                      }}
+                    >
+                      <AiOutlineEye className="w-6 h-6" />
+                    </button>
+                    <button
+                      className="text-green-600 hover:text-green-800 transition-colors cursor-pointer"
+                      title="Hoàn thành đơn hàng"
+                      onClick={() => {
+                        setIsOpenConfirmComplete(true);
+                        setOrderData(order);
+                      }}
+                    >
+                      <BsClipboardCheckFill className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -315,7 +336,19 @@ export default function Orders() {
         )}
       </div>
       {isOpenModalDetail && (
-        <ModalOrderDetail isOpenModal={isOpenModalDetail} setIsOpenModal={setIsOpenModalDetail} orderData={orderData}/>
+        <ModalOrderDetail
+          isOpenModal={isOpenModalDetail}
+          setIsOpenModal={setIsOpenModalDetail}
+          orderData={orderData}
+        />
+      )}
+          {isOpenConfirmComplete && (
+        <ModalConfirmCompleteOrder
+          isOpenConfirmComplete={isOpenConfirmComplete}
+          setIsOpenConfirmComplete={setIsOpenConfirmComplete}
+          orderData={orderData}
+          // onConfirm={}
+        />
       )}
     </div>
   );

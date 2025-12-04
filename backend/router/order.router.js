@@ -1,7 +1,7 @@
 import express from 'express'
-import { getOrders } from '../controllers/order/order.controller.js';
+import { completeOrder, getOrders } from '../controllers/order/order.controller.js';
 
 const router = express.Router();
 router.get('/', getOrders);
-router.patch("/orders/:id/complete", isAdmin, completeOrder);
-export default router
+router.patch("/orders/:id/complete", completeOrder);
+export default router;

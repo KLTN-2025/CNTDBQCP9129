@@ -1,6 +1,6 @@
 import Modal from "react-modal";
-import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
-import { formatCurrency } from "../../../utils/formatCurrencyVN";
+import useLockBodyScroll from "../../../hooks/useLockBodyScroll"
+import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
 const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
   useLockBodyScroll(isOpenModal);
   const formatDate = (dateString) => {
@@ -282,7 +282,7 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                       <p className="text-gray-600">
                         Đơn giá:{" "}
                         <span className="font-medium text-blue-600">
-                          {formatCurrency(item.price || 0)}
+                          {formatCurrencyVN(item.price || 0)}
                         </span>
                       </p>
                     </div>
@@ -294,7 +294,7 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                   </div>
                   <div className="text-right ml-4">
                     <p className="font-bold text-blue-600 text-lg">
-                      {formatCurrency((item.price || 0) * (item.quantity || 0))}
+                      {formatCurrencyVN((item.price || 0) * (item.quantity || 0))}
                     </p>
                   </div>
                 </div>
@@ -360,7 +360,7 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                     <div className="flex justify-between py-2">
                       <span className="text-gray-600">Số tiền VNPay:</span>
                       <span className="font-medium text-green-600">
-                        {formatCurrency(orderData.vnp_Amount)}
+                        {formatCurrencyVN(orderData.vnp_Amount)}
                       </span>
                     </div>
                   )}
@@ -371,7 +371,7 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">Tạm tính:</span>
                   <span className="font-semibold text-gray-900">
-                    {formatCurrency(
+                    {formatCurrencyVN(
                       (orderData.totalPrice || 0) +
                         (orderData.voucherDiscount || 0)
                     )}
@@ -398,7 +398,7 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                         Giảm giá voucher:
                       </span>
                       <span className="font-semibold text-red-600">
-                        -{formatCurrency(orderData.voucherDiscount)}
+                        -{formatCurrencyVN(orderData.voucherDiscount)}
                       </span>
                     </div>
                     {orderData.voucherId?.code && (
@@ -415,7 +415,7 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                 <div className="flex justify-between text-xl font-bold pt-3 border-t-2 border-blue-200">
                   <span className="text-gray-900">Tổng thanh toán:</span>
                   <span className="text-blue-600">
-                    {formatCurrency(orderData.totalPrice || 0)}
+                    {formatCurrencyVN(orderData.totalPrice || 0)}
                   </span>
                 </div>
               </div>
