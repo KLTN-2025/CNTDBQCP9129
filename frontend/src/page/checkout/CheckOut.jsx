@@ -109,7 +109,7 @@ const CheckOut = () => {
   const handleClickRemoveVoucher = () => {
     setDiscount(0);
     setVoucherUsed("");
-  }
+  };
   return (
     <div className="mx-auto max-lg:px-4 px-40 py-10 w-full">
       <div className="w-full flex items-center justify-center gap-x-2">
@@ -187,13 +187,15 @@ const CheckOut = () => {
               placeholder="Số điện thoại"
               className="pl-4 placeholder:text-gray-400 border border-gray-200 py-2 w-full focus:outline-0"
             />
-            <input
-              type="text"
-              value={deliveryNote}
-              onChange={(e) => setDeliveryNote(e.target.value)}
-              placeholder="Hướng dẫn giao hàng"
-              className="pl-4 placeholder:text-gray-400 border border-gray-200 py-2 w-full focus:outline-0"
-            />
+            {receiveMethod === "delivery" && (
+              <input
+                type="text"
+                value={deliveryNote}
+                onChange={(e) => setDeliveryNote(e.target.value)}
+                placeholder="Hướng dẫn giao hàng"
+                className="pl-4 placeholder:text-gray-400 border border-gray-200 py-2 w-full focus:outline-0"
+              />
+            )}
           </div>
           {/* Phương thức thanh toán */}
           <div className="pt-5">
@@ -308,7 +310,9 @@ const CheckOut = () => {
                   <input
                     type="text"
                     value={voucherCode}
-                    className={`border-2 py-2 rounded-sm w-full ${error ? "border-red-700" : "border-gray-300"}  pl-2 focus:border-orange-500 focus:outline-none`}
+                    className={`border-2 py-2 rounded-sm w-full ${
+                      error ? "border-red-700" : "border-gray-300"
+                    }  pl-2 focus:border-orange-500 focus:outline-none`}
                     onChange={(e) => setVoucherCode(e.target.value)}
                     onPaste={(e) => setVoucherCode(e.target.value)}
                   />
@@ -323,15 +327,14 @@ const CheckOut = () => {
                     Áp dụng
                   </button>
                 </div>
-                {error && (
-                  <p className="text-red-600">{error}</p>
-                )}
+                {error && <p className="text-red-600">{error}</p>}
                 {voucherUsed && (
                   <div className="pl-4 pr-2 flex relative gap-x-2 py-2 max-w-[200px] bg-gray-300 rounded-sm mt-4">
                     <BsFillTagFill className="text-xl mt-1" />
                     <p>{voucherUsed}</p>
-                    <IoMdRemoveCircleOutline className=" cursor-pointer right-1 absolute" 
-                     onClick={handleClickRemoveVoucher}
+                    <IoMdRemoveCircleOutline
+                      className=" cursor-pointer right-1 absolute"
+                      onClick={handleClickRemoveVoucher}
                     />
                   </div>
                 )}
