@@ -3,5 +3,5 @@ import { createPayment, handleVnpayReturn } from '../controllers/payment/payment
 
 const router = express.Router();
 router.post("/create", createPayment);
-router.get("/ipn", handleVnpayReturn);
+router.get("/vnpay-return", handleVnpayReturn);
 export default router;
