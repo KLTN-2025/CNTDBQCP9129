@@ -8,18 +8,17 @@ import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import playTingSound from "../../utils/playTingSound";
 import { AiOutlineEye } from "react-icons/ai";
 import { BsClipboardCheckFill } from "react-icons/bs";
+import ModalOrderDetail from "../../components/modal/adminOrders/ModalDetailOrder";
 export default function Orders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orders, setOrders] = useState([]);
   const [newOrderCount, setNewOrderCount] = useState(0);
-  
-  // Infinite scroll states
+  const [isOpenModalDetail, setIsOpenModalDetail] = useState(false);
+  const [orderData, setOrderData] = useState(null)
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const observer = useRef();
-
-  // Load orders với pagination
   const loadOrders = async (pageNum, isInitial = false) => {
     if (loading) return;
     
@@ -58,10 +57,8 @@ export default function Orders() {
   useEffect(() => {
     loadOrders(page, page === 1);
   }, [page]);
-
+  console.log("orders", orders);
   // Socket setup
-        console.log("orders", orders);
-
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
@@ -277,10 +274,10 @@ export default function Orders() {
                       <button
                         className="text-orange-600 hover:text-orange-800 transition-colors cursor-pointer"
                         title="Xem chi tiết đơn hàng"
-                        // onClick={() => {
-                        //   setDataBlog(blog);
-                        //   setIsOpenModalPreviewBlog(true);
-                        // }}
+                        onClick={() => {
+                          setOrderData(order);
+                          setIsOpenModalDetail(true);
+                        }}
                       >
                         <AiOutlineEye className="w-6 h-6" />
                       </button>
@@ -317,6 +314,9 @@ export default function Orders() {
           </div>
         )}
       </div>
+      {isOpenModalDetail && (
+        <ModalOrderDetail isOpenModal={isOpenModalDetail} setIsOpenModal={setIsOpenModalDetail} orderData={orderData}/>
+      )}
     </div>
   );
 }

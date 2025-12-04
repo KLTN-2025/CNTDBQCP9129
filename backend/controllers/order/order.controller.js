@@ -4,11 +4,12 @@ import Order from "../../model/order.model.js";
 export const getOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 5; // Load 20 đơn mỗi lần
+    const limit = 5; // Load 5 đơn mỗi lần
     const skip = (page - 1) * limit;
 
     const orders = await Order.find()
       .populate("userId", "name email role")
+      .populate("voucherId", "code") // Thêm populate voucherId
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
