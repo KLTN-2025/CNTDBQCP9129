@@ -100,11 +100,11 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
     >
       <div className="bg-white w-full flex flex-col select-none">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl z-10">
+        <div className="sticky top-0 bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-t-xl z-10">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold mb-2">Chi tiết đơn hàng</h2>
-              <p className="text-blue-100 text-sm">Mã đơn: #{orderData._id.slice(-8)}</p>
+              <p className="text-sm">Mã đơn: #{orderData._id.slice(-8)}</p>
             </div>
             <button
               onClick={() => setIsOpenModal(false)}
