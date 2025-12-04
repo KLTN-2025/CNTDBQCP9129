@@ -6,7 +6,8 @@ import { io } from "socket.io-client";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import playTingSound from "../../utils/playTingSound";
-
+import { AiOutlineEye } from "react-icons/ai";
+import { BsClipboardCheckFill } from "react-icons/bs";
 export default function Orders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orders, setOrders] = useState([]);
@@ -271,6 +272,30 @@ export default function Orders() {
                     {order.status === "CANCELLED" && "Đã hủy"}
                   </span>
                 </td>
+                      <td className="px-6 py-4 text-sm">
+                    <div className="flex items-center space-x-3">
+                      <button
+                        className="text-orange-600 hover:text-orange-800 transition-colors cursor-pointer"
+                        title="Xem chi tiết đơn hàng"
+                        // onClick={() => {
+                        //   setDataBlog(blog);
+                        //   setIsOpenModalPreviewBlog(true);
+                        // }}
+                      >
+                        <AiOutlineEye className="w-6 h-6" />
+                      </button>
+                      <button
+                        className="text-green-600 hover:text-green-800 transition-colors cursor-pointer"
+                        title="Hoàn thành đơn hàng"
+                        // onClick={() => {
+                        //   setBlogToUpdate(blog);
+                        //   setIsOpenModalUpdateBlog(true);
+                        // }}
+                      >
+                        <BsClipboardCheckFill className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
               </tr>
             ))}
           </tbody>
