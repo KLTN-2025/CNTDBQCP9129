@@ -3,15 +3,28 @@ import Order from "../../model/order.model.js";
 // Lấy danh sách tất cả order (cho admin)
 export const getOrders = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5; // Load 20 đơn mỗi lần
+    const skip = (page - 1) * limit;
+
     const orders = await Order.find()
-      .populate("userId", "name email role") // populate thông tin user 
-      .sort({ createdAt: -1 });
-    res.json(orders);
+      .populate("userId", "name email role")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Order.countDocuments();
+
+    res.json({
+      orders,
+      hasMore: skip + orders.length < total,
+      currentPage: page,
+      totalOrders: total
+    });
   } catch (err) {
     res.status(500).json({ message: "Lấy danh sách đơn hàng thất bại" });
   }
 };
-
 // Lấy order theo id
 export const getOrderById = async (req, res) => {
   try {

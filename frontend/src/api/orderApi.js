@@ -6,8 +6,8 @@ const orderApi = {
     return res.data
   },
 
-  getAllOrders: async() => {
-    const res = await axiosClient.get('/orders');
+  getAllOrders: async(params) => {
+    const res = await axiosClient.get('/orders', { params }); // Thêm params
     return res.data
   }
 }
