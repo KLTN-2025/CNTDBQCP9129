@@ -13,7 +13,6 @@ export default function BlogCategory() {
   const [isOpenModalCreateCategory, setIsOpenModalCreateCategory] =
     useState(false);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
-  const [deleteCategoryId, setDeleteCategoryId] = useState(null);
   const [isOpenModalUpdateCategory, setIsOpenModalUpdateCategory] =
     useState(false);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
@@ -75,7 +74,6 @@ export default function BlogCategory() {
       toast.error(err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại");
     } finally {
       setIsOpenConfirmDelete(false);
-      setDeleteCategoryId(null);
     }
   };
 
@@ -169,7 +167,8 @@ export default function BlogCategory() {
                       </button>
                       <button
                         onClick={() => {
-                          setDeleteCategoryId(category._id);
+                          setCurrentCategoryId(category._id);
+                          setUpdateCategoryName(category.name);
                           setIsOpenConfirmDelete(true);
                         }}
                         className="text-red-600 hover:text-red-800 transition-colors cursor-pointer"
@@ -199,10 +198,10 @@ export default function BlogCategory() {
       {/* Modal xác nhận xóa */}
       {isOpenConfirmDelete && (
         <ModalConfirmDelete
-          content="Bạn có chắc chắn muốn xóa danh mục này?"
+          content={`Bạn có chắc chắn muốn xóa danh mục ${updateCategoryName}?`}
           isOpenConfirmDelete={isOpenConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenConfirmDelete}
-          onConfirm={() => handleDeleteCategory(deleteCategoryId)}
+          onConfirm={() => handleDeleteCategory(currentCategoryId)}
         />
       )}
       {isOpenModalUpdateCategory && (

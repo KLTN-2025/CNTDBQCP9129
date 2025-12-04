@@ -15,7 +15,6 @@ export default function BlogCategory() {
   const [isOpenModalPreviewBlog, setIsOpenModalPreviewBlog] = useState(false);
   const [dataBlog, setDataBlog] = useState(null);
   const [isOpenModalCreateBlog, setIsOpenModalCreateBlog] = useState(false);
-  const [blogId, setBlogId] = useState(null);
   const [isOpenModalUpdateBlog, setIsOpenModalUpdateBlog] = useState(false);
   const [blogToUpdate, setBlogToUpdate] = useState(null);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
@@ -35,12 +34,11 @@ export default function BlogCategory() {
     try {
       await blogApi.delete(id);
       setAllBlogs((prev) => prev.filter((blog) => blog._id !== id));
-      setIsOpenConfirmDelete(false);
       toast.success("Xóa bài viết thành công");
     } catch {
       toast.error("Đã xảy ra lỗi hãy thử lại");
     } finally {
-      setBlogId(null);
+      setIsOpenConfirmDelete(false);
     }
   };
   return (
@@ -138,7 +136,7 @@ export default function BlogCategory() {
                       </button>
                       <button
                         onClick={() => { 
-                          setBlogId(blog._id);
+                          setDataBlog(blog);
                           setIsOpenConfirmDelete(true);
                         }}
                         className="text-red-600 hover:text-red-800 transition-colors cursor-pointer"
@@ -179,10 +177,10 @@ export default function BlogCategory() {
       )}
       {isOpenConfirmDelete && (
         <ModalConfirmDelete
-          content={"Bạn có chắc chắn muốn xóa bài viết này không"}
+          content={`Bạn có chắc chắn muốn xóa bài viết ${dataBlog.title}`}
           isOpenConfirmDelete={isOpenConfirmDelete}
           setIsOpenConfirmDelete={setIsOpenConfirmDelete}
-          onConfirm={() => handleRemoveBlog(blogId)}
+          onConfirm={() => handleRemoveBlog(dataBlog._id)}
         />
       )}
       {isOpenModalUpdateBlog && (
