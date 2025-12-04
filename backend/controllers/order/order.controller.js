@@ -41,24 +41,33 @@ export const getOrderById = async (req, res) => {
 };
 
 // Cập nhật trạng thái order
-export const updateOrderStatus = async (req, res) => {
+export const completeOrder = async (req, res) => {
   try {
-    const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-
-    if (!order) return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
-
-    if (req.io) {
-      req.io.emit("orderUpdated", order);
+    const { id } = req.params;
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
+    if (order.status !== "PROCESSING") {
+      return res.status(400).json({ 
+        message: "Chỉ có thể hoàn thành đơn hàng đang ở trạng thái 'Đang xử lý'" 
+      });
     }
 
-    res.json(order);
+    if (order.paymentStatus !== "SUCCESS") {
+      return res.status(400).json({ 
+        message: "Chỉ có thể hoàn thành đơn hàng đã thanh toán thành công" 
+      });
+    }
+    order.status = "COMPLETED";
+    await order.save();
+    const updatedOrder = await Order.findById(id)
+      .populate("userId", "name email role")
+      .populate("voucherId", "code");
+
+    res.json({updatedOrder});
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Xác nhận hoàn thành đơn hàng thất bại" });
   }
 };
 
