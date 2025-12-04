@@ -64,10 +64,10 @@ export const completeOrder = async (req, res) => {
     const updatedOrder = await Order.findById(id)
       .populate("userId", "name email role")
       .populate("voucherId", "code");
-
-    res.json({updatedOrder});
+    res.json(updatedOrder);
   } catch (err) {
     res.status(500).json({ message: "Xác nhận hoàn thành đơn hàng thất bại" });
+    console.log(err);
   }
 };
 

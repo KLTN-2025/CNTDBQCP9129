@@ -133,7 +133,19 @@ export default function Orders() {
   const filteredOrders = orders.filter((order) =>
     order.delivery?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  const handleCompleteOrder = async (orderId) => {
+    try {
+      const res = await orderApi.completeOrder(orderId);
+      setOrders((prev) =>
+        prev.map((o) => (o._id === orderId ? { ...o, status: res.status } : o))
+      );
+      toast.success("Đơn hàng đã hoàn thành");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
+    } finally {
+      setIsOpenConfirmComplete(false);
+    }
+  };
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
       {/* Header */}
@@ -172,6 +184,7 @@ export default function Orders() {
             <tr>
               {[
                 "STT",
+                "Mã đơn",
                 "Thời gian",
                 "Tổng tiền",
                 "Tiền khuyến mãi",
@@ -198,6 +211,7 @@ export default function Orders() {
                 ref={index === filteredOrders.length - 1 ? lastOrderRef : null}
               >
                 <td className="px-6 py-4 text-sm">{index + 1}</td>
+                <td className="px-6 py-4 text-sm">#{order._id?.slice(-8)}</td>
                 <td className="px-6 py-4 text-sm">
                   {formatDatetimeVN(order.createdAt)}
                 </td>
@@ -225,7 +239,7 @@ export default function Orders() {
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm max-w-[350px]">
+                <td className="px-6 py-4 text-sm max-w-[300px]">
                   <div className="flex flex-col space-y-1">
                     {order.items.map((item, idx) => (
                       <div key={idx} className="p-1 border rounded bg-gray-50">
@@ -302,16 +316,19 @@ export default function Orders() {
                     >
                       <AiOutlineEye className="w-6 h-6" />
                     </button>
-                    <button
-                      className="text-green-600 hover:text-green-800 transition-colors cursor-pointer"
-                      title="Hoàn thành đơn hàng"
-                      onClick={() => {
-                        setIsOpenConfirmComplete(true);
-                        setOrderData(order);
-                      }}
-                    >
-                      <BsClipboardCheckFill className="w-4 h-4" />
-                    </button>
+                    {order.paymentStatus === "SUCCESS" &&
+                      order.status === "PROCESSING" && (
+                        <button
+                          className="text-green-600 hover:text-green-800 transition-colors cursor-pointer"
+                          title="Hoàn thành đơn hàng"
+                          onClick={() => {
+                            setIsOpenConfirmComplete(true);
+                            setOrderData(order);
+                          }}
+                        >
+                          <BsClipboardCheckFill className="w-4 h-4" />
+                        </button>
+                      )}
                   </div>
                 </td>
               </tr>
@@ -342,12 +359,12 @@ export default function Orders() {
           orderData={orderData}
         />
       )}
-          {isOpenConfirmComplete && (
+      {isOpenConfirmComplete && (
         <ModalConfirmCompleteOrder
           isOpenConfirmComplete={isOpenConfirmComplete}
           setIsOpenConfirmComplete={setIsOpenConfirmComplete}
           orderData={orderData}
-          // onConfirm={}
+          onConfirm={() => handleCompleteOrder(orderData._id)}
         />
       )}
     </div>

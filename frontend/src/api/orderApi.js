@@ -9,6 +9,10 @@ const orderApi = {
   getAllOrders: async(params) => {
     const res = await axiosClient.get('/orders', { params }); // Thêm params
     return res.data
+  },
+  completeOrder: async (id) => {
+    const res = await axiosClient.patch(`/orders/${id}/complete`);
+    return res.data;
   }
 }
 export default orderApi

@@ -3,5 +3,5 @@ import { completeOrder, getOrders } from '../controllers/order/order.controller.
 
 const router = express.Router();
 router.get('/', getOrders);
-router.patch("/orders/:id/complete", completeOrder);
+router.patch("/:id/complete", completeOrder);
 export default router;
