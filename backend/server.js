@@ -4,7 +4,7 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import { connectDB } from './config/db.js';
-
+import { watchOrders } from './config/orderWatcher.js';
 import authRouter from './router/auth.router.js';
 import blogCategoryRouter from './router/blogCategory.router.js';
 import blogRouter from './router/blog.router.js';
@@ -18,6 +18,7 @@ import userRouter from './router/user.router.js';
 import voucherRouter from './router/voucher.router.js';
 import contactRouter from './router/contact.router.js';
 import paymentRouter from './router/payment.router.js';
+
 dotenv.config();
 
 const app = express();
@@ -54,21 +55,18 @@ app.use("/api/vouchers", voucherRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/api/payment", paymentRouter);
 
-
 // ---- Socket.IO logic ----
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  // Admin join room để nhận realtime đơn hàng
-  socket.on("join_admin", () => {
+  socket.on("join_admin", () => { 
     socket.join("admin_room");
-    console.log("Admin joined room:", socket.id);
+    console.log("Admin joined:", socket.id);
   });
 
-  // User join room theo userId để nhận realtime VNPAY & trạng thái đơn hàng
   socket.on("join_user", (userId) => {
     socket.join(`user_${userId}`);
-    console.log(`User ${userId} joined room:`, socket.id);
+    console.log(`User ${userId} joined:`, socket.id);
   });
 
   socket.on("disconnect", () => {
@@ -78,7 +76,8 @@ io.on("connection", (socket) => {
 
 // ---- Start server ----
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  connectDB();
+server.listen(PORT, async () => {
+  await connectDB();
+  watchOrders(io); 
   console.log(`Server started at http://localhost:${PORT}`);
 });
