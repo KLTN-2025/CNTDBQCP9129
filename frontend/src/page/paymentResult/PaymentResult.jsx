@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, AlertCircle, ArrowLeft, Package } from 'lucide-react';
 import { formatCurrencyVN } from '../../utils/formatCurrencyVN';
+import ErrorPage from '../../error/ErrorPage';
 const PaymentResult = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ const PaymentResult = () => {
   const amount = searchParams.get('amount');
   const transactionNo = searchParams.get('transactionNo');
   const message = searchParams.get('message');
-  const code = searchParams.get('code');
   const payDate = searchParams.get('payDate');
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 800);
@@ -55,7 +55,9 @@ const PaymentResult = () => {
       </div>
     );
   }
-
+  if(!status){
+    return <ErrorPage/>
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white  flex items-center justify-center p-4">
       <div className="max-w-md w-full">
