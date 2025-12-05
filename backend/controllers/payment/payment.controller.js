@@ -5,7 +5,6 @@ import Order from "../../model/order.model.js";
 import Voucher from "../../model/voucher.model.js";
 import Recipe from "../../model/recipe.model.js"; 
 import Ingredient from "../../model/ingredient.model.js"; 
-import { calculateVoucherDiscount } from "../voucher/voucher.controller.js";
 
 const vnpay = new VNPay({
   tmnCode: "6Z3TSPO9",
@@ -39,7 +38,6 @@ const scheduleOrderCancellation = async (orderId) => {
           const recipe = await Recipe.findOne({
             productId: item.productId,
           }).session(session);
-
           if (recipe) {
             for (const r of recipe.items) {
               const requiredAmount = r.quantity * item.quantity;
@@ -51,7 +49,6 @@ const scheduleOrderCancellation = async (orderId) => {
             }
           }
         }
-
         order.status = "CANCELLED";
         order.paymentStatus = "FAILED";
         await order.save({ session });
@@ -66,7 +63,7 @@ const scheduleOrderCancellation = async (orderId) => {
     } finally {
       session.endSession();
     }
-  }, 30 * 1000); // 15 phút
+  }, 1 * 60 * 1000); // 15 phút
 };
 
 export const createPayment = async (req, res) => {
@@ -74,7 +71,7 @@ export const createPayment = async (req, res) => {
   session.startTransaction();
 
   try {
-    const { cartItems, userId, delivery, voucherCode } = req.body;
+    const { cartItems, userId, delivery, voucher } = req.body;
     if (!delivery || !delivery.name || !delivery.phone) {
       return res.status(400).json({
         message: "Thiếu thông tin giao hàng",
@@ -88,7 +85,6 @@ export const createPayment = async (req, res) => {
     // BƯỚC 1: TÍNH TỔNG TIỀN VÀ FORMAT ITEMS
     let total = 0;
     const detailedItems = [];
-
     for (const item of cartItems) {
       if (!item.productId || !item.quantity) {
         await session.abortTransaction();
@@ -96,10 +92,9 @@ export const createPayment = async (req, res) => {
           .status(400)
           .json({ message: "Sản phẩm hoặc số lượng không hợp lệ" });
       }
-      const product = await Product.findById(item.productId._id).session(
+      const product = await Product.findById(item.productId).session(
         session
       );
-
       if (!product) {
         await session.abortTransaction();
         return res.status(400).json({
@@ -126,23 +121,10 @@ export const createPayment = async (req, res) => {
       shippingFee = 20000;
       total += shippingFee;
     }
-
-    // Áp dụng voucher
-    let discount = 0;
-    let voucherId = null;
-    if (voucherCode) {
-      const result = await calculateVoucherDiscount({
-        voucherCode,
-        items: cartItems.map((i) => i.productId.productCategoryId),
-        total,
-        userId,
-      });
-      discount = result.discount;
-      voucherId = result.voucherId;
-      total -= discount;
+     if (voucher && voucher.discount) {
+      total -= Number(voucher.discount);
       if (total < 0) total = 0;
     }
-
     total = Math.round(total);
 
     // BƯỚC 2: KIỂM TRA VÀ TRỪ KHO NGUYÊN LIỆU THEO CÔNG THỨC
@@ -190,9 +172,9 @@ export const createPayment = async (req, res) => {
     // BƯỚC 3: TẠO ORDER VỚI STATUS PENDING_PAYMENT
     const newOrder = new Order({
       userId,
-      voucherId,
+      voucherId: voucher?.voucherId || null,
       items: detailedItems,
-      voucherDiscount: discount,
+      voucherDiscount: voucher?.discount || 0,
       delivery,
       orderType: "ONLINE",
       paymentMethod: "VNPAY",
@@ -227,7 +209,7 @@ export const createPayment = async (req, res) => {
       orderId: newOrder._id,
       txnRef,
       total,
-      discount,
+      discount: voucher?.discount || 0,
       items: detailedItems,
       message: "Đơn hàng đã được tạo. Vui lòng thanh toán trong 15 phút",
     });
