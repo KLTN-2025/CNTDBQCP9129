@@ -23,7 +23,6 @@ export default function Orders() {
   const observer = useRef();
   const loadOrders = async (pageNum, isInitial = false) => {
     if (loading) return;
-
     try {
       setLoading(true);
       const res = await orderApi.getAllOrders({ page: pageNum, limit: 5 });
@@ -57,7 +56,7 @@ export default function Orders() {
     },
     [loading, hasMore]
   );
-
+  console.log(orders);
   // Load orders khi page thay đổi
   useEffect(() => {
     loadOrders(page, page === 1);
@@ -76,6 +75,7 @@ export default function Orders() {
       console.log("Order changed:", change);
 
       if (change.type === "insert") {
+        console.log("change.data", change.data)
         setOrders((prev) => [change.data, ...prev]); // Thêm vào đầu
         playTingSound();
         if (document.hidden) {
