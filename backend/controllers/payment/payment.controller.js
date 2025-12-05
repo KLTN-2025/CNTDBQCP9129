@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import Product from "../../model/product.model.js";
 import Order from "../../model/order.model.js";
 import Voucher from "../../model/voucher.model.js";
-import Recipe from "../../model/recipe.model.js"; 
-import Ingredient from "../../model/ingredient.model.js"; 
+import Recipe from "../../model/recipe.model.js";
+import Ingredient from "../../model/ingredient.model.js";
 
 const vnpay = new VNPay({
   tmnCode: "6Z3TSPO9",
@@ -92,9 +92,7 @@ export const createPayment = async (req, res) => {
           .status(400)
           .json({ message: "Sản phẩm hoặc số lượng không hợp lệ" });
       }
-      const product = await Product.findById(item.productId).session(
-        session
-      );
+      const product = await Product.findById(item.productId).session(session);
       if (!product) {
         await session.abortTransaction();
         return res.status(400).json({
@@ -121,7 +119,7 @@ export const createPayment = async (req, res) => {
       shippingFee = 20000;
       total += shippingFee;
     }
-     if (voucher && voucher.discount) {
+    if (voucher && voucher.discount) {
       total -= Number(voucher.discount);
       if (total < 0) total = 0;
     }
@@ -225,73 +223,144 @@ export const createPayment = async (req, res) => {
   }
 };
 
+// export const handleVnpayReturn = async (req, res) => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
+
+//   try {
+//     console.log(" VNPay callback received:", req.query);
+
+//     // Verify chữ ký từ VNPay
+//     const verify = vnpay.verifyReturnUrl(req.query);
+
+//     if (!verify.isVerified) {
+//       await session.abortTransaction();
+//       return res.status(400).json({
+//         message: "Chữ ký không hợp lệ",
+//         code: "97",
+//       });
+//     }
+
+//     const orderId = verify.vnp_TxnRef;
+//     const order = await Order.findById(orderId).session(session);
+
+//     if (!order) {
+//       await session.abortTransaction();
+//       return res.status(404).json({
+//         message: "Không tìm thấy đơn hàng",
+//         code: "01",
+//       });
+//     }
+
+//     // Kiểm tra order đã được xử lý chưa
+//     if (order.paymentStatus !== "PENDING") {
+//       await session.abortTransaction();
+//       return res.status(200).json({
+//         message: "Đơn hàng đã được xử lý trước đó",
+//         paymentStatus: order.paymentStatus,
+//         orderId: order._id,
+//       });
+//     }
+
+//     // THANH TOÁN THÀNH CÔNG
+//     if (verify.isSuccess) {
+//       order.paymentStatus = "SUCCESS";
+//       order.vnp_PayDate = new Date();
+//       order.vnp_TransactionNo = verify.vnp_TransactionNo;
+//       order.vnp_Amount = verify.vnp_Amount;
+
+//       if (order.voucherId) {
+//         await Voucher.findByIdAndUpdate(
+//           order.voucherId,
+//           { $inc: { usedCount: 1 } },
+//           { session }
+//         );
+//       }
+
+//       await order.save({ session });
+//       await session.commitTransaction();
+//       return res.status(200).json({
+//         success: true,
+//         message: "Thanh toán thành công",
+//         code: "00",
+//         orderId: order._id,
+//         amount: verify.vnp_Amount,
+//         transactionNo: verify.vnp_TransactionNo,
+//       });
+//     }
+//     else {
+//       // Hoàn lại nguyên liệu theo công thức
+//       for (const item of order.items) {
+//         const recipe = await Recipe.findOne({
+//           productId: item.productId,
+//         }).session(session);
+
+//         if (recipe) {
+//           for (const r of recipe.items) {
+//             const requiredAmount = r.quantity * item.quantity;
+//             await Ingredient.findByIdAndUpdate(
+//               r.ingredientId,
+//               { $inc: { quantity: requiredAmount } },
+//               { session }
+//             );
+//           }
+//         }
+//       }
+
+//       order.status = "CANCELLED";
+//       order.paymentStatus = "FAILED"
+//       await order.save({ session });
+//       await session.commitTransaction();
+//       return res.status(400).json({
+//         success: false,
+//         message: "Giao dịch thất bại, nguyên liệu đã được hoàn lại",
+//         code: verify.vnp_ResponseCode,
+//         orderId: order._id,
+//       });
+//     }
+//   } catch (err) {
+//     await session.abortTransaction();
+//     console.error("VNPAY CALLBACK ERROR:", err);
+//     res.status(500).json({
+//       message: "Xử lý callback thất bại",
+//       error: err.message,
+//     });
+//   } finally {
+//     session.endSession();
+//   }
+// };
 export const handleVnpayReturn = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    console.log(" VNPay callback received:", req.query);
+    console.log("VNPay callback received:", req.query);
 
-    // Verify chữ ký từ VNPay
     const verify = vnpay.verifyReturnUrl(req.query);
 
     if (!verify.isVerified) {
       await session.abortTransaction();
-      return res.status(400).json({
-        message: "Chữ ký không hợp lệ",
-        code: "97",
-      });
+      return res.redirect(
+        `http://localhost:5173/payment-result?status=error&code=97&message=${encodeURIComponent(
+          "Chữ ký không hợp lệ"
+        )}`
+      );
     }
-
     const orderId = verify.vnp_TxnRef;
     const order = await Order.findById(orderId).session(session);
 
+    // Không tìm thấy đơn hàng
     if (!order) {
       await session.abortTransaction();
-      return res.status(404).json({
-        message: "Không tìm thấy đơn hàng",
-        code: "01",
-      });
+      return res.redirect(
+        `http://localhost:5173/payment-result?status=error&code=01&message=${encodeURIComponent(
+          "Không tìm thấy đơn hàng"
+        )}`
+      );
     }
 
-    // Kiểm tra order đã được xử lý chưa
-    if (order.paymentStatus !== "PENDING") {
-      await session.abortTransaction();
-      return res.status(200).json({
-        message: "Đơn hàng đã được xử lý trước đó",
-        paymentStatus: order.paymentStatus,
-        orderId: order._id,
-      });
-    }
-
-    // THANH TOÁN THÀNH CÔNG
-    if (verify.isSuccess) {
-      order.paymentStatus = "SUCCESS";
-      order.vnp_PayDate = new Date();
-      order.vnp_TransactionNo = verify.vnp_TransactionNo;
-      order.vnp_Amount = verify.vnp_Amount; 
-      
-      if (order.voucherId) {
-        await Voucher.findByIdAndUpdate(
-          order.voucherId,
-          { $inc: { usedCount: 1 } },
-          { session }
-        );
-      }
-
-      await order.save({ session });
-      await session.commitTransaction();
-      return res.status(200).json({
-        success: true,
-        message: "Thanh toán thành công",
-        code: "00",
-        orderId: order._id,
-        amount: verify.vnp_Amount,
-        transactionNo: verify.vnp_TransactionNo,
-      });
-    }
-    else {
-      // Hoàn lại nguyên liệu theo công thức
+    // Nếu thanh toán thất bại
+    if (!verify.isSuccess) {
       for (const item of order.items) {
         const recipe = await Recipe.findOne({
           productId: item.productId,
@@ -300,6 +369,7 @@ export const handleVnpayReturn = async (req, res) => {
         if (recipe) {
           for (const r of recipe.items) {
             const requiredAmount = r.quantity * item.quantity;
+
             await Ingredient.findByIdAndUpdate(
               r.ingredientId,
               { $inc: { quantity: requiredAmount } },
@@ -308,25 +378,56 @@ export const handleVnpayReturn = async (req, res) => {
           }
         }
       }
-
+      order.paymentStatus = "FAILED";
       order.status = "CANCELLED";
-      order.paymentStatus = "FAILED"
       await order.save({ session });
+
       await session.commitTransaction();
-      return res.status(400).json({
-        success: false,
-        message: "Giao dịch thất bại, nguyên liệu đã được hoàn lại",
-        code: verify.vnp_ResponseCode,
-        orderId: order._id,
-      });
+
+      return res.redirect(
+        `http://localhost:5173/payment-result?status=failed&code=${
+          verify.vnp_ResponseCode
+        }&orderId=${order._id}&payDate=${
+          verify.vnp_PayDate
+        }&message=${encodeURIComponent("Giao dịch thất bại")}`
+      );
     }
+
+    // ✔ THANH TOÁN THÀNH CÔNG
+    order.paymentStatus = "SUCCESS";
+    order.vnp_TransactionNo = verify.vnp_TransactionNo;
+    order.vnp_Amount = verify.vnp_Amount;
+    order.vnp_PayDate = verify.vnp_PayDate;
+
+    // Cập nhật voucher nếu có
+    if (order.voucherId) {
+      await Voucher.findByIdAndUpdate(
+        order.voucherId,
+        { $inc: { usedCount: 1 } },
+        { session }
+      );
+    }
+
+    await order.save({ session });
+    await session.commitTransaction();
+
+    return res.redirect(
+      `http://localhost:5173/payment-result?status=success&code=00&orderId=${
+        order._id
+      }&amount=${verify.vnp_Amount}&transactionNo=${
+        verify.vnp_TransactionNo
+      }&payDate=${verify.vnp_PayDate}&message=${encodeURIComponent(
+        "Thanh toán thành công"
+      )}`
+    );
   } catch (err) {
     await session.abortTransaction();
     console.error("VNPAY CALLBACK ERROR:", err);
-    res.status(500).json({
-      message: "Xử lý callback thất bại",
-      error: err.message,
-    });
+    return res.redirect(
+      `http://localhost:5173/payment-result?status=error&message=${encodeURIComponent(
+        "Xử lý callback thất bại"
+      )}`
+    );
   } finally {
     session.endSession();
   }

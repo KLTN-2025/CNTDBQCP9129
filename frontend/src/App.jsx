@@ -39,6 +39,7 @@ import Contacts from "./page/admin/Contacts";
 // store
 import useCartStore from "./store/cartStore";
 import Vouchers from "./page/admin/Vouchers";
+import PaymentResult from "./page/paymentResult/PaymentResult";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -177,6 +178,8 @@ function App() {
               cart?.length > 0 && user ? <CheckOut /> : <Navigate to="/menu" />
             }
           />
+          {/* payment result route */}
+          <Route path="/payment-result" element={<PaymentResult />} />
           {/* menu route */}
           <Route path="/menu/:categorySlug?" element={<MenuPage />} />
           <Route path="*" element={<ErrorPage />} />
