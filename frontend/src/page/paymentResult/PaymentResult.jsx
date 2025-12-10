@@ -93,8 +93,8 @@ const PaymentResult = () => {
 
             <div className="space-y-3">
               <button
-                onClick={() => navigate(`/order/${orderId}`)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                onClick={() => navigate(`/profile/orders-history`)}
+                className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <Package className="w-5 h-5" />
                 Xem chi tiết đơn hàng
@@ -158,12 +158,6 @@ const PaymentResult = () => {
               </h1>
             </div>
             <div className="space-y-3">
-              <button
-                onClick={() => navigate('/cart')}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                Quay lại giỏ hàng
-              </button>
               <button
                 onClick={() => navigate('/')}
                 className="w-full bg-gray-200 cursor-pointer hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
