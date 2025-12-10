@@ -28,7 +28,7 @@ export default function Orders() {
       const res = await orderApi.getAllOrders({ page: pageNum, limit: 5 });
 
       if (isInitial) {
-        setOrders(res.orders); 
+        setOrders(res.orders);
       } else {
         setOrders((prev) => [...prev, ...res.orders]); // Append thêm
       }
@@ -56,18 +56,15 @@ export default function Orders() {
     },
     [loading, hasMore]
   );
-  console.log(orders);
   // Load orders khi page thay đổi
   useEffect(() => {
     loadOrders(page, page === 1);
   }, [page]);
-  console.log("orders", orders);
   // Socket setup
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
     socket.on("connect", () => {
-      console.log("Socket connected:", socket.id);
       socket.emit("join_admin");
     });
 
@@ -75,7 +72,7 @@ export default function Orders() {
       console.log("Order changed:", change);
 
       if (change.type === "insert") {
-        console.log("change.data", change.data)
+        console.log("change.data", change.data);
         setOrders((prev) => [change.data, ...prev]); // Thêm vào đầu
         playTingSound();
         if (document.hidden) {
@@ -83,13 +80,20 @@ export default function Orders() {
         }
         toast.success("🎉 Có đơn hàng mới!");
       } else if (change.type === "update") {
+        console.log("Order changed:", change);
         setOrders((prev) =>
           prev.map((o) => {
             if (o._id === change.orderId) {
               if (change.updatedFields.paymentStatus === "FAILED") {
                 return { ...o, paymentStatus: "FAILED", status: "CANCELLED" };
               } else if (change.updatedFields.paymentStatus === "SUCCESS") {
-                return { ...o, paymentStatus: "SUCCESS" };
+                return {
+                  ...o,
+                  paymentStatus: "SUCCESS",
+                  vnp_Amount: change.data.vnp_Amount,
+                  vnp_PayDate: change.data.vnp_PayDate,
+                  vnp_TransactionNo: change.data.vnp_TransactionNo,
+                };
               }
             }
             return o;
