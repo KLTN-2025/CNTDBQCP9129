@@ -1,7 +1,7 @@
 import Modal from "react-modal";
-import useLockBodyScroll from "../../../hooks/useLockBodyScroll"
+import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
-import { formatDatetimeVN } from "../../../utils/formatDatetimeVN";
+import { useMemo } from "react";
 const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
   useLockBodyScroll(isOpenModal);
   const formatDate = (dateString) => {
@@ -14,7 +14,12 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
       second: "2-digit",
     });
   };
-
+  const subTotal = useMemo(() => {
+    return orderData.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+  }, [orderData.items]);
   const getStatusBadge = (status) => {
     const statusConfig = {
       PROCESSING: { label: "Đang xử lý", color: "bg-yellow-500" },
@@ -295,7 +300,9 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                   </div>
                   <div className="text-right ml-4">
                     <p className="font-bold text-blue-600 text-lg">
-                      {formatCurrencyVN((item.price || 0) * (item.quantity || 0))}
+                      {formatCurrencyVN(
+                        (item.price || 0) * (item.quantity || 0)
+                      )}
                     </p>
                   </div>
                 </div>
@@ -369,6 +376,20 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
               )}
 
               <div className="border-t-2 border-gray-200 pt-4 mt-4 space-y-3">
+                <div className="flex justify-between text-base">
+                  <span className="text-gray-600">Tổng tiền sản phẩm:</span>
+                  <span className="font-semibold text-gray-900">
+                    {formatCurrencyVN(subTotal)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-base">
+                  <span className="text-gray-600">Phí ship: </span>
+                  <span className="font-semibold text-gray-900">
+                    {orderData.delivery?.address
+                      ? formatCurrencyVN(20000)
+                      : formatCurrencyVN(0)}
+                  </span>
+                </div>
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">Tạm tính:</span>
                   <span className="font-semibold text-gray-900">
