@@ -12,12 +12,12 @@ const ProfilePage = () => {
   const isCustomer = user.role === "customer";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8 pt-10 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">
         <div className="flex gap-8 max-lg:flex-col">
           {/* Sidebar */}
-          <aside className="w-full lg:w-80 flex-shrink-0">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden sticky top-8">
+          <aside className="w-full lg:w-80 flex-shrink-0 ">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden ">
               {/* Header Card */}
               <div className="bg-gradient-to-br from-green-600 to-green-700 p-6 text-white">
                 <div className="flex items-center gap-3 mb-2">
@@ -129,7 +129,7 @@ const ProfilePage = () => {
 
           {/* Main Content */}
           <main className="flex-1 min-w-0">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 lg:p-8">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 lg:p-4">
               {isRootProfile ? <UserInfo user={user} /> : <Outlet />}
             </div>
           </main>

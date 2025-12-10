@@ -36,7 +36,21 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({ message: "Lấy dữ liệu đơn hàng thất bại" });
   }
 };
-
+// Lấy tất cả order theo userId (cho khách hàng xem lịch sử đơn hàng)
+export const getAllOrdersByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({ message: "Thiếu userId" });
+    }
+    const orders = await Order.find({ userId })
+      .populate("voucherId", "code")
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: "Không thể lấy danh sách đơn hàng" });
+  }
+};
 // Cập nhật trạng thái order
 export const completeOrder = async (req, res) => {
   try {

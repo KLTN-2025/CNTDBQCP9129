@@ -47,7 +47,7 @@ const ModalUpdateProduct = ({
       }
       console.log(updateData);
       await cartApi.updateCartItem(user.id, updateData);
-      toast.success("Đã thêm sản phẩm vào giỏ hàng");
+      toast.success("Cập nhật sản phẩm thành công");
       const cartUpdate = cart.map((item) => item.productId._id === itemUpdate.productId._id ? {...item, note: note, quantity: count} : item)
       setCart(cartUpdate);
       localStorage.setItem("cart", JSON.stringify(cartUpdate));

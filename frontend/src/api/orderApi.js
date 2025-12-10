@@ -9,6 +9,10 @@ const orderApi = {
     const res = await axiosClient.get('/orders', { params }); 
     return res.data
   },
+  getAllOrdersByUserId: async(userId) => {
+    const res = await axiosClient.get(`/orders/user/${userId}`); 
+    return res.data
+  },
   getOrderById: async(orderId) => {
     const res = await axiosClient.get(`/orders/${orderId}`);
     return res.data;
