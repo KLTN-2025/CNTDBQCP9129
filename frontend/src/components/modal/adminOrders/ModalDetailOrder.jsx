@@ -2,6 +2,7 @@ import Modal from "react-modal";
 import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
 import { useMemo } from "react";
+import { formatDatetimeVNOfVNPAY } from "../../../utils/formatDatetimeVNOfVNPAY";
 const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
   useLockBodyScroll(isOpenModal);
   const formatDate = (dateString) => {
@@ -360,7 +361,7 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                         Thời gian thanh toán:
                       </span>
                       <span className="font-medium text-gray-900">
-                        {formatDate(orderData.vnp_PayDate)}
+                        {formatDatetimeVNOfVNPAY(orderData.vnp_PayDate)}
                       </span>
                     </div>
                   )}
