@@ -1,6 +1,7 @@
 import Modal from "react-modal";
 import useLockBodyScroll from "../../../hooks/useLockBodyScroll"
 import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
+import { formatDatetimeVN } from "../../../utils/formatDatetimeVN";
 const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
   useLockBodyScroll(isOpenModal);
   const formatDate = (dateString) => {
@@ -334,7 +335,7 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                     <div className="flex justify-between py-2">
                       <span className="text-gray-600">Mã tham chiếu:</span>
                       <span className="font-medium text-gray-900">
-                        {orderData.vnp_TxnRef}
+                        #{orderData.vnp_TxnRef.slice(-8)}
                       </span>
                     </div>
                   )}

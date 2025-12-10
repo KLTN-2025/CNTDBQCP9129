@@ -146,7 +146,6 @@ const CheckOut = () => {
         voucher: voucherUsed,
         userId: user.id,
       };
-      console.log("orderData", orderData);
       const response = await paymentApi.createPayment(orderData);
       if (response.success && response.vnpUrl) {
         window.location.href = response.vnpUrl;

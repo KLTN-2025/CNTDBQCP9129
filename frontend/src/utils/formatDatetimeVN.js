@@ -8,8 +8,8 @@ export const formatDatetimeVN = (isoString) => {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: false,             // 24h format
-    timeZone: "Asia/Ho_Chi_Minh" // giờ Việt Nam
+    hour12: false,           
+    timeZone: "Asia/Ho_Chi_Minh" 
   };
 
   // trả về dạng dd/mm/yyyy, hh:mm

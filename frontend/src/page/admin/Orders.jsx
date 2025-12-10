@@ -28,7 +28,7 @@ export default function Orders() {
       const res = await orderApi.getAllOrders({ page: pageNum, limit: 5 });
 
       if (isInitial) {
-        setOrders(res.orders); // Lần đầu thì replace
+        setOrders(res.orders); 
       } else {
         setOrders((prev) => [...prev, ...res.orders]); // Append thêm
       }
@@ -115,8 +115,6 @@ export default function Orders() {
       document.title = "Quản lý đơn hàng";
     }
   }, [newOrderCount]);
-
-  // Reset badge khi quay lại tab
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {

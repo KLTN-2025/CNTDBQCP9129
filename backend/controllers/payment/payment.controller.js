@@ -167,7 +167,7 @@ export const createPayment = async (req, res) => {
       }
     }
 
-    // BƯỚC 3: TẠO ORDER VỚI STATUS PENDING_PAYMENT
+    // BƯỚC 3: TẠO ORDER VỚI STATUS PENDING PAYMENT
     const newOrder = new Order({
       userId,
       voucherId: voucher?.voucherId || null,
@@ -179,7 +179,7 @@ export const createPayment = async (req, res) => {
       totalPrice: total,
       paymentStatus: "PENDING",
     });
-
+    newOrder.vnp_TxnRef = newOrder._id.toString();
     await newOrder.save({ session });
 
     // Commit transaction - ĐÃ GIỮ NGUYÊN LIỆU THÀNH CÔNG
@@ -223,119 +223,11 @@ export const createPayment = async (req, res) => {
   }
 };
 
-// export const handleVnpayReturn = async (req, res) => {
-//   const session = await mongoose.startSession();
-//   session.startTransaction();
-
-//   try {
-//     console.log(" VNPay callback received:", req.query);
-
-//     // Verify chữ ký từ VNPay
-//     const verify = vnpay.verifyReturnUrl(req.query);
-
-//     if (!verify.isVerified) {
-//       await session.abortTransaction();
-//       return res.status(400).json({
-//         message: "Chữ ký không hợp lệ",
-//         code: "97",
-//       });
-//     }
-
-//     const orderId = verify.vnp_TxnRef;
-//     const order = await Order.findById(orderId).session(session);
-
-//     if (!order) {
-//       await session.abortTransaction();
-//       return res.status(404).json({
-//         message: "Không tìm thấy đơn hàng",
-//         code: "01",
-//       });
-//     }
-
-//     // Kiểm tra order đã được xử lý chưa
-//     if (order.paymentStatus !== "PENDING") {
-//       await session.abortTransaction();
-//       return res.status(200).json({
-//         message: "Đơn hàng đã được xử lý trước đó",
-//         paymentStatus: order.paymentStatus,
-//         orderId: order._id,
-//       });
-//     }
-
-//     // THANH TOÁN THÀNH CÔNG
-//     if (verify.isSuccess) {
-//       order.paymentStatus = "SUCCESS";
-//       order.vnp_PayDate = new Date();
-//       order.vnp_TransactionNo = verify.vnp_TransactionNo;
-//       order.vnp_Amount = verify.vnp_Amount;
-
-//       if (order.voucherId) {
-//         await Voucher.findByIdAndUpdate(
-//           order.voucherId,
-//           { $inc: { usedCount: 1 } },
-//           { session }
-//         );
-//       }
-
-//       await order.save({ session });
-//       await session.commitTransaction();
-//       return res.status(200).json({
-//         success: true,
-//         message: "Thanh toán thành công",
-//         code: "00",
-//         orderId: order._id,
-//         amount: verify.vnp_Amount,
-//         transactionNo: verify.vnp_TransactionNo,
-//       });
-//     }
-//     else {
-//       // Hoàn lại nguyên liệu theo công thức
-//       for (const item of order.items) {
-//         const recipe = await Recipe.findOne({
-//           productId: item.productId,
-//         }).session(session);
-
-//         if (recipe) {
-//           for (const r of recipe.items) {
-//             const requiredAmount = r.quantity * item.quantity;
-//             await Ingredient.findByIdAndUpdate(
-//               r.ingredientId,
-//               { $inc: { quantity: requiredAmount } },
-//               { session }
-//             );
-//           }
-//         }
-//       }
-
-//       order.status = "CANCELLED";
-//       order.paymentStatus = "FAILED"
-//       await order.save({ session });
-//       await session.commitTransaction();
-//       return res.status(400).json({
-//         success: false,
-//         message: "Giao dịch thất bại, nguyên liệu đã được hoàn lại",
-//         code: verify.vnp_ResponseCode,
-//         orderId: order._id,
-//       });
-//     }
-//   } catch (err) {
-//     await session.abortTransaction();
-//     console.error("VNPAY CALLBACK ERROR:", err);
-//     res.status(500).json({
-//       message: "Xử lý callback thất bại",
-//       error: err.message,
-//     });
-//   } finally {
-//     session.endSession();
-//   }
-// };
 export const handleVnpayReturn = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    console.log("VNPay callback received:", req.query);
-
     const verify = vnpay.verifyReturnUrl(req.query);
 
     if (!verify.isVerified) {
