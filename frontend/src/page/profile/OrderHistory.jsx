@@ -212,6 +212,7 @@ const OrderHistory = () => {
           isOpenModal={isOpenModalOrderDetail}
           setIsOpenModal={setIsOpenModalOrderDetail}
           orderData={orderData}
+          openByCustomer={true}
         />
       )}
     </div>

@@ -3,7 +3,12 @@ import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
 import { useMemo } from "react";
 import { formatDatetimeVNOfVNPAY } from "../../../utils/formatDatetimeVNOfVNPAY";
-const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
+const ModalOrderDetail = ({
+  isOpenModal,
+  setIsOpenModal,
+  orderData,
+  openByCustomer = false,
+}) => {
   useLockBodyScroll(isOpenModal);
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("vi-VN", {
@@ -156,44 +161,46 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
           </div>
 
           {/* Thông tin khách hàng */}
-          <div className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm">
-            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-gray-800">
-              <svg
-                className="w-5 h-5 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-              Thông tin khách hàng
-            </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-600">Họ tên:</span>
-                <span className="font-medium text-gray-900">
-                  {orderData.userId?.name || "N/A"}
-                </span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-600">Email:</span>
-                <span className="font-medium text-gray-900">
-                  {orderData.userId?.email || "N/A"}
-                </span>
-              </div>
-              <div className="flex justify-between py-2">
-                <span className="text-gray-600">Vai trò:</span>
-                <span className="font-semibold uppercase text-blue-600">
-                  {orderData.userId?.role || "N/A"}
-                </span>
+          {!openByCustomer && (
+            <div className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm">
+              <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-gray-800">
+                <svg
+                  className="w-5 h-5 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                Thông tin khách hàng
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Họ tên:</span>
+                  <span className="font-medium text-gray-900">
+                    {orderData.userId?.name || "N/A"}
+                  </span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Email:</span>
+                  <span className="font-medium text-gray-900">
+                    {orderData.userId?.email || "N/A"}
+                  </span>
+                </div>
+                <div className="flex justify-between py-2">
+                  <span className="text-gray-600">Vai trò:</span>
+                  <span className="font-semibold uppercase text-blue-600">
+                    {orderData.userId?.role || "N/A"}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Thông tin giao hàng */}
           <div className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm">
@@ -466,27 +473,6 @@ const ModalOrderDetail = ({ isOpenModal, setIsOpenModal, orderData }) => {
                   <p className="text-gray-600 mb-1">Ngày tạo đơn</p>
                   <p className="font-semibold text-gray-900">
                     {formatDate(orderData.createdAt)}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg
-                  className="w-5 h-5 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                <div>
-                  <p className="text-gray-600 mb-1">Cập nhật lần cuối</p>
-                  <p className="font-semibold text-gray-900">
-                    {formatDate(orderData.updatedAt)}
                   </p>
                 </div>
               </div>
