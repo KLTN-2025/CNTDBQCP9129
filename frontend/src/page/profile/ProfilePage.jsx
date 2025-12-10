@@ -6,7 +6,6 @@ import Breadcrumbs from "../../components/Breadcrumbs";
 const ProfilePage = () => {
   const location = useLocation();
   const activePath = location.pathname;
-
   const isRootProfile = activePath === "/profile";
   const user = useAuthStore((state) => state.user);
   const isCustomer = user.role === "customer";
@@ -58,7 +57,7 @@ const ProfilePage = () => {
 
                   <li>
                     <Link
-                      to="/profile/orders/history"
+                      to="/profile/orders-history"
                       className={`flex items-center gap-4 p-3 rounded-xl transition-all duration-200 ${
                         activePath.includes("orders")
                           ? "bg-green-50 text-green-700 shadow-sm"

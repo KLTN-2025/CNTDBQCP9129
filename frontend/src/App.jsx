@@ -132,7 +132,7 @@ function App() {
             path="/profile"
             element={!user ? <Navigate to="/account/login" /> : <ProfilePage />}
           >
-            <Route path="orders/history" element={<OrderHistory />} />
+            <Route path="orders-history" element={<OrderHistory />} />
             <Route path="change-password" element={<ChangePassword />} />
           </Route>
           {/* admin route */}
