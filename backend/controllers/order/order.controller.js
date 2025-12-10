@@ -9,7 +9,7 @@ export const getOrders = async (req, res) => {
 
     const orders = await Order.find()
       .populate("userId", "name email role")
-      .populate("voucherId", "code") // Thêm populate voucherId
+      .populate("voucherId", "code")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -29,10 +29,7 @@ export const getOrders = async (req, res) => {
 // Lấy order theo id
 export const getOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
-      "userId",
-      "name email"
-    );
+    const order = await Order.findById(req.params.orderId);
     if (!order) return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
     res.json(order);
   } catch (err) {

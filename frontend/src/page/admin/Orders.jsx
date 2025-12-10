@@ -69,10 +69,7 @@ export default function Orders() {
     });
 
     socket.on("order_changed", (change) => {
-      console.log("Order changed:", change);
-
       if (change.type === "insert") {
-        console.log("change.data", change.data);
         setOrders((prev) => [change.data, ...prev]); // Thêm vào đầu
         playTingSound();
         if (document.hidden) {
@@ -80,7 +77,6 @@ export default function Orders() {
         }
         toast.success("🎉 Có đơn hàng mới!");
       } else if (change.type === "update") {
-        console.log("Order changed:", change);
         setOrders((prev) =>
           prev.map((o) => {
             if (o._id === change.orderId) {

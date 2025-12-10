@@ -63,7 +63,7 @@ const scheduleOrderCancellation = async (orderId) => {
     } finally {
       session.endSession();
     }
-  }, 5 * 60 * 1000); // 15 phút
+  }, 15 * 60 * 1000); // 15 phút
 };
 
 export const createPayment = async (req, res) => {
@@ -204,12 +204,6 @@ export const createPayment = async (req, res) => {
     return res.status(200).json({
       success: true,
       vnpUrl: vnpayResponse,
-      orderId: newOrder._id,
-      txnRef,
-      total,
-      discount: voucher?.discount || 0,
-      items: detailedItems,
-      message: "Đơn hàng đã được tạo. Vui lòng thanh toán trong 15 phút",
     });
   } catch (err) {
     await session.abortTransaction();
@@ -277,15 +271,11 @@ export const handleVnpayReturn = async (req, res) => {
       await session.commitTransaction();
 
       return res.redirect(
-        `http://localhost:5173/payment-result?status=failed&code=${
-          verify.vnp_ResponseCode
-        }&orderId=${order._id}&payDate=${
-          verify.vnp_PayDate
-        }&message=${encodeURIComponent("Giao dịch thất bại")}`
+        `http://localhost:5173/payment-result?orderId=${order._id}`
       );
     }
 
-    // ✔ THANH TOÁN THÀNH CÔNG
+    // THANH TOÁN THÀNH CÔNG
     order.paymentStatus = "SUCCESS";
     order.vnp_TransactionNo = verify.vnp_TransactionNo;
     order.vnp_Amount = verify.vnp_Amount;
@@ -304,13 +294,9 @@ export const handleVnpayReturn = async (req, res) => {
     await session.commitTransaction();
 
     return res.redirect(
-      `http://localhost:5173/payment-result?status=success&code=00&orderId=${
+      `http://localhost:5173/payment-result?&orderId=${
         order._id
-      }&amount=${verify.vnp_Amount}&transactionNo=${
-        verify.vnp_TransactionNo
-      }&payDate=${verify.vnp_PayDate}&message=${encodeURIComponent(
-        "Thanh toán thành công"
-      )}`
+      }`
     );
   } catch (err) {
     await session.abortTransaction();

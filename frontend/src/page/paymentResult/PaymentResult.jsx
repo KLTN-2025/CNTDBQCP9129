@@ -1,26 +1,31 @@
-// PaymentResult.jsx
 import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, XCircle, AlertCircle, ArrowLeft, Package } from 'lucide-react';
 import { formatCurrencyVN } from '../../utils/formatCurrencyVN';
 import { formatDatetimeVNOfVNPAY } from '../../utils/formatDatetimeVNOfVNPAY';
+import orderApi from '../../api/orderApi';
 import ErrorPage from '../../error/ErrorPage';
+import { toast } from 'react-toastify';
 const PaymentResult = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const status = searchParams.get('status');
   const orderId = searchParams.get('orderId');
-  const amount = searchParams.get('amount');
-  const transactionNo = searchParams.get('transactionNo');
-  const message = searchParams.get('message');
-  const payDate = searchParams.get('payDate');
+  const status = searchParams.get('status');
+  const [order, setOrder] = useState(null);
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
-  
-
+    const getOrderById = async() => {
+     try {
+      const orderData = await orderApi.getOrderById(orderId);
+      setOrder(orderData);
+     } catch {
+      toast.error("Đã có lỗi xảy ra, vui lòng thử lại");
+     } finally {
+      setLoading(false);
+     }
+    }
+    getOrderById()
+  }, [orderId]);
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white flex items-center justify-center">
@@ -31,14 +36,14 @@ const PaymentResult = () => {
       </div>
     );
   }
-  if(!status){
+  if(!order && !false){
     return <ErrorPage/>
   }
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-white  flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
+     <div className="max-w-md w-full">
         {/* SUCCESS */}
-        {status === 'success' && (
+        {order?.paymentStatus === "SUCCESS" && (
           <div className="bg-white rounded-2xl shadow-2xl p-8 text-center animate-fade-in">
             <div className="mb-6">
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -48,7 +53,7 @@ const PaymentResult = () => {
                 Thanh toán thành công!
               </h1>
               <p className="text-gray-500">
-                {message || 'Đơn hàng của bạn đã được xác nhận'}
+                Đơn hàng của bạn đã được xác nhận
               </p>
             </div>
 
@@ -56,24 +61,24 @@ const PaymentResult = () => {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Mã đơn hàng:</span>
                 <span className="font-mono font-semibold text-gray-800">
-                  {orderId?.slice(-8).toUpperCase()}
+                  {order?._id?.slice(-8).toUpperCase()}
                 </span>
               </div>
               
-              {amount && (
+              {order?.vnp_Amount && (
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Số tiền:</span>
                   <span className="font-bold text-green-600 text-xl">
-                    {formatCurrencyVN(amount)}
+                    {formatCurrencyVN(order.vnp_Amount)}
                   </span>
                 </div>
               )}
 
-              {transactionNo && (
+              {order?.vnp_TransactionNo && (
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Mã giao dịch:</span>
                   <span className="font-mono text-sm text-gray-800">
-                    {transactionNo}
+                    {order?.vnp_TransactionNo}
                   </span>
                 </div>
               )}
@@ -81,7 +86,7 @@ const PaymentResult = () => {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Thời gian:</span>
                 <span className="text-sm text-gray-800">
-                  {formatDatetimeVNOfVNPAY(payDate)}
+                  {formatDatetimeVNOfVNPAY(order?.vnp_PayDate)}
                 </span>
               </div>
             </div>
@@ -106,7 +111,7 @@ const PaymentResult = () => {
           </div>
         )}
         {/* FAILED */}
-        {status === 'failed' && (
+        {order?.paymentStatus === 'FAILED' && (
           <div className="bg-white rounded-2xl shadow-2xl p-8 text-center animate-fade-in">
             <div className="mb-6">
               <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -116,26 +121,19 @@ const PaymentResult = () => {
                 Thanh toán thất bại
               </h1>
               <p className="text-gray-500">
-                {message || 'Giao dịch không thành công'}
+                Giao dịch không thành công
               </p>
             </div>
 
             <div className="bg-red-50 rounded-xl p-6 mb-6 space-y-3">
-              {orderId && (
+              {order?._id && (
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Mã đơn hàng:</span>
                   <span className="font-mono font-semibold text-gray-800">
-                    {orderId.slice(-8).toUpperCase()}
+                    {order?._id.slice(-8).toUpperCase()}
                   </span>
                 </div>
               )}
-
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Thời gian:</span>
-                <span className="text-sm text-gray-800">
-                  {formatDatetimeVNOfVNPAY(payDate)}
-                </span>
-              </div>
             </div>
             <div className="space-y-3">
               <button
@@ -159,12 +157,6 @@ const PaymentResult = () => {
                 Có lỗi xảy ra thanh toán thất bại
               </h1>
             </div>
-            <div className="bg-orange-50 rounded-xl p-4 mb-6 flex justify-between items-center">
-              <span className="text-gray-600 text-sm">Thời gian:</span>
-              <span className="text-sm text-gray-800">
-                {formatDatetimeVNOfVNPAY(payDate)}
-              </span>
-            </div>
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/cart')}
@@ -181,9 +173,8 @@ const PaymentResult = () => {
               </button>
             </div>
           </div>
-        )}
+        )} 
       </div>
-
       <style>{`
         @keyframes fade-in {
           from {
