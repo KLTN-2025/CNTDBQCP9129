@@ -126,7 +126,6 @@ const OrderHistory = () => {
             {filteredOrders.map((order) => {
               const statusConfig = getStatusConfig(order.status);
               const StatusIcon = statusConfig.icon;
-
               return (
                 <div
                   key={order._id}

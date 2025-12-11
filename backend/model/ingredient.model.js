@@ -6,30 +6,21 @@ const ingredientSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  quantity: {
-    type: Number,
-    required: true,
-    default: 0,
-    min: 0,
-  },
   unit: {
     type: String,
     required: true,
     enum: ["g", "ml", "cái"]
   },
-  totalCost: { // tổng tiền nhập kho
+  quantity: {         // tồn kho hiện tại
     type: Number,
     required: true,
-    default: 0,
-    min: 0
+    default: 0
   },
-  perUnitCost: { // giá trên 1 đơn vị = totalCost / quantity nhập
+  lastPrice: {        // giá gần nhất (đơn giá)
     type: Number,
-    required: true,
-    default: 0,
-    min: 0
+    default: 0
   },
-  status: { 
+  status: {
     type: Boolean,
     default: true
   }
