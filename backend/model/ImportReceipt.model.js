@@ -2,12 +2,6 @@ import mongoose from "mongoose";
 
 const importReceiptSchema = new mongoose.Schema(
   {
-    code: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-
     items: [
       {
         ingredientId: {
@@ -20,28 +14,25 @@ const importReceiptSchema = new mongoose.Schema(
           required: true,
           min: 1,
         },
-        totalCost: {
+        pricePerUnit: {
           type: Number,
           required: true,
           min: 0,
         },
-        pricePerUnit: {
-          // = totalCost / quantity
+        totalCost: {
           type: Number,
           required: true,
           min: 0,
         },
       },
     ],
-
     note: {
       type: String,
       default: "",
     },
-
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // nếu có quản lý/nhân viên
+      ref: "User",
       default: null,
     },
   },
