@@ -42,12 +42,12 @@ export const createImportReceipt = async (req, res) => {
     }
 
     // Lưu phiếu nhập
-    const receipt = await ImportReceipt.create({
+    let receipt = await ImportReceipt.create({
       items: processedItems,
       note: note || "",
       createdBy: userId
     });
-
+    
     // Cập nhật kho (quantity + totalCost + perUnitCost = giá gần nhất)
     for (let it of processedItems) {
       const ing = await Ingredient.findById(it.ingredientId);
@@ -63,7 +63,11 @@ export const createImportReceipt = async (req, res) => {
 
       await ing.save();
     }
+    // Populate ingredientId trong items
+    receipt = await receipt.populate("items.ingredientId", "name unit");
 
+    // Populate user tạo phiếu
+    receipt = await receipt.populate("createdBy", "name email");
     res.status(201).json(receipt);
   } catch (error) {
     console.error(error);

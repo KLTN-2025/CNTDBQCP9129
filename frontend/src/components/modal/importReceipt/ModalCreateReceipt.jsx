@@ -5,6 +5,7 @@ import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 import ingredientApi from "../../../api/ingredientApi";
 import importReceiptApi from "../../../api/importReceiptApi";
 import useAuthStore from "../../../store/authStore";
+import { IoIosRemoveCircle } from "react-icons/io";
 const ModalCreateReceipt = ({
   isOpenModalCreateReceipt,
   setIsOpenModalCreateReceipt,
@@ -34,7 +35,7 @@ const ModalCreateReceipt = ({
       toast.error("Lỗi tải danh sách nguyên liệu");
     }
   };
-
+  console.log("ingredients", ingredients);
   const handleChangeItem = (index, field, value) => {
     setItems((prev) => {
       const newItems = [...prev];
@@ -82,7 +83,7 @@ const ModalCreateReceipt = ({
         note: note.trim(),
         userId: user.id
       });
-
+      
       if (response?._id) {
         toast.success("Tạo phiếu nhập thành công!");
         setReceipts((prev) => [response, ...prev]);
@@ -140,10 +141,10 @@ const ModalCreateReceipt = ({
               {/* Remove row */}
               {items.length > 1 && (
                 <button
-                  className="absolute top-2 right-2 text-red-500"
+                  className="absolute top-2 right-2 text-red-700 cursor-pointer"
                   onClick={() => removeItemRow(idx)}
                 >
-                  X
+                  <IoIosRemoveCircle className="text-xl"/>
                 </button>
               )}
 

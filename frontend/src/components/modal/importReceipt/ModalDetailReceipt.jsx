@@ -1,30 +1,15 @@
 import React, { useMemo } from "react";
 import Modal from "react-modal";
 import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
+import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
+import { formatDatetimeVN } from "../../../utils/formatDatetimeVN";
 const ModalDetailReceipt = ({
   isOpenModalDetailReceipt,
   setIsOpenModalDetailReceipt,
   receiptData,
 }) => {
+  console.log(receiptData);
   useLockBodyScroll(isOpenModalDetailReceipt);
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString("vi-VN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
-  };
-
-  const formatCurrencyVN = (amount) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
-  };
-
   const totalCost = useMemo(() => {
     return receiptData?.items?.reduce(
       (sum, item) => sum + (item.totalCost || 0),
@@ -252,7 +237,7 @@ const ModalDetailReceipt = ({
                 <div>
                   <p className="text-gray-600 mb-1">Ngày tạo phiếu</p>
                   <p className="font-semibold text-gray-900">
-                    {formatDate(receiptData.createdAt)}
+                    {formatDatetimeVN(receiptData.createdAt)}
                   </p>
                 </div>
               </div>
@@ -273,7 +258,7 @@ const ModalDetailReceipt = ({
                 <div>
                   <p className="text-gray-600 mb-1">Cập nhật lần cuối</p>
                   <p className="font-semibold text-gray-900">
-                    {formatDate(receiptData.updatedAt)}
+                    {formatDatetimeVN(receiptData.updatedAt)}
                   </p>
                 </div>
               </div>

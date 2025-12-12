@@ -119,7 +119,7 @@ export default function Ingredients() {
                 "Tên nguyên liệu",
                 "Số lượng",
                 "Tổng tiền",
-                "Giá mới nhất / đơn vị",
+                "Đơn giá nguyên liệu mới nhất",
                 "Tình trạng",
                 "Thao tác",
               ].map((head) => (
@@ -216,7 +216,6 @@ export default function Ingredients() {
         />
       )}
 
-      {/* Modal cập nhật (chỉ name + unit) */}
       {isOpenModalUpdateIngredient && selectedIngredient && (
         <ModalUpdateIngredient
           isOpenModalUpdateIngredient={isOpenModalUpdateIngredient}
