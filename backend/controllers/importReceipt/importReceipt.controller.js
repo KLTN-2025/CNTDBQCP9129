@@ -3,13 +3,13 @@ import ImportReceipt from "../../model/receipt.model.js";
 // Tạo phiếu nhập kho
 export const createImportReceipt = async (req, res) => {
   try {
-    const { items, note } = req.body;
+    const { items, note, userId } = req.body;
 
     // Kiểm tra dữ liệu đầu vào
-    if (!items || !Array.isArray(items) || items.length === 0) {
+    if (!items || !Array.isArray(items) || items.length === 0 || !userId) {
       return res.status(400).json({ message: "Danh sách nguyên liệu không hợp lệ" });
     }
-
+    console.log(userId);
     // Tính pricePerUnit cho từng item
     const processedItems = [];
     
@@ -45,6 +45,7 @@ export const createImportReceipt = async (req, res) => {
     const receipt = await ImportReceipt.create({
       items: processedItems,
       note: note || "",
+      createdBy: userId
     });
 
     // Cập nhật kho (quantity + totalCost + perUnitCost = giá gần nhất)
@@ -52,13 +53,13 @@ export const createImportReceipt = async (req, res) => {
       const ing = await Ingredient.findById(it.ingredientId);
 
       // Cộng thêm vào kho
-      ing.quantity += it.quantity;
+      ing.quantity += Number(it.quantity);
 
       // Tổng tiền mới = tổng tiền cũ + tổng tiền nhập
-      ing.totalCost += it.totalCost;
+      ing.totalCost += Number(it.totalCost);
 
       // Giá gần nhất (giá trên 1 đơn vị mới)
-      ing.perUnitCost = it.pricePerUnit;
+      ing.lastPrice = Number(it.pricePerUnit);
 
       await ing.save();
     }
@@ -75,6 +76,7 @@ export const getImportReceipts = async (req, res) => {
   try {
     const receipts = await ImportReceipt.find()
       .populate("items.ingredientId", "name unit")
+      .populate("createdBy", "name email role")
       .sort({ createdAt: -1 });
 
     res.status(200).json(receipts);

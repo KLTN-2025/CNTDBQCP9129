@@ -2,19 +2,18 @@ import { useEffect, useState } from "react";
 import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
-import importReceiptApi from "../../api/importReceiptApi"
-import { IoIosWarning } from "react-icons/io";
+import importReceiptApi from "../../api/importReceiptApi";
+import ModalCreateReceipt from "../../components/modal/importReceipt/ModalCreateReceipt";
+import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
+import { AiOutlineEye } from "react-icons/ai";
+import ModalDetailReceipt from "../../components/modal/importReceipt/ModalDetailReceipt";
 export default function ImportReceipts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [receipts, setReceipts] = useState([]);
-  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] =
+  const [isOpenModalCreateReceipt, setIsOpenModalCreateReceipt] =
     useState(false);
-  const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] =
-    useState(false);
-  const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] =
-    useState(false);
-  const [selectedIngredient, setSelectedIngredient] = useState(null);
-
+  const [receiptData, setReceiptData] = useState(null);
+  const [isOpenModalDetailReceipt, setIsOpenModalDetailReceipt] = useState(false);
   // Lấy danh sách nguyên liệu trong kho
   useEffect(() => {
     const getAllIngredients = async () => {
@@ -29,7 +28,7 @@ export default function ImportReceipts() {
     };
     getAllIngredients();
   }, []);
-
+  console.log(receipts[0])
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
@@ -43,7 +42,7 @@ export default function ImportReceipts() {
             <p className="text-gray-600 mt-1">Danh sách phiếu nhập kho</p>
           </div>
           <button
-            onClick={() => setIsOpenModalCreateIngredient(true)}
+            onClick={() => setIsOpenModalCreateReceipt(true)}
             className="flex items-center cursor-pointer space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -88,36 +87,29 @@ export default function ImportReceipts() {
           </thead>
           <tbody className="bg-white divide-y">
             {receipts
-              .filter((p) =>
-                p.name.toLowerCase().includes(searchTerm.toLowerCase())
-              )
-              .map((receipts, index) => (
-                <tr key={receipts._id} className="hover:bg-gray-50">
-                  {/* <td className="px-6 py-4 text-sm">{index + 1}</td>
+              // .filter((p) =>
+              //   p.name.toLowerCase().includes(searchTerm.toLowerCase())
+              // )
+              .map((receipt, index) => (
+                <tr key={receipt._id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm">{index + 1}</td>
                   <td className="px-6 py-4 text-sm truncate max-w-[200px]">
-                    {ingredient.name}
+                    {formatDatetimeVN(receipt.createdAt)}
                   </td>
                   <td className="px-6 py-4 items-center text-sm truncate max-w-[200px]">
-                    <div className="flex  gap-x-2">
-                      {(ingredient.unit === "cái" &&
-                        ingredient.quantity <= 5) ||
-                      (ingredient.unit !== "cái" &&
-                        ingredient.quantity <= 500) ? (
-                        <IoIosWarning
-                          className="text-xl text-yellow-400"
-                          title="Nguyên liệu sắp hết"
-                        />
-                      ) : null}
-                      {ingredient.quantity} {ingredient.unit}
-                    </div>
+                    {receipt.items.length}
                   </td>
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
-                    {formatCurrencyVN(ingredient.totalCost)}
+                    {formatCurrencyVN(
+                      receipt.items.reduce(
+                        (sum, item) => sum + Number(item.totalCost),
+                        0
+                      )
+                    )}
                   </td>
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
-                    {formatCurrencyVN(ingredient.perUnitCost)} / 1
-                    {ingredient.unit}
-                  </td> */}
+                    {receipt.note ? receipt.note : "Không có ghi chú"}
+                  </td>
                   {/* Nút toggle tình trạng */}
 
                   <td className="px-6 py-4 text-sm">
@@ -125,12 +117,13 @@ export default function ImportReceipts() {
                       {/* Nút sửa */}
                       <button
                         className="text-blue-600 hover:text-blue-800 cursor-pointer"
-                        // onClick={() => {
-                        //   setSelectedIngredient(ingredient);
-                        //   setIsOpenModalUpdateIngredient(true);
-                        // }}
+                        title="Chi tiết phiếu nhập"
+                        onClick={() => {
+                          setReceiptData(receipt);
+                          setIsOpenModalDetailReceipt(true);
+                        }}
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <AiOutlineEye className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -141,13 +134,20 @@ export default function ImportReceipts() {
       </div>
 
       {/* Modal thêm nguyên liệu trong kho */}
-      {/* {isOpenModalCreateIngredient && (
-        <ModalCreateIngredient
-          isOpenModalCreateIngredient={isOpenModalCreateIngredient}
-          setIsOpenModalCreateIngredient={setIsOpenModalCreateIngredient}
-          setIngredients={setIngredients}
+      {isOpenModalCreateReceipt && (
+        <ModalCreateReceipt
+          isOpenModalCreateReceipt={isOpenModalCreateReceipt}
+          setIsOpenModalCreateReceipt={setIsOpenModalCreateReceipt}
+          setReceipts={setReceipts}
         />
-      )} */}
+      )}
+      {isOpenModalDetailReceipt && (
+        <ModalDetailReceipt
+         isOpenModalDetailReceipt={isOpenModalDetailReceipt}
+         setIsOpenModalDetailReceipt={setIsOpenModalDetailReceipt}
+         receiptData={receiptData}
+        />
+      )}
     </div>
   );
 }
