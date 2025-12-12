@@ -15,39 +15,32 @@ export const getAllIngredients = async (req, res) => {
 // Thêm nguyên liệu mới
 export const createIngredient = async (req, res) => {
   try {
-    const { name, quantity, unit, lastPrice } = req.body;
+    const { name, unit } = req.body;
 
-    if (!name || quantity == null || !unit || lastPrice == null) {
+    if (!name || !unit) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
 
-    if (quantity < 0) {
-      return res.status(400).json({ message: "Số lượng không được nhỏ hơn 0" });
+    // check trùng
+    const exist = await Ingredient.findOne({ name: name.trim() });
+    if (exist) {
+      return res.status(400).json({ message: "Tên nguyên liệu đã tồn tại" });
     }
 
-    if (lastPrice < 0) {
-      return res.status(400).json({ message: "Giá gần nhất không được nhỏ hơn 0" });
-    }
-
-    const existing = await Ingredient.findOne({ name: name.trim() });
-    if (existing) {
-      return res.status(400).json({ message: "Nguyên liệu đã tồn tại" });
-    }
-
-    const newIngredient = new Ingredient({
+    const ingredient = await Ingredient.create({
       name: name.trim(),
-      quantity,
       unit,
-      lastPrice,
-      status: true
+      quantity: 0,
+      lastPrice: 0,
+      totalCost: 0,
     });
 
-    await newIngredient.save();
-    res.status(201).json(newIngredient);
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi server", error });
+    res.status(201).json(ingredient);
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server", error: err });
   }
 };
+
 
 // Cập nhập trạng thái nguyên liệu trong kho
 export const toggleIngredientStatus = async (req, res) => {
