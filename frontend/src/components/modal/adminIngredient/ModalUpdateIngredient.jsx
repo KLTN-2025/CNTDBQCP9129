@@ -15,15 +15,13 @@ const ModalUpdateIngredient = ({
   const [formData, setFormData] = useState({
     name: "",
     unit: "",
-    quantity: "",       // tồn kho cũ
-    totalCost: "",      // tổng tiền cũ
-    backupQuantity: "", // số lượng nhập thêm
-    backupCost: "",     // tổng tiền nhập thêm
+    quantity: "",
+    totalCost: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // Khi mở modal thì load dữ liệu nguyên liệu vào form
+  // Load nguyên liệu khi mở modal
   useEffect(() => {
     if (selectedIngredient) {
       setFormData({
@@ -31,52 +29,36 @@ const ModalUpdateIngredient = ({
         unit: selectedIngredient.unit || "",
         quantity: selectedIngredient.quantity || "",
         totalCost: selectedIngredient.totalCost || "",
-        backupQuantity: "",
-        backupCost: "",
       });
     }
   }, [selectedIngredient]);
 
+  // Handle input
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Submit update name + unit
   const handleSubmit = async () => {
     if (isLoading) return;
 
-    if (
-      !formData.name.trim() ||
-      !formData.unit.trim() ||
-      !formData.backupQuantity ||
-      !formData.backupCost
-    ) {
+    if (!formData.name.trim() || !formData.unit.trim()) {
       toast.error("Vui lòng nhập đầy đủ thông tin");
       return;
     }
 
-    const newQuantity =
-      Number(formData.quantity) + Number(formData.backupQuantity);
-
-    const newTotalCost =
-      Number(formData.totalCost) + Number(formData.backupCost);
-
     try {
       setIsLoading(true);
+
       const response = await ingredientApi.update(selectedIngredient._id, {
         name: formData.name,
         unit: formData.unit,
-        quantity: newQuantity,
-        totalCost: newTotalCost,
       });
 
       if (!response.message) {
         toast.success("Cập nhật nguyên liệu thành công!");
 
-        // Cập nhật lại danh sách nguyên liệu
         setIngredients((prev) =>
           prev.map((item) =>
             item._id === selectedIngredient._id ? response : item
@@ -120,7 +102,6 @@ const ModalUpdateIngredient = ({
           overflow: "visible",
           width: "100%",
           maxWidth: "460px",
-          maxHeight: "90vh",
         },
       }}
     >
@@ -130,8 +111,8 @@ const ModalUpdateIngredient = ({
           <p className="font-bold text-xl">Cập nhật nguyên liệu</p>
         </div>
 
-        {/* Form */}
         <div className="py-8 px-4 space-y-4">
+          {/* Name */}
           <div>
             <p className="font-medium">Tên nguyên liệu *</p>
             <input
@@ -144,6 +125,7 @@ const ModalUpdateIngredient = ({
             />
           </div>
 
+          {/* Unit */}
           <div>
             <p className="font-medium">Đơn vị *</p>
             <select
@@ -158,58 +140,6 @@ const ModalUpdateIngredient = ({
               <option value="cái">cái</option>
             </select>
           </div>
-
-          {/* Tồn kho cũ (readonly) */}
-          <div>
-            <p className="font-medium">Tồn kho hiện tại</p>
-            <input
-              type="number"
-              name="quantity"
-              value={formData.quantity}
-              readOnly
-              className="w-full px-3 py-2 bg-gray-100 border rounded-lg"
-            />
-          </div>
-
-          {/* Tổng tiền hiện tại (readonly) */}
-          <div>
-            <p className="font-medium">Tổng tiền hiện tại</p>
-            <input
-              type="number"
-              name="totalCost"
-              value={formData.totalCost}
-              readOnly
-              className="w-full px-3 py-2 bg-gray-100 border rounded-lg"
-            />
-          </div>
-
-          {/* Nhập số lượng thêm */}
-          <div>
-            <p className="font-medium">Nhập thêm số lượng *</p>
-            <input
-              type="number"
-              name="backupQuantity"
-              value={formData.backupQuantity}
-              min="1"
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-              placeholder="Nhập số lượng muốn nhập thêm"
-            />
-          </div>
-
-          {/* Tổng tiền nhập thêm */}
-          <div>
-            <p className="font-medium">Tổng tiền nhập thêm *</p>
-            <input
-              type="number"
-              name="backupCost"
-              value={formData.backupCost}
-              min="0"
-              onChange={handleChange}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-              placeholder="Nhập tổng tiền cho số lượng nhập thêm"
-            />
-          </div>
         </div>
 
         {/* Footer */}
@@ -220,17 +150,14 @@ const ModalUpdateIngredient = ({
           >
             Hủy
           </button>
+
           <button
             className="bg-green-600 w-full text-white rounded-md px-2 py-2 cursor-pointer"
             onClick={handleSubmit}
             disabled={isLoading}
           >
             {isLoading ? (
-              <img
-                src="/loading.gif"
-                alt="Đang tải..."
-                className="w-7 h-7 mx-auto"
-              />
+              <img src="/loading.gif" alt="loading" className="w-7 h-7 mx-auto" />
             ) : (
               "Cập nhật"
             )}

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Plus, Search, Trash2 } from "lucide-react";
+import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import ingredientApi from "../../api/ingredientApi";
 import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import ModalCreateIngredient from "../../components/modal/adminIngredient/ModalCreateIngredient";
+import ModalUpdateIngredient from "../../components/modal/adminIngredient/ModalUpdateIngredient";
 import { IoIosWarning } from "react-icons/io";
 
 export default function Ingredients() {
@@ -12,6 +13,7 @@ export default function Ingredients() {
   const [ingredients, setIngredients] = useState([]);
   const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
   const [isOpenModalCreateIngredient, setIsOpenModalCreateIngredient] = useState(false);
+  const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] = useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState(null);
 
   // Lấy danh sách nguyên liệu trong kho
@@ -41,6 +43,7 @@ export default function Ingredients() {
       );
     } finally {
       setIsOpenModalConfirmDelete(false);
+      setSelectedIngredient(null);
     }
   };
 
@@ -59,6 +62,16 @@ export default function Ingredients() {
     } catch (err) {
       toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
     }
+  };
+
+  // Mở modal update (chỉ truyền id, name, unit)
+  const openUpdateModal = (ingredient) => {
+    setSelectedIngredient({
+      _id: ingredient._id,
+      name: ingredient.name,
+      unit: ingredient.unit,
+    });
+    setIsOpenModalUpdateIngredient(true);
   };
 
   return (
@@ -101,23 +114,29 @@ export default function Ingredients() {
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              {["STT", "Tên nguyên liệu", "Số lượng", "Tổng tiền", "Giá / đơn vị", "Tình trạng", "Thao tác"].map(
-                (head) => (
-                  <th
-                    key={head}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                  >
-                    {head}
-                  </th>
-                )
-              )}
+              {[
+                "STT",
+                "Tên nguyên liệu",
+                "Số lượng",
+                "Tổng tiền",
+                "Giá mới nhất / đơn vị",
+                "Tình trạng",
+                "Thao tác",
+              ].map((head) => (
+                <th
+                  key={head}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
+                  {head}
+                </th>
+              ))}
             </tr>
           </thead>
 
           <tbody className="bg-white divide-y">
             {ingredients
               .filter((p) =>
-                p.name.toLowerCase().includes(searchTerm.toLowerCase())
+                (p.name || "").toLowerCase().includes(searchTerm.toLowerCase())
               )
               .map((ingredient, index) => (
                 <tr key={ingredient._id} className="hover:bg-gray-50">
@@ -142,11 +161,11 @@ export default function Ingredients() {
                   </td>
 
                   <td className="px-6 py-4 text-sm max-w-[160px]">
-                    {formatCurrencyVN(ingredient.totalCost)}
+                    {formatCurrencyVN(ingredient.totalCost ?? 0)}
                   </td>
 
                   <td className="px-6 py-4 text-sm max-w-[160px]">
-                    {formatCurrencyVN(ingredient.perUnitCost)} / 1{ingredient.unit}
+                    {formatCurrencyVN(ingredient.lastPrice ?? 0)} / 1{ingredient.unit}
                   </td>
 
                   {/* Toggle trạng thái */}
@@ -161,17 +180,26 @@ export default function Ingredients() {
                     </button>
                   </td>
 
-                  {/* Xóa */}
+                  {/* Thao tác: Sửa (chỉ name/unit) & Xóa */}
                   <td className="px-6 py-4 text-sm">
-                    <button
-                      className="text-red-600 hover:text-red-800 cursor-pointer"
-                      onClick={() => {
-                        setSelectedIngredient(ingredient);
-                        setIsOpenModalConfirmDelete(true);
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center space-x-4">
+                      <button
+                        className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                        onClick={() => openUpdateModal(ingredient)}
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        className="text-red-600 hover:text-red-800 cursor-pointer"
+                        onClick={() => {
+                          setSelectedIngredient(ingredient);
+                          setIsOpenModalConfirmDelete(true);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -188,8 +216,18 @@ export default function Ingredients() {
         />
       )}
 
+      {/* Modal cập nhật (chỉ name + unit) */}
+      {isOpenModalUpdateIngredient && selectedIngredient && (
+        <ModalUpdateIngredient
+          isOpenModalUpdateIngredient={isOpenModalUpdateIngredient}
+          setIsOpenModalUpdateIngredient={setIsOpenModalUpdateIngredient}
+          setIngredients={setIngredients}
+          selectedIngredient={selectedIngredient}
+        />
+      )}
+
       {/* Modal xác nhận xóa */}
-      {isOpenModalConfirmDelete && (
+      {isOpenModalConfirmDelete && selectedIngredient && (
         <ModalConfirmDelete
           content={`Bạn có chắn chắn muốn xóa nguyên liệu ${selectedIngredient.name}?`}
           isOpenConfirmDelete={isOpenModalConfirmDelete}

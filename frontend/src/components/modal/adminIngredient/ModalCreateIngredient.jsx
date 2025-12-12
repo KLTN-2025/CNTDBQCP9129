@@ -14,8 +14,6 @@ const ModalCreateIngredient = ({
   const [formData, setFormData] = useState({
     name: "",
     unit: "",
-    quantity: "",
-    totalCost: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -28,26 +26,20 @@ const ModalCreateIngredient = ({
     }));
   };
 
-  // Submit
   const handleSubmit = async () => {
     if (isLoading) return;
-    if (
-      !formData.name.trim() ||
-      !formData.unit.trim() ||
-      !Number(formData.quantity) ||
-      formData.totalCost == ""
-    ) {
-      toast.error("Vui lòng nhập đầy đủ hoặc đúng thông tin nguyên liệu");
+
+    if (!formData.name.trim() || !formData.unit.trim()) {
+      toast.error("Vui lòng nhập đầy đủ thông tin");
       return;
     }
 
     try {
       setIsLoading(true);
+
       const response = await ingredientApi.create({
-        name: formData.name,
+        name: formData.name.trim(),
         unit: formData.unit,
-        quantity: Number(formData.quantity),
-        totalCost: Number(formData.totalCost),
       });
 
       if (!response.message) {
@@ -55,10 +47,12 @@ const ModalCreateIngredient = ({
         setIngredients((prev) => [...prev, response]);
         setIsOpenModalCreateIngredient(false);
       } else {
-        toast.error(response.message || "Đã có lỗi xảy ra");
+        toast.error(response.message);
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Lỗi khi thêm nguyên liệu");
+      toast.error(
+        err?.response?.data?.message || "Lỗi khi thêm nguyên liệu"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -92,10 +86,13 @@ const ModalCreateIngredient = ({
       }}
     >
       <div className="bg-white rounded-md w-full flex flex-col select-none">
+        {/* Header */}
         <div className="w-full bg-green-700 text-white py-3 px-4">
           <p className="font-bold text-lg">Thêm nguyên liệu mới</p>
         </div>
+
         <div className="p-6 space-y-4">
+          {/* Tên */}
           <div>
             <label className="font-medium">Tên nguyên liệu *</label>
             <input
@@ -107,6 +104,7 @@ const ModalCreateIngredient = ({
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             />
           </div>
+
           {/* Đơn vị */}
           <div>
             <label className="font-medium">Đơn vị *</label>
@@ -116,43 +114,15 @@ const ModalCreateIngredient = ({
               onChange={handleChange}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
             >
-              <option value="">-- Chọn đơn vị --</option>
-              <option value="g">g</option>
-              <option value="ml">ml</option>
-              <option value="cái">cái</option>
+            <option value="">-- Chọn đơn vị --</option>
+            <option value="g">g</option>
+            <option value="ml">ml</option>
+            <option value="cái">cái</option>
             </select>
-          </div>
-
-          {/* Số lượng */}
-          <div>
-            <label className="font-medium">Số lượng *</label>
-            <input
-              type="number"
-              name="quantity"
-              min="1"
-              value={formData.quantity}
-              onChange={handleChange}
-              placeholder="Nhập số lượng"
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
-          {/* Tổng tiền */}
-          <div>
-            <label className="font-medium">Tổng tiền *</label>
-            <input
-              type="number"
-              name="totalCost"
-              value={formData.totalCost}
-              min="0"
-              onChange={handleChange}
-              placeholder="Nhập tổng tiền nhập"
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-            />
           </div>
         </div>
 
-        {/* Footer buttons */}
+        {/* Footer */}
         <div className="flex gap-4 px-6 py-4 border-t">
           <button
             className="w-full border px-4 py-2 rounded-md cursor-pointer"
@@ -160,6 +130,7 @@ const ModalCreateIngredient = ({
           >
             Hủy
           </button>
+
           <button
             className="bg-green-700 w-full text-white flex items-center justify-center rounded-md px-4 py-2 cursor-pointer"
             onClick={handleSubmit}
