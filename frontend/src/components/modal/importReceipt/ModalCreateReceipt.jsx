@@ -38,6 +38,15 @@ const ModalCreateReceipt = ({
     }
   };
 
+  // Lọc danh sách nguyên liệu khả dụng cho mỗi dropdown
+  const getAvailableIngredients = (currentIndex) => {
+    const selectedIds = items
+      .map((item, idx) => (idx !== currentIndex ? item.ingredientId : null))
+      .filter(Boolean);
+    
+    return ingredients.filter((ing) => !selectedIds.includes(ing._id));
+  };
+
   const handleChangeItem = (index, field, value) => {
     setItems((prev) => {
       const newItems = [...prev];
@@ -151,66 +160,70 @@ const ModalCreateReceipt = ({
           {/* ITEMS */}
           <p className="font-semibold">Danh sách nguyên liệu *</p>
 
-          {items.map((item, idx) => (
-            <div key={idx} className="border rounded-lg p-3 space-y-3 relative">
-              {/* Remove row */}
-              {items.length > 1 && (
-                <button
-                  className="absolute top-2 right-2 text-red-700 cursor-pointer"
-                  onClick={() => removeItemRow(idx)}
-                >
-                  <IoIosRemoveCircle className="text-xl" />
-                </button>
-              )}
+          {items.map((item, idx) => {
+            const availableIngredients = getAvailableIngredients(idx);
+            
+            return (
+              <div key={idx} className="border rounded-lg p-3 space-y-3 relative">
+                {/* Remove row */}
+                {items.length > 1 && (
+                  <button
+                    className="absolute top-2 right-2 text-red-700 cursor-pointer"
+                    onClick={() => removeItemRow(idx)}
+                  >
+                    <IoIosRemoveCircle className="text-xl" />
+                  </button>
+                )}
 
-              {/* Chọn nguyên liệu */}
-              <div>
-                <label className="font-medium">Nguyên liệu</label>
-                <select
-                  value={item.ingredientId}
-                  onChange={(e) =>
-                    handleChangeItem(idx, "ingredientId", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border rounded-lg"
-                >
-                  <option value="">-- Chọn nguyên liệu --</option>
-                  {ingredients.map((ing) => (
-                    <option key={ing._id} value={ing._id}>
-                      {ing.name} ({ing.unit})
-                    </option>
-                  ))}
-                </select>
-              </div>
+                {/* Chọn nguyên liệu */}
+                <div>
+                  <label className="font-medium">Nguyên liệu</label>
+                  <select
+                    value={item.ingredientId}
+                    onChange={(e) =>
+                      handleChangeItem(idx, "ingredientId", e.target.value)
+                    }
+                    className="w-full px-3 py-2 border rounded-lg"
+                  >
+                    <option value="">-- Chọn nguyên liệu --</option>
+                    {availableIngredients.map((ing) => (
+                      <option key={ing._id} value={ing._id}>
+                        {ing.name} ({ing.unit})
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              {/* Số lượng */}
-              <div>
-                <label className="font-medium">Số lượng nhập *</label>
-                <input
-                  type="text"
-                  value={item.quantity}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, "");
-                    handleChangeItem(idx, "quantity", val);
-                  }}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
-              </div>
+                {/* Số lượng */}
+                <div>
+                  <label className="font-medium">Số lượng nhập *</label>
+                  <input
+                    type="text"
+                    value={item.quantity}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      handleChangeItem(idx, "quantity", val);
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
 
-              {/* Tổng tiền */}
-              <div>
-                <label className="font-medium">Tổng tiền *</label>
-                <input
-                  type="text"
-                  value={item.totalCost}
-                  onChange={(e) => {
-                    const val = e.target.value.replace(/\D/g, "");
-                    handleChangeItem(idx, "totalCost", val);
-                  }}
-                  className="w-full px-3 py-2 border rounded-lg"
-                />
+                {/* Tổng tiền */}
+                <div>
+                  <label className="font-medium">Tổng tiền *</label>
+                  <input
+                    type="text"
+                    value={item.totalCost}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      handleChangeItem(idx, "totalCost", val);
+                    }}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           <button
             className="w-full border border-green-700 text-green-700 py-2 rounded-md"
