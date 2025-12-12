@@ -82,7 +82,36 @@ export const getImportReceipts = async (req, res) => {
     res.status(500).json({ message: "Lỗi server", error });
   }
 };
+export const getReceiptsByDateRange = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    if (!startDate || !endDate) {
+      return res.status(400).json({ 
+        message: "Vui lòng cung cấp ngày bắt đầu và kết thúc" 
+      });
+    }
 
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const receipts = await ImportReceipt.find({
+      createdAt: {
+        $gte: start,
+        $lte: end
+      }
+    })
+    .populate('createdBy', 'name email')
+    .sort({ createdAt: -1 });
+
+    res.json(receipts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 // Lấy 1 phiếu nhập chi tiết
 export const getImportReceiptById = async (req, res) => {
   try {

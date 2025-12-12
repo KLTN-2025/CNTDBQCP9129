@@ -15,6 +15,12 @@ const importReceiptApi = {
     const res = await axiosClient.post('/import-receipts', data);
     return res.data;
   },
+  getByDateRange: async (startDate, endDate) => {
+    const response = await axiosClient.get('/import-receipts/getByDate', {
+      params: { startDate, endDate }
+    });
+    return response.data;
+  },
 }
 
 export default importReceiptApi;

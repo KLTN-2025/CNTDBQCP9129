@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Search, Edit2, Trash2 } from "lucide-react";
+import { Plus, Search, Calendar } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import importReceiptApi from "../../api/importReceiptApi";
@@ -7,28 +7,73 @@ import ModalCreateReceipt from "../../components/modal/importReceipt/ModalCreate
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import { AiOutlineEye } from "react-icons/ai";
 import ModalDetailReceipt from "../../components/modal/importReceipt/ModalDetailReceipt";
+
 export default function ImportReceipts() {
   const [searchTerm, setSearchTerm] = useState("");
   const [receipts, setReceipts] = useState([]);
-  const [isOpenModalCreateReceipt, setIsOpenModalCreateReceipt] =
-    useState(false);
+  const [isOpenModalCreateReceipt, setIsOpenModalCreateReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
   const [isOpenModalDetailReceipt, setIsOpenModalDetailReceipt] = useState(false);
-  // Lấy danh sách nguyên liệu trong kho
+  
+  // Date filters
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [isLoadingFilter, setIsLoadingFilter] = useState(false);
+
+  // Get today's date in YYYY-MM-DD format for max attribute
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  // Lấy tất cả phiếu nhập
+  const getAllReceipts = async () => {
+    try {
+      const res = await importReceiptApi.getAll();
+      setReceipts(res);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Lỗi khi tải phiếu nhập kho"
+      );
+    }
+  };
+
+  // Lấy phiếu nhập theo khoảng thời gian
+  const getReceiptsByDateRange = async () => {
+    if (!startDate || !endDate) {
+      toast.warning("Vui lòng chọn cả ngày bắt đầu và ngày kết thúc");
+      return;
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      toast.error("Ngày bắt đầu không được lớn hơn ngày kết thúc");
+      return;
+    }
+
+    try {
+      setIsLoadingFilter(true);
+      const res = await importReceiptApi.getByDateRange(startDate, endDate);
+      setReceipts(res);
+      toast.success(`Tìm thấy ${res.length} phiếu nhập`);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Lỗi khi lọc phiếu nhập theo ngày"
+      );
+    } finally {
+      setIsLoadingFilter(false);
+    }
+  };
+
+  // Reset filter
+  const handleResetFilter = () => {
+    setStartDate("");
+    setEndDate("");
+    getAllReceipts();
+  };
+
   useEffect(() => {
-    const getAllIngredients = async () => {
-      try {
-        const res = await importReceiptApi.getAll();
-        setReceipts(res);
-      } catch (error) {
-        toast.error(
-          error.response?.data?.message || "Lỗi khi tải nguyên liệu trong kho"
-        );
-      }
-    };
-    getAllIngredients();
+    getAllReceipts();
   }, []);
-  console.log(receipts[0])
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
@@ -49,17 +94,60 @@ export default function ImportReceipts() {
             <span>Nhập kho</span>
           </button>
         </div>
+        {/* Date Range Filter */}
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="flex items-center gap-2 mb-3">
+            <Calendar className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-gray-700">Lọc theo thời gian</h3>
+          </div>
+          
+          <div className="flex flex-wrap items-end gap-3">
+            {/* Start Date */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Từ ngày
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                max={getTodayDate()}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+              />
+            </div>
 
-        {/* Ô tìm kiếm */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm tên nguyên liệu trong kho..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-          />
+            {/* End Date */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Đến ngày
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                max={getTodayDate()}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+              />
+            </div>
+
+            {/* Filter Button */}
+            <button
+              onClick={getReceiptsByDateRange}
+              disabled={isLoadingFilter}
+              className="px-6 py-2 bg-green-600 text-white cursor-pointer rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isLoadingFilter ? "Đang lọc..." : "Lọc"}
+            </button>
+
+            {/* Reset Button */}
+            <button
+              onClick={handleResetFilter}
+              className="px-6 py-2 bg-gray-200 cursor-pointer text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              title="Đặt lại thời gian"
+            >
+              Đặt lại
+            </button>
+          </div>
         </div>
       </div>
 
@@ -87,9 +175,6 @@ export default function ImportReceipts() {
           </thead>
           <tbody className="bg-white divide-y">
             {receipts
-              // .filter((p) =>
-              //   p.name.toLowerCase().includes(searchTerm.toLowerCase())
-              // )
               .map((receipt, index) => (
                 <tr key={receipt._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm">{index + 1}</td>
@@ -110,11 +195,9 @@ export default function ImportReceipts() {
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
                     {receipt.note ? receipt.note : "Không có"}
                   </td>
-                  {/* Nút toggle tình trạng */}
 
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center space-x-4">
-                      {/* Nút sửa */}
                       <button
                         className="text-blue-600 hover:text-blue-800 cursor-pointer"
                         title="Chi tiết phiếu nhập"
@@ -133,7 +216,7 @@ export default function ImportReceipts() {
         </table>
       </div>
 
-      {/* Modal thêm nguyên liệu trong kho */}
+      {/* Modal thêm phiếu nhập */}
       {isOpenModalCreateReceipt && (
         <ModalCreateReceipt
           isOpenModalCreateReceipt={isOpenModalCreateReceipt}
@@ -141,11 +224,13 @@ export default function ImportReceipts() {
           setReceipts={setReceipts}
         />
       )}
+      
+      {/* Modal chi tiết phiếu nhập */}
       {isOpenModalDetailReceipt && (
         <ModalDetailReceipt
-         isOpenModalDetailReceipt={isOpenModalDetailReceipt}
-         setIsOpenModalDetailReceipt={setIsOpenModalDetailReceipt}
-         receiptData={receiptData}
+          isOpenModalDetailReceipt={isOpenModalDetailReceipt}
+          setIsOpenModalDetailReceipt={setIsOpenModalDetailReceipt}
+          receiptData={receiptData}
         />
       )}
     </div>
