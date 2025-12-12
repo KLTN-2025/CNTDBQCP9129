@@ -1,5 +1,5 @@
 import Ingredient from "../../model/ingredient.model.js";
-import ImportReceipt from "../../model/importReceipt.model.js";
+import ImportReceipt from "../../model/receipt.model.js";
 // Tạo phiếu nhập kho
 export const createImportReceipt = async (req, res) => {
   try {
