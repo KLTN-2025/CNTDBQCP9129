@@ -11,7 +11,6 @@ const ModalDetailReceipt = ({
 }) => {
   console.log(receiptData);
   useLockBodyScroll(isOpenModalDetailReceipt);
-  
   const totalCost = useMemo(() => {
     return receiptData?.items?.reduce(
       (sum, item) => sum + (item.totalCost || 0),
@@ -20,7 +19,7 @@ const ModalDetailReceipt = ({
   }, [receiptData?.items]);
 
   if (!receiptData) return null;
-
+  console.log(receiptData);
   return (
     <Modal
       appElement={document.getElementById("root")}

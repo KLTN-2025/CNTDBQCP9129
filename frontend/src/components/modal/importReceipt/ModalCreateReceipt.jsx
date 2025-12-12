@@ -88,14 +88,9 @@ const ModalCreateReceipt = ({
 
     try {
       setIsLoading(true);
-
-      // Tạo items với snapshot name và unit
       const itemsWithSnapshot = items.map((item) => {
-        const ingredient = ingredients.find((ing) => ing._id === item.ingredientId);
         return {
           ingredientId: item.ingredientId,
-          ingredientName: ingredient?.name || "",
-          unit: ingredient?.unit || "",
           quantity: Number(item.quantity),
           totalCost: Number(item.totalCost),
           pricePerUnit: Number(item.totalCost) / Number(item.quantity),
