@@ -36,6 +36,7 @@ import Ingredients from "./page/admin/Ingredients";
 import Recipes from "./page/admin/Recipes";
 import Orders from "./page/admin/Orders";
 import Contacts from "./page/admin/Contacts";
+import ImportReceipts from "./page/admin/importReceipts";
 // store
 import useCartStore from "./store/cartStore";
 import Vouchers from "./page/admin/Vouchers";
@@ -156,6 +157,7 @@ function App() {
             <Route path="orders" element={<Orders />} />
             <Route path="vouchers" element={<Vouchers />} />
             <Route path="contacts" element={<Contacts />} />
+            <Route path="import-receipts" element={<ImportReceipts />} />
           </Route>
           {/* blog route */}
           <Route path="/blogs">
