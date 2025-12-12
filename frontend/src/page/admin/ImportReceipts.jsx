@@ -108,7 +108,7 @@ export default function ImportReceipts() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm truncate max-w-[160px]">
-                    {receipt.note ? receipt.note : "Không có ghi chú"}
+                    {receipt.note ? receipt.note : "Không có"}
                   </td>
                   {/* Nút toggle tình trạng */}
 

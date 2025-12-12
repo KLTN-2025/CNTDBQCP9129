@@ -3,6 +3,7 @@ import Modal from "react-modal";
 import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
 import { formatDatetimeVN } from "../../../utils/formatDatetimeVN";
+
 const ModalDetailReceipt = ({
   isOpenModalDetailReceipt,
   setIsOpenModalDetailReceipt,
@@ -10,6 +11,7 @@ const ModalDetailReceipt = ({
 }) => {
   console.log(receiptData);
   useLockBodyScroll(isOpenModalDetailReceipt);
+  
   const totalCost = useMemo(() => {
     return receiptData?.items?.reduce(
       (sum, item) => sum + (item.totalCost || 0),
@@ -139,19 +141,19 @@ const ModalDetailReceipt = ({
                 >
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900">
-                      {item.ingredientId?.name || "Nguyên liệu"}
+                      {item.ingredientName || "Nguyên liệu"}
                     </p>
                     <div className="flex gap-4 mt-2 text-sm">
                       <p className="text-gray-600">
                         Số lượng:{" "}
                         <span className="font-medium text-gray-900">
-                          {item.quantity} {item.ingredientId?.unit || ""}
+                          {item.quantity} {item.unit || ""}
                         </span>
                       </p>
                       <p className="text-gray-600">
                         Đơn giá:{" "}
                         <span className="font-medium text-blue-600">
-                          {formatCurrencyVN(item.pricePerUnit || 0)}/{item.ingredientId?.unit || "đơn vị"}
+                          {formatCurrencyVN(item.pricePerUnit || 0)}/{item.unit || "đơn vị"}
                         </span>
                       </p>
                     </div>

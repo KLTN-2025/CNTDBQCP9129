@@ -10,8 +10,6 @@ export const getAllIngredients = async (req, res) => {
     res.status(500).json({ message: "Lỗi server", error });
   }
 };
-
-
 // Thêm nguyên liệu mới
 export const createIngredient = async (req, res) => {
   try {

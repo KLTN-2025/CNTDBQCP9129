@@ -9,6 +9,14 @@ const importReceiptSchema = new mongoose.Schema(
           ref: "Ingredient",
           required: true,
         },
+        ingredientName: {
+          type: String,
+          required: true,
+        },
+        unit: {
+          type: String,
+          required: true,
+        },
         quantity: {
           type: Number,
           required: true,

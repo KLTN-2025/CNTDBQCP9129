@@ -6,6 +6,7 @@ import ingredientApi from "../../../api/ingredientApi";
 import importReceiptApi from "../../../api/importReceiptApi";
 import useAuthStore from "../../../store/authStore";
 import { IoIosRemoveCircle } from "react-icons/io";
+
 const ModalCreateReceipt = ({
   isOpenModalCreateReceipt,
   setIsOpenModalCreateReceipt,
@@ -19,7 +20,8 @@ const ModalCreateReceipt = ({
   ]);
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const {user} = useAuthStore()
+  const { user } = useAuthStore();
+
   // Lấy danh sách nguyên liệu khi mở modal
   useEffect(() => {
     if (isOpenModalCreateReceipt) {
@@ -35,7 +37,7 @@ const ModalCreateReceipt = ({
       toast.error("Lỗi tải danh sách nguyên liệu");
     }
   };
-  console.log("ingredients", ingredients);
+
   const handleChangeItem = (index, field, value) => {
     setItems((prev) => {
       const newItems = [...prev];
@@ -78,12 +80,25 @@ const ModalCreateReceipt = ({
     try {
       setIsLoading(true);
 
-      const response = await importReceiptApi.create({
-        items,
-        note: note.trim(),
-        userId: user.id
+      // Tạo items với snapshot name và unit
+      const itemsWithSnapshot = items.map((item) => {
+        const ingredient = ingredients.find((ing) => ing._id === item.ingredientId);
+        return {
+          ingredientId: item.ingredientId,
+          ingredientName: ingredient?.name || "",
+          unit: ingredient?.unit || "",
+          quantity: Number(item.quantity),
+          totalCost: Number(item.totalCost),
+          pricePerUnit: Number(item.totalCost) / Number(item.quantity),
+        };
       });
-      
+
+      const response = await importReceiptApi.create({
+        items: itemsWithSnapshot,
+        note: note.trim(),
+        userId: user.id,
+      });
+
       if (response?._id) {
         toast.success("Tạo phiếu nhập thành công!");
         setReceipts((prev) => [response, ...prev]);
@@ -144,7 +159,7 @@ const ModalCreateReceipt = ({
                   className="absolute top-2 right-2 text-red-700 cursor-pointer"
                   onClick={() => removeItemRow(idx)}
                 >
-                  <IoIosRemoveCircle className="text-xl"/>
+                  <IoIosRemoveCircle className="text-xl" />
                 </button>
               )}
 
