@@ -186,9 +186,21 @@ export const updateProductStatus = async (req, res) => {
       const ingredient = item.ingredientId;
       const requiredAmount = item.quantity;
 
-      if (!ingredient || ingredient.quantity < requiredAmount) {
+      if (!ingredient) {
         return res.status(400).json({
-          message: `Nguyên liệu trong kho không đủ: ${ingredient?.name || "Không xác định"}`,
+          message: `Nguyên liệu không tồn tại`,
+        });
+      }
+
+      if (!ingredient.status) {
+        return res.status(400).json({
+          message: `Nguyên liệu đang hết hàng: ${ingredient.name}`,
+        });
+      }
+
+      if (ingredient.quantity < requiredAmount) {
+        return res.status(400).json({
+          message: `Nguyên liệu trong kho không đủ: ${ingredient.name}`,
         });
       }
     }
@@ -210,6 +222,7 @@ export const updateProductStatus = async (req, res) => {
     res.status(500).json({ message: "Cập nhật trạng thái sản phẩm thất bại" });
   }
 };
+
 
 export const deleteProduct = async (req, res) => {
   try {
