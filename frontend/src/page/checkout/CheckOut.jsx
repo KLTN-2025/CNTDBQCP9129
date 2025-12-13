@@ -146,8 +146,6 @@ const CheckOut = () => {
         userId: user.id,
       };
       const response = await paymentApi.createPayment(orderData);
-      setCart([]);
-      localStorage.setItem("cart", JSON.stringify([]));
       if (response.success && response.vnpUrl) {
         window.location.href = response.vnpUrl;
       }

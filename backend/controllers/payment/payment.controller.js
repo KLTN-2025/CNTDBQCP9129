@@ -5,7 +5,7 @@ import Order from "../../model/order.model.js";
 import Voucher from "../../model/voucher.model.js";
 import Recipe from "../../model/recipe.model.js";
 import Ingredient from "../../model/ingredient.model.js";
-
+import Cart from "../../model/cart.model.js";
 const vnpay = new VNPay({
   tmnCode: "6Z3TSPO9",
   secureSecret: "40YYRRUMS9DEF74CWS38QO5DL68TOUI5",
@@ -251,6 +251,7 @@ export const handleVnpayReturn = async (req, res) => {
         )}`
       );
     }
+
     const orderId = verify.vnp_TxnRef;
     const order = await Order.findById(orderId).session(session);
 
@@ -283,6 +284,7 @@ export const handleVnpayReturn = async (req, res) => {
           }
         }
       }
+
       order.paymentStatus = "FAILED";
       order.status = "CANCELLED";
       await order.save({ session });
@@ -293,13 +295,11 @@ export const handleVnpayReturn = async (req, res) => {
         `http://localhost:5173/payment-result?orderId=${order._id}`
       );
     }
-
     // THANH TOÁN THÀNH CÔNG
     order.paymentStatus = "SUCCESS";
     order.vnp_TransactionNo = verify.vnp_TransactionNo;
     order.vnp_Amount = verify.vnp_Amount;
     order.vnp_PayDate = verify.vnp_PayDate;
-
     // Cập nhật voucher nếu có
     if (order.voucherId) {
       await Voucher.findByIdAndUpdate(
@@ -309,13 +309,18 @@ export const handleVnpayReturn = async (req, res) => {
       );
     }
 
+    // CLEAR CART
+    await Cart.findOneAndUpdate(
+      { userId: order.userId },
+      { $set: { items: [] } },
+      { session }
+    );
+
     await order.save({ session });
     await session.commitTransaction();
 
     return res.redirect(
-      `http://localhost:5173/payment-result?&orderId=${
-        order._id
-      }`
+      `http://localhost:5173/payment-result?&orderId=${order._id}`
     );
   } catch (err) {
     await session.abortTransaction();

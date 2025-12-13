@@ -1,7 +1,13 @@
 import "./App.css";
 import LayoutPage from "./layout/LayoutPage";
 import { useEffect } from "react";
-import { Routes, Route, useNavigate, Navigate, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { ToastContainer } from "react-toastify";
 import { ParallaxProvider } from "react-scroll-parallax";
@@ -41,6 +47,7 @@ import ImportReceipts from "./page/admin/importReceipts";
 import useCartStore from "./store/cartStore";
 import Vouchers from "./page/admin/Vouchers";
 import PaymentResult from "./page/paymentResult/PaymentResult";
+import cartApi from "./api/cartApi";
 function App() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
@@ -71,6 +78,29 @@ function App() {
       }
     }
   }, [token, navigate]);
+useEffect(() => {
+  const fetchCart = async () => {
+    try {
+      const res = await cartApi.getCart(user.id);
+
+      if (res?.items) {
+        setCart(res.items);
+        localStorage.setItem("cart", JSON.stringify(res.items));
+      } else {
+        setCart([]);
+        localStorage.removeItem("cart");
+      }
+    } catch (error) {
+      console.error("Chưa có cart:", error);
+      setCart([]);
+      localStorage.removeItem("cart");
+    }
+  };
+
+  if (user?.id) {
+    fetchCart();
+  }
+}, [user?.id]);
 
   // Route bảo vệ cho các trang cần token
   const PrivateRoute = ({ children }) => {
@@ -78,17 +108,18 @@ function App() {
     if (!token) return <Navigate to="/account/login" replace />;
     return children;
   };
-  const redirectTo = new URLSearchParams(location.search).get("redirect") || "/profile";
+  const redirectTo =
+    new URLSearchParams(location.search).get("redirect") || "/profile";
   const GuestRoute = ({ children }) => {
     const { user } = useAuthStore();
-    if (user) return <Navigate to={redirectTo} replace />; 
+    if (user) return <Navigate to={redirectTo} replace />;
     return children;
   };
   const GuestOnly = ({ children }) => {
-  const { user } = useAuthStore();
-  if (user) return <Navigate to="/profile" replace />;
-  return children;
-};
+    const { user } = useAuthStore();
+    if (user) return <Navigate to="/profile" replace />;
+    return children;
+  };
   return (
     <ParallaxProvider>
       <LayoutPage>
@@ -107,7 +138,7 @@ function App() {
 
           {/* auth route */}
           <Route path="/account">
-          <Route index element={<Navigate to="/account/login" replace />} />
+            <Route index element={<Navigate to="/account/login" replace />} />
             <Route
               path="login"
               element={
@@ -124,9 +155,30 @@ function App() {
                 </GuestRoute>
               }
             />
-            <Route path="forgot-password" element={<GuestOnly><ForgotPassword /></GuestOnly>} />
-            <Route path="reset-password" element={<GuestOnly><ResetPassword /></GuestOnly>} />
-            <Route path="verify-email" element={<GuestOnly><VerifyEmailPage /></GuestOnly>} />
+            <Route
+              path="forgot-password"
+              element={
+                <GuestOnly>
+                  <ForgotPassword />
+                </GuestOnly>
+              }
+            />
+            <Route
+              path="reset-password"
+              element={
+                <GuestOnly>
+                  <ResetPassword />
+                </GuestOnly>
+              }
+            />
+            <Route
+              path="verify-email"
+              element={
+                <GuestOnly>
+                  <VerifyEmailPage />
+                </GuestOnly>
+              }
+            />
           </Route>
           {/* profile route */}
           <Route
