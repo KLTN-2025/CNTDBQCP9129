@@ -43,27 +43,44 @@ export const createIngredient = async (req, res) => {
 // Cập nhập trạng thái nguyên liệu trong kho
 export const toggleIngredientStatus = async (req, res) => {
   try {
-    const { id } = req.params; // id nguyên liệu
+    const { id } = req.params;
     const ingredient = await Ingredient.findById(id);
     if (!ingredient) return res.status(404).json({ message: "Không tìm thấy nguyên liệu" });
 
-    const newStatus = !ingredient.status;
+    const currentStatus = ingredient.status;
+    let newStatus;
 
-    // Cập nhật trạng thái nguyên liệu
-    await Ingredient.findByIdAndUpdate(id, { status: newStatus });
+    if (currentStatus === false) {
+      // Click từ false -> true
+      if (ingredient.quantity <= 0) {
+        return res.status(400).json({ message: "Nguyên liệu đã hết phải nhập thêm" });
+      }
+      newStatus = true;
 
-    // Tìm tất cả công thức có chứa nguyên liệu này
-    const recipes = await Recipe.find({ "items.ingredientId": id });
-    const productIds = recipes.map(r => r.productId);
+      // Chỉ bật nguyên liệu, không cập nhật sản phẩm
+      await Ingredient.findByIdAndUpdate(id, { status: true });
 
-    // Cập nhật trạng thái món nước liên quan
-    await Product.updateMany(
-      { _id: { $in: productIds } },
-      { $set: { status: newStatus } }
-    );
+    } else {
+      // Click từ true -> false
+      newStatus = false;
+
+      // Tắt nguyên liệu
+      await Ingredient.findByIdAndUpdate(id, { status: false });
+
+      // Tìm tất cả công thức có chứa nguyên liệu này
+      const recipes = await Recipe.find({ "items.ingredientId": id });
+      const productIds = recipes.map(r => r.productId);
+
+      // Tắt tất cả sản phẩm liên quan
+      await Product.updateMany(
+        { _id: { $in: productIds } },
+        { $set: { status: false } }
+      );
+    }
 
     res.json({ message: "Cập nhật trạng thái thành công", newStatus });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Lỗi server", error });
   }
 };
