@@ -1,7 +1,6 @@
 import Product from "../../model/product.model.js";
 import ProductCategory from "../../model/productCategory.model.js";
 import Recipe from "../../model/recipe.model.js"
-import Ingredient from "../../model/ingredient.model.js"
 //  Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
   try {
@@ -215,7 +214,6 @@ export const updateProductStatus = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-
     // Kiểm tra xem sản phẩm có đang được dùng trong công thức không
     const isUsed = await Recipe.exists({ productId: id });
     if (isUsed) {
@@ -223,7 +221,6 @@ export const deleteProduct = async (req, res) => {
         message: "Không thể xóa sản phẩm này vì đang được sử dụng trong công thức",
       });
     }
-
     const product = await Product.findByIdAndDelete(id);
     if (!product)
       return res.status(404).json({ message: "Không tìm thấy sản phẩm" });

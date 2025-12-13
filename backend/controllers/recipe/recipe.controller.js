@@ -1,6 +1,6 @@
 import Recipe from "../../model/recipe.model.js";
 // Tạo công thức mới
-
+import Product from "../../model/product.model.js";
 export const createRecipe = async (req, res) => {
   try {
     const { productId, items } = req.body;
@@ -116,13 +116,18 @@ export const updateRecipe = async (req, res) => {
 // Xóa công thức
 export const deleteRecipe = async (req, res) => {
   try {
+    // 1️⃣ Xóa công thức
     const deletedRecipe = await Recipe.findByIdAndDelete(req.params.id);
 
     if (!deletedRecipe)
       return res.status(404).json({ message: "Không tìm thấy công thức" });
 
-    res.status(200).json({ message: "Xóa công thức thành công" });
+    // 2️⃣ Tắt sản phẩm liên quan
+    await Product.findByIdAndUpdate(deletedRecipe.productId, { status: false });
+
+    res.status(200).json({ message: "Xóa công thức thành công và sản phẩm đã hết hàng" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
