@@ -6,6 +6,7 @@ import Voucher from "../../model/voucher.model.js";
 import Recipe from "../../model/recipe.model.js";
 import Ingredient from "../../model/ingredient.model.js";
 import Cart from "../../model/cart.model.js";
+
 const vnpay = new VNPay({
   tmnCode: "6Z3TSPO9",
   secureSecret: "40YYRRUMS9DEF74CWS38QO5DL68TOUI5",
@@ -148,24 +149,22 @@ export const createPayment = async (req, res) => {
       }
 
       for (const recipeItem of recipe.items) {
-        const requiredAmount =
-          recipeItem.quantity * item.quantity;
+        const requiredAmount = recipeItem.quantity * item.quantity;
 
-        const ingredientAfterUpdate =
-          await Ingredient.findOneAndUpdate(
-            {
-              _id: recipeItem.ingredientId,
-              quantity: { $gte: requiredAmount },
-              status: true,
-            },
-            {
-              $inc: { quantity: -requiredAmount },
-            },
-            {
-              new: true,
-              session,
-            }
-          );
+        const ingredientAfterUpdate = await Ingredient.findOneAndUpdate(
+          {
+            _id: recipeItem.ingredientId,
+            quantity: { $gte: requiredAmount },
+            status: true,
+          },
+          {
+            $inc: { quantity: -requiredAmount },
+          },
+          {
+            new: true,
+            session,
+          }
+        );
 
         // Không trừ được => rollback
         if (!ingredientAfterUpdate) {
@@ -189,7 +188,13 @@ export const createPayment = async (req, res) => {
       voucherId: voucher?.voucherId || null,
       items: detailedItems,
       voucherDiscount: voucher?.discount || 0,
-      delivery,
+      delivery: {
+        name: delivery.name,
+        phone: delivery.phone,
+        address: delivery.address || null,
+        note: delivery.note || "",
+        deliveryTime: delivery.deliveryTime || "Càng sớm càng tốt", // THÊM DÒNG NÀY
+      },
       orderType: "ONLINE",
       paymentMethod: "VNPAY",
       totalPrice: total,
@@ -234,7 +239,6 @@ export const createPayment = async (req, res) => {
     session.endSession();
   }
 };
-
 
 export const handleVnpayReturn = async (req, res) => {
   const session = await mongoose.startSession();
@@ -295,11 +299,13 @@ export const handleVnpayReturn = async (req, res) => {
         `http://localhost:5173/payment-result?orderId=${order._id}`
       );
     }
+
     // THANH TOÁN THÀNH CÔNG
     order.paymentStatus = "SUCCESS";
     order.vnp_TransactionNo = verify.vnp_TransactionNo;
     order.vnp_Amount = verify.vnp_Amount;
     order.vnp_PayDate = verify.vnp_PayDate;
+
     // Cập nhật voucher nếu có
     if (order.voucherId) {
       await Voucher.findByIdAndUpdate(

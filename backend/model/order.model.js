@@ -39,6 +39,7 @@ const orderSchema = new mongoose.Schema(
       phone: { type: String, required: true },
       address: { type: String, default: null },
       note: { type: String, default: "" },
+      deliveryTime: { type: String, default: "Càng sớm càng tốt" }, 
     },
 
     orderType: { type: String, enum: ["ONLINE", "OFFLINE"], required: true },

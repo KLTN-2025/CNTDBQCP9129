@@ -20,6 +20,7 @@ const CheckOut = () => {
   const { user } = useAuthStore();
   const [timeSlots, setTimeSlots] = useState([]);
   const [receiveMethod, setReceiveMethod] = useState("delivery");
+  const [selectedTime, setSelectedTime] = useState(""); // THÊM STATE NÀY
   const { cart, setCart } = useCartStore();
   const [itemUpdate, setItemUpdate] = useState();
   const [isOpenModalUpdateItem, setIsOpenModalUpdateItem] = useState(false);
@@ -42,7 +43,9 @@ const CheckOut = () => {
   });
 
   useEffect(() => {
-    setTimeSlots(["Càng sớm càng tốt", ...getDeliverySlots()]);
+    const slots = ["Càng sớm càng tốt", ...getDeliverySlots()];
+    setTimeSlots(slots);
+    setSelectedTime(slots[0]); // SET GIÁ TRỊ MẶC ĐỊNH
   }, []);
 
   const subTotal = useMemo(() => {
@@ -141,6 +144,7 @@ const CheckOut = () => {
           name: data.name,
           phone: data.phoneNumber,
           note: data.deliveryNote || "",
+          deliveryTime: selectedTime, // THÊM DÒNG NÀY
         },
         voucher: voucherUsed,
         userId: user.id,
@@ -175,7 +179,11 @@ const CheckOut = () => {
             <p className="font-semibold">Nhận hàng trong ngày 15-30 phút</p>
             <div className="flex items-center gap-x-2">
               <p>Vào lúc:</p>
-              <select className="cursor-pointer outline-0">
+              <select 
+                className="cursor-pointer outline-0"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+              >
                 {timeSlots.map((timeSlot, index) => (
                   <option key={index} value={timeSlot}>
                     {timeSlot}
@@ -233,7 +241,7 @@ const CheckOut = () => {
               {...register("name", {
                 required: "Tên người nhận bắt buộc",
                 pattern: {
-                  value: /^[A-Za-zÀ-ỹ\s]+$/, // chỉ cho phép chữ cái và khoảng trắng 
+                  value: /^[A-Za-zÀ-ỹ\s]+$/, 
                   message: "Tên không được có số và ký tự đặc biệt",
                 },
               })}
@@ -266,8 +274,6 @@ const CheckOut = () => {
                 className="pl-4 placeholder:text-gray-400 border border-gray-200 py-2 w-full focus:outline-0"
               />
             )}
-
-            {/* Nút đặt hàng */}
           </form>
 
           {/* PHẦN CÒN LẠI GIỮ NGUYÊN */}
