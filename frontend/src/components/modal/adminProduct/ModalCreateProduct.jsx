@@ -95,14 +95,14 @@ const ModalCreateProduct = ({
       if (!response.message) {
         toast.success("Thêm sản phẩm thành công!");
         setProducts((prev) => [
-          ...prev,
-          {
+                    {
             ...response,
             productCategoryId: {
               ...response.productCategoryId,
               name: nameProductCategory
             }
-          }
+          },
+          ...prev
         ]);
         setIsOpenModalCreateProduct(false);
       } else {
