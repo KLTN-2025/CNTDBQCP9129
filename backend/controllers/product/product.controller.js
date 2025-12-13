@@ -1,6 +1,7 @@
 import Product from "../../model/product.model.js";
 import ProductCategory from "../../model/productCategory.model.js";
 import Recipe from "../../model/recipe.model.js"
+import Ingredient from "../../model/ingredient.model.js"
 //  Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
   try {
@@ -156,10 +157,48 @@ export const updateProductStatus = async (req, res) => {
       return res.status(400).json({ message: "Trạng thái không hợp lệ" });
     }
 
+    // Tắt sản phẩm -> cho tắt luôn
+    if (status === false) {
+      const product = await Product.findByIdAndUpdate(
+        id,
+        { status: false },
+        { new: true }
+      );
+
+      if (!product) {
+        return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+      }
+
+      return res.json(product);
+    }
+
+    // Bật sản phẩm -> kiểm tra công thức
+    const recipe = await Recipe.findOne({ productId: id })
+      .populate("items.ingredientId");
+
+    if (!recipe) {
+      return res.status(400).json({
+        message: "Sản phẩm chưa có công thức",
+      });
+    }
+
+    // Check nguyên liệu
+    for (let item of recipe.items) {
+      const ingredient = item.ingredientId;
+      const requiredAmount = item.quantity;
+
+      if (!ingredient || ingredient.quantity < requiredAmount) {
+        return res.status(400).json({
+          message: `Nguyên liệu trong kho không đủ: ${ingredient?.name || "Không xác định"}`,
+        });
+      }
+    }
+
+    // Đủ -> bật sản phẩm
     const product = await Product.findByIdAndUpdate(
       id,
-      { status },
-      { new: true, runValidators: true }
+      { status: true },
+      { new: true }
     );
 
     if (!product) {
@@ -168,7 +207,8 @@ export const updateProductStatus = async (req, res) => {
 
     res.json(product);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Cập nhật trạng thái sản phẩm thất bại" });
   }
 };
 
