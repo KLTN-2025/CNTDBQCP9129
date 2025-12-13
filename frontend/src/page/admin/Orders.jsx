@@ -222,6 +222,10 @@ export default function Orders() {
                 <td className="px-6 py-4 text-sm max-w-[300px] whitespace-break-spaces">
                   <div className="flex flex-col">
                     <span>
+                      <strong>Giờ lấy hàng: </strong>{" "}
+                      {order.delivery.deliveryTime}
+                    </span>
+                    <span>
                       <strong>Tên: </strong> {order.delivery.name}
                     </span>
                     <span>

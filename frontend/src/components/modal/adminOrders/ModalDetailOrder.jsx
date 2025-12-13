@@ -227,6 +227,12 @@ const ModalOrderDetail = ({
               Thông tin giao hàng
             </h3>
             <div className="space-y-3">
+              <div className="flex justify-between items-start py-2">
+                  <span className="text-gray-600">Giờ lấy hàng:</span>
+                  <span className="font-medium text-right max-w-md italic text-green-600 bg-green-50 px-2 py-1 rounded">
+                    {orderData.delivery.deliveryTime}
+                  </span>
+              </div>
               <div className="flex justify-between py-2 border-b border-gray-100">
                 <span className="text-gray-600">Người nhận:</span>
                 <span className="font-medium text-gray-900">
