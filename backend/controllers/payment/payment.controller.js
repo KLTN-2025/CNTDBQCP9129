@@ -167,7 +167,7 @@ export const createPayment = async (req, res) => {
             }
           );
 
-        // Không trừ được → rollback
+        // Không trừ được => rollback
         if (!ingredientAfterUpdate) {
           await session.abortTransaction();
           return res.status(400).json({

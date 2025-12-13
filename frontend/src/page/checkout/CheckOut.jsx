@@ -233,7 +233,7 @@ const CheckOut = () => {
               {...register("name", {
                 required: "Tên người nhận bắt buộc",
                 pattern: {
-                  value: /^[A-Za-zÀ-ỹ\s]+$/, // chỉ cho phép chữ cái và khoảng trắng (có dấu tiếng Việt)
+                  value: /^[A-Za-zÀ-ỹ\s]+$/, // chỉ cho phép chữ cái và khoảng trắng 
                   message: "Tên không được có số và ký tự đặc biệt",
                 },
               })}
@@ -248,8 +248,8 @@ const CheckOut = () => {
               {...register("phoneNumber", {
                 required: "Số điện thoại bắt buộc",
                 pattern: {
-                  value: /^\d{10}$/, // chỉ đúng 10 chữ số
-                  message: "Số điện thoại phải đúng 10 chữ số",
+                  value: /^0\d{9}$/, 
+                  message: "Số điện thoại phải bắt đầu bằng 0 và đủ 10 chữ số",
                 },
               })}
               placeholder="Số điện thoại"
