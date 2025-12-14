@@ -9,6 +9,14 @@ const orderApi = {
     const res = await axiosClient.get('/orders', { params }); 
     return res.data
   },
+  getPendingOrders: async(params) => {
+    const res = await axiosClient.get('/orders/pending', { params }); 
+    return res.data
+  },
+  getSuccessOrders: async(params) => {
+    const res = await axiosClient.get('/orders/success', { params }); 
+    return res.data
+  },
   getAllOrdersByUserId: async(userId) => {
     const res = await axiosClient.get(`/orders/user/${userId}`); 
     return res.data
