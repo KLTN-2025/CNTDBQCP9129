@@ -145,7 +145,7 @@ const ReservationPage = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
-                  <span>Đặt bàn trước ít nhất 30 phút</span>
+                  <span>Bạn nên đặt bàn sớm hơn 30p để chúng tôi có sự chuẩn bị tốt nhất</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
