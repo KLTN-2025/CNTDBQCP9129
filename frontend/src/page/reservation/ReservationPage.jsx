@@ -144,7 +144,7 @@ const ReservationPage = () => {
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
-                  <span>Chỉ nhận đặt bàn trong ngày từ 8h đến 22h</span>
+                  <span>Chỉ nhận đặt bàn trong ngày từ 8h đến 21h30</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
