@@ -70,9 +70,11 @@ const ReservationPage = () => {
       note: "",
     },
   });
+  
   useEffect(() => {
     document.title = "Đặt bàn";
   }, []);
+  
   const onSubmit = async (data) => {
     if (isLoading) return;
 
@@ -131,6 +133,7 @@ const ReservationPage = () => {
             🕐 Giờ mở cửa: 8:00 - 23:00 (Chỉ đặt trong ngày)
           </div>
         </div>
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Info Section - Bên trái */}
           <div className="lg:col-span-1">
@@ -145,7 +148,10 @@ const ReservationPage = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
-                  <span>Bạn nên đặt bàn sớm hơn 30p để chúng tôi có sự chuẩn bị tốt nhất</span>
+                  <span>
+                    Bạn nên đặt bàn sớm hơn 30p để chúng tôi có sự chuẩn bị tốt
+                    nhất
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
@@ -261,7 +267,7 @@ const ReservationPage = () => {
                 </div>
 
                 {/* Date */}
-               <div>
+                <div>
                   <label className="flex items-center gap-2 text-gray-700 font-semibold mb-2">
                     <Clock className="w-5 h-5 text-orange-600" />
                     Ngày *
@@ -290,7 +296,7 @@ const ReservationPage = () => {
               <div>
                 <label className="flex items-center gap-2 text-gray-700 font-semibold mb-2">
                   <Clock className="w-5 h-5 text-orange-600" />
-                  Giờ (8h-22h) *
+                  Giờ (8h-21h30) *
                 </label>
                 <select
                   {...register("time", {
@@ -360,6 +366,37 @@ const ReservationPage = () => {
                 />
               </div>
 
+              {/* Success Message - Chỉ render khi isSuccess = true */}
+              {isSuccess && (
+                <div className="bg-green-50 border-2 border-green-400 rounded-lg p-5 shadow-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-green-500 rounded-full p-2 animate-bounce">
+                      <svg
+                        className="w-7 h-7 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-green-800 text-lg">
+                        Đặt bàn thành công!
+                      </h3>
+                      <p className="text-sm text-green-600 mt-1">
+                        Chúng tôi sẽ giữ bàn cho bạn. Cảm ơn bạn đã tin tưởng!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Submit Button */}
               <button
                 type="submit"
@@ -391,41 +428,6 @@ const ReservationPage = () => {
                 )}
               </button>
             </form>
-
-            {/* Success Message ở dưới form */}
-            <div
-              className={`mt-6 bg-green-50 border-2 border-green-400 rounded-lg p-5 shadow-lg transition-all duration-300 ${
-                isSuccess
-                  ? "opacity-100 translate-y-0 visible"
-                  : "opacity-0 -translate-y-4 invisible"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="bg-green-500 rounded-full p-2 animate-bounce">
-                  <svg
-                    className="w-7 h-7 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-green-800 text-lg">
-                    Đặt bàn thành công!
-                  </h3>
-                  <p className="text-sm text-green-600 mt-1">
-                    Chúng tôi sẽ giữ bàn cho bạn. Cảm ơn bạn đã tin tưởng!
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -433,4 +435,4 @@ const ReservationPage = () => {
   );
 };
 
-export default ReservationPage;
+export default ReservationPage
