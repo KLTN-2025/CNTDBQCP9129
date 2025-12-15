@@ -47,6 +47,7 @@ export const createImportReceipt = async (req, res) => {
 
     // Lưu phiếu nhập (snapshot)
     let receipt = await ImportReceipt.create({
+      type: "IMPORT",
       items: processedItems,
       note: note || "",
       createdBy: userId,
@@ -63,6 +64,87 @@ export const createImportReceipt = async (req, res) => {
       await ing.save();
     }
     receipt = await receipt.populate("createdBy", "name email");
+    res.status(201).json(receipt);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi server", error });
+  }
+};
+export const createExportReceipt = async (req, res) => {
+  try {
+    const { items, note, userId } = req.body;
+
+    // Validate input
+    if (!items || !Array.isArray(items) || items.length === 0 || !userId) {
+      return res
+        .status(400)
+        .json({ message: "Danh sách nguyên liệu không hợp lệ" });
+    }
+
+    const processedItems = [];
+
+    for (let item of items) {
+      if (!item.ingredientId || !item.quantity) {
+        return res
+          .status(400)
+          .json({ message: "Thiếu dữ liệu trong từng nguyên liệu" });
+      }
+
+      if (item.quantity <= 0) {
+        return res
+          .status(400)
+          .json({ message: "Số lượng xuất phải lớn hơn 0" });
+      }
+
+      // Lấy nguyên liệu hiện tại
+      const ing = await Ingredient.findById(item.ingredientId);
+      if (!ing) {
+        return res
+          .status(404)
+          .json({ message: "Nguyên liệu không tồn tại: " + item.ingredientId });
+      }
+
+      // Check tồn kho
+      if (ing.quantity < item.quantity) {
+        return res.status(400).json({
+          message: `Nguyên liệu ${ing.name} không đủ tồn kho`,
+        });
+      }
+
+      // Snapshot
+      processedItems.push({
+        ingredientId: ing._id,
+        ingredientName: ing.name,
+        unit: ing.unit,
+        quantity: item.quantity,
+        pricePerUnit: ing.lastPrice || 0,
+        totalCost: (ing.lastPrice || 0) * item.quantity,
+      });
+    }
+
+    // Lưu phiếu xuất
+    let receipt = await ImportReceipt.create({
+      type: "EXPORT",
+      items: processedItems,
+      note: note || "",
+      createdBy: userId,
+    });
+
+    // Trừ kho
+    for (let it of processedItems) {
+      const ing = await Ingredient.findById(it.ingredientId);
+
+      ing.quantity -= Number(it.quantity);
+      ing.totalCost -= Number(it.totalCost);
+
+      if (ing.quantity < 0) ing.quantity = 0;
+      if (ing.totalCost < 0) ing.totalCost = 0;
+
+      await ing.save();
+    }
+
+    receipt = await receipt.populate("createdBy", "name email");
+
     res.status(201).json(receipt);
   } catch (error) {
     console.error(error);
