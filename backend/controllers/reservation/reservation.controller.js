@@ -41,8 +41,6 @@ export const createReservation = async (req, res) => {
 
     const cancelAt = new Date(reservationTime.getTime() + 30 * 1000);
     const delay = cancelAt.getTime() - Date.now();
-
-    // Nếu delay <= 0 thì hủy luôn (phòng edge case)
     if (delay > 0) {
       setTimeout(async () => {
         const latest = await Reservation.findById(reservation._id);

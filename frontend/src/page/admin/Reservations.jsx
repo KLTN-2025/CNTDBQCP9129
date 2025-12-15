@@ -61,7 +61,6 @@ export default function Reservations() {
       document.title = "Quản lý lịch hẹn - Admin";
     };
   }, [newReservationCount]);
-
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
@@ -144,7 +143,7 @@ export default function Reservations() {
       {/* Header */}
       <div className="p-6 border-b">
         <h2 className="text-2xl font-bold">Quản lý lịch hẹn</h2>
-        <p className="text-gray-600 mt-1">Danh sách reservation cà phê</p>
+        <p className="text-gray-600 mt-1">Danh sách đặt lịch</p>
 
         {/* Search */}
         <div className="relative mt-4">
@@ -202,22 +201,25 @@ export default function Reservations() {
                   <td className="px-6 py-4">
                     <span
                       className={`px-2 py-1 rounded text-xs font-semibold
-                        ${
-                          r.status === "PENDING"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : r.status === "COMPLETED"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
+    ${
+      r.status === "PENDING"
+        ? "bg-yellow-100 text-yellow-700"
+        : r.status === "COMPLETED"
+        ? "bg-green-100 text-green-700"
+        : "bg-red-100 text-red-700"
+    }`}
                     >
-                      {r.status}
+                      {r.status === "PENDING"
+                        ? "Đang chờ khách"
+                        : r.status === "COMPLETED"
+                        ? "Khách đã đến"
+                        : "Đã hủy"}
                     </span>
                   </td>
 
                   {/* Actions */}
                   <td className="px-6 py-4">
                     <div className="flex gap-3">
-                      {/* PENDING → Confirm / Cancel */}
                       {r.status === "PENDING" && (
                         <>
                           <button
@@ -244,7 +246,6 @@ export default function Reservations() {
                         </>
                       )}
 
-                      {/* COMPLETED hoặc CANCELED → Delete */}
                       {(r.status === "COMPLETED" ||
                         r.status === "CANCELLED") && (
                         <button

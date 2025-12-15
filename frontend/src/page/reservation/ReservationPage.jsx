@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Clock, Users, User, Phone, Mail, MessageSquare } from "lucide-react";
 import reservationApi from "../../api/reservationApi";
+import { useEffect } from "react";
 
 // Utility function để tạo time slots
 function getDeliverySlots() {
@@ -31,7 +32,9 @@ function getDeliverySlots() {
 
   for (let h = startHour; h < lastHour; h++) {
     for (let m = h === startHour ? startMinute : 0; m < 60; m += 30) {
-      slots.push(`${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`);
+      slots.push(
+        `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`
+      );
     }
   }
 
@@ -67,13 +70,15 @@ const ReservationPage = () => {
       note: "",
     },
   });
-
+  useEffect(() => {
+    document.title = "Đặt bàn";
+  }, []);
   const onSubmit = async (data) => {
     if (isLoading) return;
 
     try {
       setIsLoading(true);
-      
+
       // Format payload đúng với controller
       const payload = {
         name: data.name.trim(),
@@ -86,7 +91,7 @@ const ReservationPage = () => {
       };
 
       await reservationApi.create(payload);
-      
+
       setIsSuccess(true);
       reset({
         name: "",
@@ -97,13 +102,15 @@ const ReservationPage = () => {
         people: 1,
         note: "",
       });
-      
+
       // Reset success state sau 5s
       setTimeout(() => {
         setIsSuccess(false);
       }, 5000);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Đặt bàn thất bại. Vui lòng thử lại!");
+      toast.error(
+        error?.response?.data?.message || "Đặt bàn thất bại. Vui lòng thử lại!"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -115,9 +122,11 @@ const ReservationPage = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-3">
-             Đặt Bàn Coffee Go
+            Đặt Bàn Coffee Go
           </h1>
-          <p className="text-gray-600 text-lg">Đặt chỗ trước để có trải nghiệm tốt nhất</p>
+          <p className="text-gray-600 text-lg">
+            Đặt chỗ trước để có trải nghiệm tốt nhất
+          </p>
           <div className="mt-4 inline-block bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium">
             🕐 Giờ mở cửa: 8:00 - 23:00 (Chỉ đặt trong ngày)
           </div>
@@ -126,7 +135,9 @@ const ReservationPage = () => {
           {/* Info Section - Bên trái */}
           <div className="lg:col-span-1">
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 text-sm text-gray-700">
-              <p className="font-semibold text-amber-800 mb-4 text-lg">📌 Lưu ý quan trọng:</p>
+              <p className="font-semibold text-amber-800 mb-4 text-lg">
+                📌 Lưu ý quan trọng:
+              </p>
               <ul className="space-y-3 text-gray-600">
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
@@ -138,13 +149,18 @@ const ReservationPage = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
-                  <span>Vui lòng đến đúng giờ để đảm bảo chỗ ngồi. Chúng tôi sẽ hủy bàn nếu bạn đi trễ quá 15 phút</span>
+                  <span>
+                    Vui lòng đến đúng giờ để đảm bảo chỗ ngồi. Chúng tôi sẽ hủy
+                    bàn nếu bạn đi trễ quá 15 phút
+                  </span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-amber-600 mt-0.5">•</span>
                   <span>
                     Liên hệ hotline nếu cần hỗ trợ:{" "}
-                    <span className="font-semibold text-amber-900">(0236)123456</span>
+                    <span className="font-semibold text-amber-900">
+                      (0236)123456
+                    </span>
                   </span>
                 </li>
               </ul>
@@ -153,7 +169,10 @@ const ReservationPage = () => {
 
           {/* Form Section - Bên phải */}
           <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="bg-white rounded-2xl shadow-xl p-8 space-y-6"
+            >
               {/* Name & Phone - Ngang trên màn hình lớn */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Name */}
@@ -166,14 +185,21 @@ const ReservationPage = () => {
                     type="text"
                     {...register("name", {
                       required: "Vui lòng nhập họ tên",
-                      minLength: { value: 2, message: "Tên phải có ít nhất 2 ký tự" },
+                      minLength: {
+                        value: 2,
+                        message: "Tên phải có ít nhất 2 ký tự",
+                      },
                     })}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition ${
                       errors.name ? "border-red-500" : "border-gray-300"
                     }`}
                     placeholder="Nguyễn Văn A"
                   />
-                  {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                  {errors.name && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* Phone */}
@@ -188,7 +214,8 @@ const ReservationPage = () => {
                       required: "Vui lòng nhập số điện thoại",
                       pattern: {
                         value: /^0[0-9]{9,10}$/,
-                        message: "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có 10-11 số)",
+                        message:
+                          "Số điện thoại không hợp lệ (phải bắt đầu bằng số 0 và có 10-11 số)",
                       },
                     })}
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition ${
@@ -196,7 +223,11 @@ const ReservationPage = () => {
                     }`}
                     placeholder="0123456789"
                   />
-                  {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.phone.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -222,7 +253,11 @@ const ReservationPage = () => {
                     }`}
                     placeholder="example@email.com"
                   />
-                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* Date */}
@@ -242,7 +277,11 @@ const ReservationPage = () => {
                       errors.date ? "border-red-500" : "border-gray-300"
                     }`}
                   />
-                  {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date.message}</p>}
+                  {errors.date && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.date.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -271,7 +310,11 @@ const ReservationPage = () => {
                     <option value="">Hết giờ đặt hôm nay</option>
                   )}
                 </select>
-                {errors.time && <p className="text-red-500 text-sm mt-1">{errors.time.message}</p>}
+                {errors.time && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.time.message}
+                  </p>
+                )}
               </div>
 
               {/* People - Full width */}
@@ -295,7 +338,11 @@ const ReservationPage = () => {
                   }`}
                   placeholder="1"
                 />
-                {errors.people && <p className="text-red-500 text-sm mt-1">{errors.people.message}</p>}
+                {errors.people && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.people.message}
+                  </p>
+                )}
               </div>
 
               {/* Note */}
@@ -347,17 +394,31 @@ const ReservationPage = () => {
             {/* Success Message ở dưới form */}
             <div
               className={`mt-6 bg-green-50 border-2 border-green-400 rounded-lg p-5 shadow-lg transition-all duration-300 ${
-                isSuccess ? "opacity-100 translate-y-0 visible" : "opacity-0 -translate-y-4 invisible"
+                isSuccess
+                  ? "opacity-100 translate-y-0 visible"
+                  : "opacity-0 -translate-y-4 invisible"
               }`}
             >
               <div className="flex items-center gap-3">
                 <div className="bg-green-500 rounded-full p-2 animate-bounce">
-                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-7 h-7 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-bold text-green-800 text-lg">Đặt bàn thành công!</h3>
+                  <h3 className="font-bold text-green-800 text-lg">
+                    Đặt bàn thành công!
+                  </h3>
                   <p className="text-sm text-green-600 mt-1">
                     Chúng tôi sẽ giữ bàn cho bạn. Cảm ơn bạn đã tin tưởng!
                   </p>
