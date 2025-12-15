@@ -9,6 +9,9 @@ const VerifyEmailPage = () => {
   const token = searchParams.get("token");
   const login = useAuthStore(state => state.login)
   useEffect(() => {
+    document.title = "Xác thực tài khoản";
+  }, []);
+  useEffect(() => {
     const verify = async () => {
       try {
         const res = await authApi.verifyEmail(token);

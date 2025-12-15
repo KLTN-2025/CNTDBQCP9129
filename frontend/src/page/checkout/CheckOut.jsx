@@ -41,7 +41,9 @@ const CheckOut = () => {
       deliveryNote: "",
     },
   });
-
+  useEffect(() => {
+      document.title = `Giỏ hàng`;
+  }, []);
   useEffect(() => {
     const slots = ["Càng sớm càng tốt", ...getDeliverySlots()];
     setTimeSlots(slots);

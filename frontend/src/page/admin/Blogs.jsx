@@ -19,6 +19,9 @@ export default function BlogCategory() {
   const [blogToUpdate, setBlogToUpdate] = useState(null);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
   useEffect(() => {
+    document.title = "Quản lý bài viết";
+  }, []);
+  useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const data = await blogApi.getAll();

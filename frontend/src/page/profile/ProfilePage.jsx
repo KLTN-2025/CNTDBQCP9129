@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import UserInfo from "../profile/UserInfo";
 import useAuthStore from "../../store/authStore";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import { useEffect } from "react";
 
 const ProfilePage = () => {
   const location = useLocation();
@@ -9,7 +10,9 @@ const ProfilePage = () => {
   const isRootProfile = activePath === "/profile";
   const user = useAuthStore((state) => state.user);
   const isCustomer = user.role === "customer";
-
+  useEffect(() => {
+      document.title = `Thông tin tài khoản`;
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8 pt-10 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20">

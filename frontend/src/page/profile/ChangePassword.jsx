@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "../../api/authApi";
 import useAuthStore from "../../store/authStore";
+import { useEffect } from "react";
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -11,6 +12,9 @@ const ChangePassword = () => {
   const [notification, setNotification] = useState('');
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
+  useEffect(() => {
+        document.title = 'Đổi mật khẩu';
+  }, []);
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (isLoading) return;

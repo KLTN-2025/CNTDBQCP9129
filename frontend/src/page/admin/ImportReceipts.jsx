@@ -79,7 +79,9 @@ export default function ImportReceipts() {
   useEffect(() => {
     getAllReceipts();
   }, []);
-
+  useEffect(() => {
+    document.title = "Quản lý phiếu nhập";
+  }, []); 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
       {/* Header */}

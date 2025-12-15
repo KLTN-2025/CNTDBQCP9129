@@ -10,11 +10,16 @@ import ModalUpdateProduct from "../../components/modal/adminProduct/ModalUpdateP
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
-  const [isOpenModalCreateProduct, setIsOpenModalCreateProduct] = useState(false);
-  const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] = useState(false);
-  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] = useState(false);
+  const [isOpenModalCreateProduct, setIsOpenModalCreateProduct] =
+    useState(false);
+  const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] =
+    useState(false);
+  const [isOpenModalConfirmDelete, setIsOpenModalConfirmDelete] =
+    useState(false);
   const [productSelected, setProductSelected] = useState(null);
-
+  useEffect(() => {
+    document.title = "Quản lý sản phẩm";
+  }, []);
   // Lấy danh sách sản phẩm
   useEffect(() => {
     const getAllProducts = async () => {
@@ -42,22 +47,24 @@ export default function Products() {
   };
 
   // Toggle tình trạng
-const handleToggleStatus = async (product) => {
-  try {
-    const updatedStatus = !product.status;
-    const res = await productApi.updateStatus(product._id, { status: updatedStatus });
+  const handleToggleStatus = async (product) => {
+    try {
+      const updatedStatus = !product.status;
+      const res = await productApi.updateStatus(product._id, {
+        status: updatedStatus,
+      });
 
-    setProducts((prev) =>
-      prev.map((p) =>
-        p._id === product._id ? { ...p, status: res.status } : p
-      )
-    );
+      setProducts((prev) =>
+        prev.map((p) =>
+          p._id === product._id ? { ...p, status: res.status } : p
+        )
+      );
 
-    toast.success("Cập nhật trạng thái thành công");
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
-  }
-};
+      toast.success("Cập nhật trạng thái thành công");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
+    }
+  };
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
@@ -65,8 +72,12 @@ const handleToggleStatus = async (product) => {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">Quản lý sản phẩm</h2>
-            <p className="text-gray-600 mt-1">Danh sách sản phẩm trên website</p>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Quản lý sản phẩm
+            </h2>
+            <p className="text-gray-600 mt-1">
+              Danh sách sản phẩm trên website
+            </p>
           </div>
           <button
             onClick={() => setIsOpenModalCreateProduct(true)}

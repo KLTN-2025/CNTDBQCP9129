@@ -2,6 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import contactApi from "../../api/contactApi";
+import { useEffect } from "react";
 const ContactPage = () => {
   const {
     register,
@@ -9,7 +10,9 @@ const ContactPage = () => {
     formState: { errors },
     reset,
   } = useForm();
-
+  useEffect(() => {
+      document.title = `Liên hệ chúng tôi`;
+  }, []);
  const onSubmit = async (data) => {
   console.log(data);
   

@@ -10,7 +10,10 @@ export default function Contacts() {
   const [contacts, setContacts] = useState([]);
   const [isOpenConfirmDelete, setIsOpenConfirmDelete] = useState(false);
   const [contactId, setContactId] = useState(null);
-  const [getContactByRouter, setGetContactByRouter] = useState('contacts')
+  const [getContactByRouter, setGetContactByRouter] = useState('contacts');
+  useEffect(() => {
+    document.title = "Quản lý lời nhắn";
+  }, []);   
   useEffect(() => {
     const fetchContacts = async () => {
       try {

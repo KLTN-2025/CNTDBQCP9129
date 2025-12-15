@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { authApi } from "../../api/authApi";
 import { Link } from "react-router-dom";
 const ForgotPassword = () => {
@@ -21,6 +21,9 @@ const ForgotPassword = () => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    document.title = "Quên mật khẩu";
+  }, []);
   return (
     <div className="w-full flex flex-col items-center justify-center pt-10">
       {!notification ? (

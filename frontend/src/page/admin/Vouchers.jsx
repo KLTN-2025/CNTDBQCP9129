@@ -36,8 +36,9 @@ export default function Vouchers() {
     };
     getAllVouchers();
   }, []);
-  console.log(vouchers);
-
+  useEffect(() => {
+    document.title = "Quản lý voucher";
+  }, []);
   const handleClickDeactivateVoucher = async (voucherId) => {
     console.log(voucherId);
     try {

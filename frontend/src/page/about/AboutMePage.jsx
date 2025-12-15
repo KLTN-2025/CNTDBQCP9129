@@ -1,7 +1,11 @@
 import React from "react";
+import { useEffect } from "react";
 import { Parallax } from "react-scroll-parallax";
 
 const AboutMePage = () => {
+  useEffect(() => {
+      document.title = `Về Coffee Go`;
+  }, []);
   return (
     <div className="mx-auto w-full space-y-10">
       <div className="w-full flex flex-col items-center min-h-[700px] h-screen md:h-screen bg-[url('/banner-page-coffeego.png')] bg-cover bg-center bg-no-repeat px-4">

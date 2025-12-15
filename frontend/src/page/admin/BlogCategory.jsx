@@ -17,8 +17,10 @@ export default function BlogCategory() {
     useState(false);
   const [currentCategoryId, setCurrentCategoryId] = useState(null);
   const [updateCategoryName, setUpdateCategoryName] = useState("");
-  const [createNameCategory, setCreateNameCategory] = useState('');
-
+  const [createNameCategory, setCreateNameCategory] = useState("");
+  useEffect(() => {
+    document.title = "Quản lý loại bài viết";
+  }, []);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -31,23 +33,27 @@ export default function BlogCategory() {
     fetchCategories();
   }, []);
 
- const handleCreateCategory = async () => {
+  const handleCreateCategory = async () => {
     if (!createNameCategory.trim()) {
       toast.error("Tên danh mục không được để trống");
       return;
     }
     try {
-      const newCategory = await blogCategoryApi.create({ name: createNameCategory });
+      const newCategory = await blogCategoryApi.create({
+        name: createNameCategory,
+      });
       if (newCategory && newCategory._id && newCategory.name) {
-        setCategories(prev => [newCategory, ...prev]);
-        toast.success('Thêm mới danh mục thành công!')
+        setCategories((prev) => [newCategory, ...prev]);
+        toast.success("Thêm mới danh mục thành công!");
       } else {
         toast.error(newCategory.message);
       }
-      setCreateNameCategory('');
+      setCreateNameCategory("");
       setIsOpenModalCreateCategory(false);
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại");
+      toast.error(
+        err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại"
+      );
     }
   };
   const handleUpdateCategory = async (id, newName) => {
@@ -60,8 +66,10 @@ export default function BlogCategory() {
       setIsOpenModalUpdateCategory(false);
       setCurrentCategoryId(null);
       setUpdateCategoryName("");
-    } catch(err) {
-      toast.error(err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại");
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message || "Có lỗi xảy ra, vui lòng thử lại"
+      );
     }
   };
 
@@ -71,7 +79,9 @@ export default function BlogCategory() {
       setCategories((prev) => prev.filter((cat) => cat._id !== id));
       toast.success(res.message);
     } catch (err) {
-      toast.error(err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại");
+      toast.error(
+        err.response.data.message || "Có lỗi xảy ra, vui lòng thử lại"
+      );
     } finally {
       setIsOpenConfirmDelete(false);
     }

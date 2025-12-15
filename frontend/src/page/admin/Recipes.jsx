@@ -13,7 +13,9 @@ export default function Recipes() {
   const [isOpenModalCreateRecipe, setIsOpenModalCreateRecipe] = useState(false);
   const [isOpenModalUpdateRecipe, setIsOpenModalUpdateRecipe] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
-  console.log(selectedRecipe)
+  useEffect(() => {
+    document.title = "Quản lý công thức";
+  }, []); 
   // Lấy danh sách công thức
   useEffect(() => {
     const getAllProducts = async () => {

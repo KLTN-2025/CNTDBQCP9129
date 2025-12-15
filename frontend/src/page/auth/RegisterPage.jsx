@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { authApi } from "../../api/authApi";
+import { useEffect } from "react";
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -8,6 +9,9 @@ const RegisterPage = () => {
   const [error, setError] = useState("");
   const [notification, setNotification] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    document.title = "Đăng kí tài khoản";
+  }, []);
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!email || !password || !name || isLoading) return;

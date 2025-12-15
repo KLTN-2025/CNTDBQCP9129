@@ -16,6 +16,9 @@ export default function Ingredients() {
   const [isOpenModalUpdateIngredient, setIsOpenModalUpdateIngredient] = useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState(null);
 
+  useEffect(() => {
+    document.title = "Quản lý kho";
+  }, []); 
   // Lấy danh sách nguyên liệu trong kho
   useEffect(() => {
     const getAllIngredients = async () => {

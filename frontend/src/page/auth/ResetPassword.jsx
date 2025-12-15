@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { authApi } from "../../api/authApi";
+import { useEffect } from "react";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -23,7 +24,9 @@ const ResetPassword = () => {
       setError(err.response?.data?.message || "Có lỗi xảy ra");
     }
   };
-
+  useEffect(() => {
+    document.title = "Lấy lại mật khẩu";
+  }, []);
   return (
     <div className="w-full flex flex-col items-center justify-center pt-10">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">

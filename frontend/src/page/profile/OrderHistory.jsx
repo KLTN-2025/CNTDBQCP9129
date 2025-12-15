@@ -33,7 +33,9 @@ const OrderHistory = () => {
 
     fetchOrders();
   }, [user]);
-
+  useEffect(() => {
+      document.title = `Lịch sử đơn hàng`;
+  }, []);
   const getStatusConfig = (status) => {
     const configs = {
       COMPLETED: {

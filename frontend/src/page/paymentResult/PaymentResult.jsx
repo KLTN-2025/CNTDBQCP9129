@@ -28,6 +28,9 @@ const PaymentResult = () => {
     }
   }, [order?.paymentStatus]);
   useEffect(() => {
+      document.title = `Xác nhận thanh toán`;
+  }, []);
+  useEffect(() => {
     const getOrderById = async () => {
       try {
         const orderData = await orderApi.getOrderById(orderId);

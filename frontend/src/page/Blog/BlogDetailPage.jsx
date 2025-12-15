@@ -8,7 +8,9 @@ import BlogsRelatedSection from "./BlogsRelatedSection";
 const BlogDetailPage = () => {
   const { categorySlug, nameBlogSlug } = useParams();
   const [dataBlog, setDataBlog] = useState(null);
-
+  useEffect(() => {
+    document.title = dataBlog?.title || "Đang tải bài viết...";
+  }, [dataBlog]);
   useEffect(() => {
     const fetchBlog = async () => {
       try {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MdLocationPin, MdAccessTime } from "react-icons/md";
 import { FaPhone, FaStore } from "react-icons/fa";
 import { BsCheckCircleFill } from "react-icons/bs";
+import { useEffect } from "react";
 
 const ShopPage = () => {
   const shopImages = [
@@ -12,7 +13,9 @@ const ShopPage = () => {
     "/view-shop8.jpg",
   ];
   const [pickedImage, setPickedImage] = useState(0);
-
+  useEffect(() => {
+      document.title = `Cửa hàng`;
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-100 via-orange-50 to-white">
       {/* Hero Section */}

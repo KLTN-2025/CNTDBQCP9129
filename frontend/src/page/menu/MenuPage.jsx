@@ -16,6 +16,9 @@ const MenuPage = () => {
   const [vouchers, setVouchers] = useState([]);
   const [isOpenModalDetailProduct, setIsOpenModalDetailProduct] =
     useState(false);
+  useEffect(() => {
+      document.title = `Tất cả sản phẩm`;
+  }, []);
   // lấy 10 sản phẩm random
   useEffect(() => {
     const getLimitProducts = async () => {

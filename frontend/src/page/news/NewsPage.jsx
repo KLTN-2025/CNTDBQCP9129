@@ -12,7 +12,9 @@ const NewsPage = () => {
   const { categorySlug } = useParams();
   const [blogcategories, setBlogCategories] = useState([]);
   const [blogs, setBlogs] = useState([]);
-  
+  useEffect(() => {
+      document.title = `Tin tức`;
+  }, []);
   useEffect(() => {
     const fetchAllCategoryBlog = async () => {
       try {

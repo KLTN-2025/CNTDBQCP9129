@@ -12,6 +12,9 @@ export default function Orders() {
   const [selectedUser, setSelectedUser] = useState(null)
   // Lấy danh sách user theo button
   useEffect(() => {
+    document.title = "Quản lý người dùng";
+  }, []);
+  useEffect(() => {
     const getAllUsersByButton = async () => {
       try {
         const res = await userApi.getAllUsers(getUsersByRouter);

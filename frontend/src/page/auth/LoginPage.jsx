@@ -4,6 +4,7 @@ import useAuthStore from "../../store/authStore";
 import { authApi } from "../../api/authApi";
 import cartApi from "../../api/cartApi";
 import useCartStore from "../../store/cartStore";
+import { useEffect } from "react";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,9 @@ const LoginPage = () => {
   const { login } = useAuthStore();
   const { setCart } = useCartStore();
  
-
+  useEffect(() => {
+    document.title = "Đăng nhập tài khoản";
+  }, []);
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password || isLoading) return;

@@ -9,10 +9,14 @@ import { CiGift } from "react-icons/ci";
 import { MdOutlineMessage } from "react-icons/md";
 import { TbReceipt } from "react-icons/tb";
 import { FaTable } from "react-icons/fa";
+import { useEffect } from "react";
 export default function LayoutAdmin() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const activePath = location.pathname;
   const isRootProfile = activePath === "/admin";
+  useEffect(() => {
+      document.title = `Trang Admin`;
+  }, []);
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
@@ -94,7 +98,7 @@ export default function LayoutAdmin() {
               <Link
                 to="/admin/reservations"
                 className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
-                  activePath.includes("products")
+                  activePath.includes("reservations")
                     ? "bg-green-50 text-green-600 border-r-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}

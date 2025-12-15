@@ -1,6 +1,10 @@
 import React from 'react'
+import { useEffect } from 'react';
 
 const UserInfo = ({user}) => {
+  useEffect(() => {
+      document.title = `Thông tin tài khoản`;
+  }, []);
   return (
     <div className='space-y-3 w-full'>
       <h2 className='text-xl font-bold text-center'>Thông tin tài khoản</h2>

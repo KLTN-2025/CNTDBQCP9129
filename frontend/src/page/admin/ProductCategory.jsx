@@ -25,7 +25,9 @@ export default function ProductCategory() {
     usePreviewImage(1);
   const { handleImageUpload } = useUpAndGetLinkImage();
   const [isLoading, setIsLoading] = useState(false);
-
+  useEffect(() => {
+    document.title = "Quản lý loại sản phẩm";
+  }, []);
   // Lấy danh sách category
   useEffect(() => {
     const fetchCategories = async () => {
@@ -75,7 +77,7 @@ export default function ProductCategory() {
 
   // Cập nhật loại sản phẩm
   const handleUpdateCategory = async (id, newName) => {
-    if(isLoading) return toast.warning("Loại sản phẩm đang được cập nhập");
+    if (isLoading) return toast.warning("Loại sản phẩm đang được cập nhập");
     try {
       let imageUrl = selectedFile[0];
       setIsLoading(true);
@@ -85,10 +87,15 @@ export default function ProductCategory() {
         imageUrl = newImage[0];
       }
 
-      const res = await productCategoryApi.update(id, { name: newName, image: imageUrl });
+      const res = await productCategoryApi.update(id, {
+        name: newName,
+        image: imageUrl,
+      });
       setCategories((prev) =>
         prev.map((cat) =>
-          cat._id === id ? { ...cat, name: newName, image: imageUrl, slug: res.slug } : cat
+          cat._id === id
+            ? { ...cat, name: newName, image: imageUrl, slug: res.slug }
+            : cat
         )
       );
 
@@ -161,16 +168,21 @@ export default function ProductCategory() {
         <table className="w-full">
           <thead className="bg-gray-50 border-b">
             <tr>
-              {["STT", "Tên loại sản phẩm", "Hình ảnh", "Slug", "Ngày tạo", "Thao tác"].map(
-                (head) => (
-                  <th
-                    key={head}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                  >
-                    {head}
-                  </th>
-                )
-              )}
+              {[
+                "STT",
+                "Tên loại sản phẩm",
+                "Hình ảnh",
+                "Slug",
+                "Ngày tạo",
+                "Thao tác",
+              ].map((head) => (
+                <th
+                  key={head}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                >
+                  {head}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="bg-white divide-y">

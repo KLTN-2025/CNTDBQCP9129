@@ -70,7 +70,7 @@ export default function Orders() {
 
     socket.on("order_changed", (change) => {
       if (change.type === "insert") {
-        setOrders((prev) => [change.data, ...prev]); 
+        setOrders((prev) => [change.data, ...prev]); // Thêm vào đầu
         playTingSound();
         if (document.hidden) {
           setNewOrderCount((prev) => prev + 1);
