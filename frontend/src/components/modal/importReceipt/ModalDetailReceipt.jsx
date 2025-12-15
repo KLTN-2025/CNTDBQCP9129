@@ -9,8 +9,8 @@ const ModalDetailReceipt = ({
   setIsOpenModalDetailReceipt,
   receiptData,
 }) => {
-  console.log(receiptData);
   useLockBodyScroll(isOpenModalDetailReceipt);
+  
   const totalCost = useMemo(() => {
     return receiptData?.items?.reduce(
       (sum, item) => sum + (item.totalCost || 0),
@@ -19,7 +19,13 @@ const ModalDetailReceipt = ({
   }, [receiptData?.items]);
 
   if (!receiptData) return null;
-  console.log(receiptData);
+
+  const isExport = receiptData.type === "EXPORT";
+  const headerGradient = isExport 
+    ? "bg-gradient-to-r from-red-500 to-red-600" 
+    : "bg-gradient-to-r from-green-500 to-green-600";
+  const totalColor = isExport ? "text-red-600" : "text-green-600";
+
   return (
     <Modal
       appElement={document.getElementById("root")}
@@ -50,10 +56,21 @@ const ModalDetailReceipt = ({
     >
       <div className="bg-white w-full flex flex-col select-none">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-t-xl z-10">
+        <div className={`sticky top-0 ${headerGradient} text-white p-6 rounded-t-xl z-10`}>
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Chi tiết phiếu nhập</h2>
+              <div className="flex items-center gap-3 mb-2">
+                <h2 className="text-2xl font-bold">
+                  Chi tiết phiếu {isExport ? "xuất" : "nhập"}
+                </h2>
+                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  isExport 
+                    ? "bg-red-100 text-red-700" 
+                    : "bg-green-100 text-green-700"
+                }`}>
+                  {isExport ? "Xuất kho" : "Nhập kho"}
+                </span>
+              </div>
               <p className="text-sm">Mã phiếu: #{receiptData._id?.slice(-8)}</p>
             </div>
             <button
@@ -158,7 +175,7 @@ const ModalDetailReceipt = ({
                     </div>
                   </div>
                   <div className="text-right ml-4">
-                    <p className="font-bold text-green-600 text-lg">
+                    <p className={`font-bold text-lg ${totalColor}`}>
                       {formatCurrencyVN(item.totalCost || 0)}
                     </p>
                   </div>
@@ -171,7 +188,7 @@ const ModalDetailReceipt = ({
           <div className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm">
             <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-gray-800">
               <svg
-                className="w-5 h-5 text-green-600"
+                className={`w-5 h-5 ${isExport ? 'text-red-600' : 'text-green-600'}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -187,8 +204,10 @@ const ModalDetailReceipt = ({
             </h3>
             <div className="border-t-2 border-gray-200 pt-4">
               <div className="flex justify-between text-xl font-bold">
-                <span className="text-gray-900">Tổng tiền nhập:</span>
-                <span className="text-green-600">
+                <span className="text-gray-900">
+                  Tổng tiền {isExport ? "xuất" : "nhập"}:
+                </span>
+                <span className={totalColor}>
                   {formatCurrencyVN(totalCost)}
                 </span>
               </div>

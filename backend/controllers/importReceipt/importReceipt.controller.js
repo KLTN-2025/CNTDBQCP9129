@@ -8,14 +8,18 @@ export const createImportReceipt = async (req, res) => {
 
     // Kiểm tra input
     if (!items || !Array.isArray(items) || items.length === 0 || !userId) {
-      return res.status(400).json({ message: "Danh sách nguyên liệu không hợp lệ" });
+      return res
+        .status(400)
+        .json({ message: "Danh sách nguyên liệu không hợp lệ" });
     }
 
     const processedItems = [];
 
     for (let item of items) {
       if (!item.ingredientId || !item.quantity || item.totalCost == null) {
-        return res.status(400).json({ message: "Thiếu dữ liệu trong từng nguyên liệu" });
+        return res
+          .status(400)
+          .json({ message: "Thiếu dữ liệu trong từng nguyên liệu" });
       }
 
       if (item.quantity <= 0) {
@@ -23,13 +27,17 @@ export const createImportReceipt = async (req, res) => {
       }
 
       if (item.totalCost < 0) {
-        return res.status(400).json({ message: "Tổng tiền không được nhỏ hơn 0" });
+        return res
+          .status(400)
+          .json({ message: "Tổng tiền không được nhỏ hơn 0" });
       }
 
       // Lấy thông tin nguyên liệu hiện tại
       const ing = await Ingredient.findById(item.ingredientId);
       if (!ing) {
-        return res.status(404).json({ message: "Nguyên liệu không tồn tại: " + item.ingredientId });
+        return res
+          .status(404)
+          .json({ message: "Nguyên liệu không tồn tại: " + item.ingredientId });
       }
 
       const pricePerUnit = item.totalCost / item.quantity;
@@ -37,8 +45,8 @@ export const createImportReceipt = async (req, res) => {
       // Snapshot vào phiếu nhập
       processedItems.push({
         ingredientId: ing._id,
-        ingredientName: ing.name, 
-        unit: ing.unit,           
+        ingredientName: ing.name,
+        unit: ing.unit,
         quantity: item.quantity,
         totalCost: item.totalCost,
         pricePerUnit,
@@ -107,7 +115,7 @@ export const createExportReceipt = async (req, res) => {
       // Check tồn kho
       if (ing.quantity < item.quantity) {
         return res.status(400).json({
-          message: `Nguyên liệu ${ing.name} không đủ tồn kho`,
+          message: `Số lượng xuất đã vượt quá số lượng hiện có`,
         });
       }
 
@@ -134,12 +142,14 @@ export const createExportReceipt = async (req, res) => {
     for (let it of processedItems) {
       const ing = await Ingredient.findById(it.ingredientId);
 
-      ing.quantity -= Number(it.quantity);
-      ing.totalCost -= Number(it.totalCost);
+     ing.quantity = Math.max(0, ing.quantity - Number(it.quantity));
+     ing.totalCost = Math.max(0, ing.totalCost - Number(it.totalCost));
 
-      if (ing.quantity < 0) ing.quantity = 0;
-      if (ing.totalCost < 0) ing.totalCost = 0;
-
+      if (ing.quantity === 0) {
+        ing.status = false;
+        ing.totalCost = 0;
+        ing.lastPrice = 0;
+      }
       await ing.save();
     }
 
@@ -167,38 +177,39 @@ export const getImportReceipts = async (req, res) => {
 export const getReceiptsByDateRange = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
+
     if (!startDate || !endDate) {
-      return res.status(400).json({ 
-        message: "Vui lòng cung cấp ngày bắt đầu và kết thúc" 
+      return res.status(400).json({
+        message: "Vui lòng cung cấp ngày bắt đầu và kết thúc",
       });
     }
 
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-    
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
+    // VN timezone = UTC+7
+    const start = new Date(startDate + "T00:00:00+07:00");
+    const end = new Date(endDate + "T23:59:59.999+07:00");
 
     const receipts = await ImportReceipt.find({
       createdAt: {
         $gte: start,
-        $lte: end
-      }
+        $lte: end,
+      },
     })
-    .populate('createdBy', 'name email')
-    .sort({ createdAt: -1 });
+      .populate("createdBy", "name email")
+      .sort({ createdAt: -1 });
 
     res.json(receipts);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 // Lấy 1 phiếu nhập chi tiết
 export const getImportReceiptById = async (req, res) => {
   try {
-    const receipt = await ImportReceipt.findById(req.params.id)
-      .populate("createdBy", "name email role");
+    const receipt = await ImportReceipt.findById(req.params.id).populate(
+      "createdBy",
+      "name email role"
+    );
 
     if (!receipt) {
       return res.status(404).json({ message: "Không tìm thấy phiếu nhập" });

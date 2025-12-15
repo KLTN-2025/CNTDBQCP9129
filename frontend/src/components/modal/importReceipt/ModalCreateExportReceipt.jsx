@@ -9,11 +9,11 @@ import useAuthStore from "../../../store/authStore";
 import { IoIosRemoveCircle } from "react-icons/io";
 
 const ModalCreateExportReceipt = ({
-  isOpen,
-  setIsOpen,
+  isOpenModalCreateExportReceipt,
+  setIsOpenModalCreateExportReceipt,
   setReceipts,
 }) => {
-  useLockBodyScroll(isOpen);
+  useLockBodyScroll(isOpenModalCreateExportReceipt);
 
   const { user } = useAuthStore();
   const [ingredients, setIngredients] = useState([]);
@@ -39,13 +39,15 @@ const ModalCreateExportReceipt = ({
   });
 
   useEffect(() => {
-    if (isOpen) fetchIngredients();
-  }, [isOpen]);
+    if (isOpenModalCreateExportReceipt) fetchIngredients();
+  }, [isOpenModalCreateExportReceipt]);
 
   const fetchIngredients = async () => {
     try {
       const data = await ingredientApi.getAll();
-      setIngredients(data);
+      // Sắp xếp theo alphabet
+      const sortedData = data.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+      setIngredients(sortedData);
     } catch {
       toast.error("Lỗi tải nguyên liệu");
     }
@@ -58,6 +60,11 @@ const ModalCreateExportReceipt = ({
       .filter(Boolean);
 
     return ingredients.filter((ing) => !selectedIds.includes(ing._id));
+  };
+
+  // Lấy thông tin nguyên liệu đã chọn
+  const getSelectedIngredient = (ingredientId) => {
+    return ingredients.find((ing) => ing._id === ingredientId);
   };
 
   const onSubmit = async (data) => {
@@ -80,7 +87,7 @@ const ModalCreateExportReceipt = ({
       if (res?._id) {
         toast.success("Xuất kho thành công");
         setReceipts((prev) => [res, ...prev]);
-        setIsOpen(false);
+        setIsOpenModalCreateExportReceipt(false);
         reset();
       }
     } catch (err) {
@@ -93,8 +100,8 @@ const ModalCreateExportReceipt = ({
   return (
     <Modal
       appElement={document.getElementById("root")}
-      isOpen={isOpen}
-      onRequestClose={() => setIsOpen(false)}
+      isOpen={isOpenModalCreateExportReceipt}
+      onRequestClose={() => setIsOpenModalCreateExportReceipt(false)}
       style={{
         overlay: {
           backgroundColor: "rgba(0,0,0,0.8)",
@@ -103,11 +110,16 @@ const ModalCreateExportReceipt = ({
           alignItems: "center",
         },
         content: {
-          top: "2rem",
+          position: "relative",
+          top: "auto",
+          left: "auto",
+          right: "auto",
+          bottom: "auto",
           padding: 0,
           border: "none",
           maxWidth: "550px",
           width: "100%",
+          maxHeight: "90vh",
         },
       }}
     >
@@ -125,6 +137,7 @@ const ModalCreateExportReceipt = ({
 
           {fields.map((field, idx) => {
             const availableIngredients = getAvailableIngredients(idx);
+            const selectedIngredient = getSelectedIngredient(watch(`items.${idx}.ingredientId`));
 
             return (
               <div key={field.id} className="border p-3 rounded-lg relative space-y-3">
@@ -153,6 +166,24 @@ const ModalCreateExportReceipt = ({
                     ))}
                   </select>
                 </div>
+
+                {/* Hiển thị số lượng hiện tại và tổng tiền hiện tại */}
+                {selectedIngredient && (
+                  <div className="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg">
+                    <div>
+                      <label className="text-sm text-gray-600">Số lượng hiện tại</label>
+                      <p className="font-semibold text-gray-800">
+                        {selectedIngredient.quantity} {selectedIngredient.unit}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-600">Tổng tiền hiện tại</label>
+                      <p className="font-semibold text-gray-800">
+                        {selectedIngredient.totalCost?.toLocaleString('vi-VN')} ₫
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* quantity */}
                 <div>
@@ -183,13 +214,19 @@ const ModalCreateExportReceipt = ({
 
           {/* note */}
           <div>
-            <label className="font-medium">Ghi chú</label>
+            <label className="font-medium">Ghi chú *</label>
             <textarea
-              {...register("note")}
-              className="w-full border px-3 py-2 rounded-lg"
+              {...register("note", { 
+                required: "Ghi chú không được để trống",
+                validate: (value) => value.trim() !== "" || "Ghi chú không được để trống"
+              })}
+              className={`w-full border px-3 py-2 rounded-lg ${errors.note ? 'border-red-500' : ''}`}
               rows={3}
               placeholder="Hết hạn / hỏng / kiểm kê..."
             />
+            {errors.note && (
+              <p className="text-red-500 text-sm mt-1">{errors.note.message}</p>
+            )}
           </div>
         </div>
 
@@ -197,15 +234,15 @@ const ModalCreateExportReceipt = ({
         <div className="flex gap-4 px-6 py-4 border-t">
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
-            className="w-full border py-2 rounded-md"
+            onClick={() => setIsOpenModalCreateExportReceipt(false)}
+            className="w-full border py-2 rounded-md cursor-pointer"
           >
             Hủy
           </button>
 
           <button
             type="submit"
-            className="w-full bg-red-700 text-white rounded-md py-2"
+            className="w-full bg-red-700 text-white rounded-md py-2 cursor-pointer"
           >
             {isLoading ? "Đang xử lý..." : "Xuất kho"}
           </button>
