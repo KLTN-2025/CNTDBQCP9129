@@ -261,7 +261,7 @@ const ReservationPage = () => {
                 </div>
 
                 {/* Date */}
-                <div>
+               <div>
                   <label className="flex items-center gap-2 text-gray-700 font-semibold mb-2">
                     <Clock className="w-5 h-5 text-orange-600" />
                     Ngày *
@@ -270,10 +270,11 @@ const ReservationPage = () => {
                     type="date"
                     min={getTodayDate()}
                     max={getTodayDate()}
+                    disabled
                     {...register("date", {
                       required: "Vui lòng chọn ngày",
                     })}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition ${
+                    className={`w-full px-4 py-3 border rounded-lg outline-none transition bg-gray-100 cursor-not-allowed ${
                       errors.date ? "border-red-500" : "border-gray-300"
                     }`}
                   />
