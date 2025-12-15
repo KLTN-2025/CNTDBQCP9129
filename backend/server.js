@@ -5,6 +5,7 @@ import http from "http";
 import { Server } from "socket.io";
 import { connectDB } from './config/db.js';
 import { watchOrders } from './config/orderWatcher.js';
+import { watchReservations } from './config/reservationWatcjer.js';
 import authRouter from './router/auth.router.js';
 import blogCategoryRouter from './router/blogCategory.router.js';
 import blogRouter from './router/blog.router.js';
@@ -19,6 +20,7 @@ import voucherRouter from './router/voucher.router.js';
 import contactRouter from './router/contact.router.js';
 import paymentRouter from './router/payment.router.js';
 import importReceiptRouter from './router/importReceipt.router.js';
+import reserVationRouter from './router/reservation.router.js';
 dotenv.config();
 
 const app = express();
@@ -54,6 +56,8 @@ app.use("/api/vouchers", voucherRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/import-receipts", importReceiptRouter);
+app.use("/api/reservations", reserVationRouter);
+
 // ---- Socket.IO logic ----
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
@@ -63,10 +67,10 @@ io.on("connection", (socket) => {
     console.log("Admin joined:", socket.id);
   });
 
-  socket.on("join_user", (userId) => {
-    socket.join(`user_${userId}`);
-    console.log(`User ${userId} joined:`, socket.id);
-  });
+  // socket.on("join_user", (userId) => {
+  //   socket.join(`user_${userId}`);
+  //   console.log(`User ${userId} joined:`, socket.id);
+  // });
 
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
@@ -78,5 +82,6 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, async () => {
   await connectDB();
   watchOrders(io); 
+  watchReservations(io);
   console.log(`Server started at http://localhost:${PORT}`);
 });
