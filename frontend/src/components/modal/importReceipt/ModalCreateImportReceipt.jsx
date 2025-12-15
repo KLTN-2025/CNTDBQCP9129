@@ -6,13 +6,12 @@ import ingredientApi from "../../../api/ingredientApi";
 import importReceiptApi from "../../../api/importReceiptApi";
 import useAuthStore from "../../../store/authStore";
 import { IoIosRemoveCircle } from "react-icons/io";
-
-const ModalCreateReceipt = ({
-  isOpenModalCreateReceipt,
-  setIsOpenModalCreateReceipt,
+const ModalCreateImportReceipt = ({
+  isOpenModalCreateImportReceipt,
+  setIsOpenModalCreateImportReceipt,
   setReceipts,
 }) => {
-  useLockBodyScroll(isOpenModalCreateReceipt);
+  useLockBodyScroll(isOpenModalCreateImportReceipt);
 
   const [ingredients, setIngredients] = useState([]);
   const [items, setItems] = useState([
@@ -24,16 +23,16 @@ const ModalCreateReceipt = ({
 
   // Lấy danh sách nguyên liệu khi mở modal
   useEffect(() => {
-    if (isOpenModalCreateReceipt) {
+    if (isOpenModalCreateImportReceipt) {
       fetchIngredients();
     }
-  }, [isOpenModalCreateReceipt]);
+  }, [isOpenModalCreateImportReceipt]);
 
   const fetchIngredients = async () => {
     try {
       const data = await ingredientApi.getAll();
       setIngredients(data);
-    } catch (error) {
+    } catch {
       toast.error("Lỗi tải danh sách nguyên liệu");
     }
   };
@@ -97,7 +96,7 @@ const ModalCreateReceipt = ({
         };
       });
 
-      const response = await importReceiptApi.create({
+      const response = await importReceiptApi.createImport({
         items: itemsWithSnapshot,
         note: note.trim(),
         userId: user.id,
@@ -106,7 +105,7 @@ const ModalCreateReceipt = ({
       if (response?._id) {
         toast.success("Tạo phiếu nhập thành công!");
         setReceipts((prev) => [response, ...prev]);
-        setIsOpenModalCreateReceipt(false);
+        setIsOpenModalCreateImportReceipt(false);
       } else {
         toast.error(response.message || "Lỗi tạo phiếu nhập");
       }
@@ -121,8 +120,8 @@ const ModalCreateReceipt = ({
   return (
     <Modal
       appElement={document.getElementById("root")}
-      isOpen={isOpenModalCreateReceipt}
-      onRequestClose={() => setIsOpenModalCreateReceipt(false)}
+      isOpen={isOpenModalCreateImportReceipt}
+      onRequestClose={() => setIsOpenModalCreateImportReceipt(false)}
       style={{
         overlay: {
           backgroundColor: "rgba(0, 0, 0, 0.8)",
@@ -244,7 +243,7 @@ const ModalCreateReceipt = ({
         <div className="flex gap-4 px-6 py-4 border-t">
           <button
             className="w-full border px-4 py-2 rounded-md cursor-pointer"
-            onClick={() => setIsOpenModalCreateReceipt(false)}
+            onClick={() => setIsOpenModalCreateImportReceipt(false)}
           >
             Hủy
           </button>
@@ -269,4 +268,4 @@ const ModalCreateReceipt = ({
   );
 };
 
-export default ModalCreateReceipt;
+export default ModalCreateImportReceipt;

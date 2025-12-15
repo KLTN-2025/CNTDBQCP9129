@@ -3,15 +3,14 @@ import { Plus, Search, Calendar } from "lucide-react";
 import { toast } from "react-toastify";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import importReceiptApi from "../../api/importReceiptApi";
-import ModalCreateReceipt from "../../components/modal/importReceipt/ModalCreateReceipt";
+import ModalCreateImportReceipt from "../../components/modal/importReceipt/ModalCreateImportReceipt";
 import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import { AiOutlineEye } from "react-icons/ai";
 import ModalDetailReceipt from "../../components/modal/importReceipt/ModalDetailReceipt";
 
 export default function ImportReceipts() {
-  const [searchTerm, setSearchTerm] = useState("");
   const [receipts, setReceipts] = useState([]);
-  const [isOpenModalCreateReceipt, setIsOpenModalCreateReceipt] = useState(false);
+  const [isOpenModalCreateImportReceipt, setIsOpenModalCreateImportReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
   const [isOpenModalDetailReceipt, setIsOpenModalDetailReceipt] = useState(false);
   
@@ -87,7 +86,7 @@ export default function ImportReceipts() {
             <p className="text-gray-600 mt-1">Danh sách phiếu nhập kho</p>
           </div>
           <button
-            onClick={() => setIsOpenModalCreateReceipt(true)}
+            onClick={() => setIsOpenModalCreateImportReceipt(true)}
             className="flex items-center cursor-pointer space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -217,10 +216,10 @@ export default function ImportReceipts() {
       </div>
 
       {/* Modal thêm phiếu nhập */}
-      {isOpenModalCreateReceipt && (
-        <ModalCreateReceipt
-          isOpenModalCreateReceipt={isOpenModalCreateReceipt}
-          setIsOpenModalCreateReceipt={setIsOpenModalCreateReceipt}
+      {isOpenModalCreateImportReceipt && (
+        <ModalCreateImportReceipt
+          isOpenModalCreateImportReceipt={isOpenModalCreateImportReceipt}
+          setIsOpenModalCreateImportReceipt={setIsOpenModalCreateImportReceipt}
           setReceipts={setReceipts}
         />
       )}
