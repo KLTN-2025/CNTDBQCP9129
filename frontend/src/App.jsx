@@ -30,6 +30,7 @@ import NewsPage from "./page/news/NewsPage";
 import AboutMePage from "./page/about/AboutMePage";
 import CheckOut from "./page/checkout/CheckOut";
 import ContactPage from "./page/contact/ContactPage";
+import ReservationPage from "./page/reservation/ReservationPage";
 // admin page
 import BlogCategory from "./page/admin/BlogCategory";
 import Users from "./page/admin/Users";
@@ -234,6 +235,8 @@ useEffect(() => {
               cart?.length > 0 && user ? <CheckOut /> : <Navigate to="/menu" />
             }
           />
+          {/* reservation route */}
+          <Route path="/reservation" element={<ReservationPage />} />
           {/* payment result route */}
           <Route path="/payment-result" element={<PaymentResult />} />
           {/* menu route */}

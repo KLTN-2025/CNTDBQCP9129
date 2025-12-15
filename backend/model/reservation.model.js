@@ -15,19 +15,31 @@ const reservationSchema = new mongoose.Schema(
 
     email: {
       type: String,
-      default: null,
+      required: true,
+      trim: true,
+    },
+
+    date: {
+      type: String,
       required: true,
     },
 
     time: {
       type: String,
-      required: true, 
+      required: true,
+    },
+
+    reservationTime: {
+      type: Date,
+      required: true,
+      index: true,
     },
 
     people: {
       type: Number,
       required: true,
       min: 1,
+      max: 20,
     },
 
     note: {
@@ -39,6 +51,7 @@ const reservationSchema = new mongoose.Schema(
       type: String,
       enum: ["PENDING", "COMPLETED", "CANCELLED"],
       default: "PENDING",
+      index: true,
     },
   },
   {

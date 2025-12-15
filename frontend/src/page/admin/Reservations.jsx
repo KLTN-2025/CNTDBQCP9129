@@ -16,6 +16,17 @@ export default function Reservations() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [newReservationCount, setNewReservationCount] = useState(0);
 
+  // Format date helper
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   // Fetch reservations
   useEffect(() => {
     const fetchReservations = async () => {
@@ -157,7 +168,8 @@ export default function Reservations() {
                 "STT",
                 "Tên khách",
                 "SĐT",
-                "Thời gian",
+                "Ngày đặt",
+                "Giờ đặt",
                 "Số người",
                 "Trạng thái",
                 "Thao tác",
@@ -184,6 +196,7 @@ export default function Reservations() {
                   <td className="px-6 py-4">{index + 1}</td>
                   <td className="px-6 py-4">{r.name}</td>
                   <td className="px-6 py-4">{r.phone}</td>
+                  <td className="px-6 py-4">{formatDate(r.date)}</td>
                   <td className="px-6 py-4">{r.time}</td>
                   <td className="px-6 py-4">{r.people}</td>
                   <td className="px-6 py-4">
@@ -208,7 +221,7 @@ export default function Reservations() {
                       {r.status === "PENDING" && (
                         <>
                           <button
-                            className="text-green-600 hover:text-green-800"
+                            className="text-green-600 hover:text-green-800 cursor-pointer"
                             title="Xác nhận"
                             onClick={() => {
                               setSelectedReservation(r);
@@ -219,7 +232,7 @@ export default function Reservations() {
                           </button>
 
                           <button
-                            className="text-orange-600 hover:text-orange-800"
+                            className="text-orange-600 hover:text-orange-800 cursor-pointer"
                             title="Hủy lịch"
                             onClick={() => {
                               setSelectedReservation(r);
@@ -235,7 +248,7 @@ export default function Reservations() {
                       {(r.status === "COMPLETED" ||
                         r.status === "CANCELLED") && (
                         <button
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-600 hover:text-red-800 cursor-pointer"
                           title="Xóa"
                           onClick={() => {
                             setSelectedReservation(r);

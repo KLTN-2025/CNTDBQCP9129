@@ -9,37 +9,57 @@ export const getAllReservations = async (req, res) => {
 };
 export const createReservation = async (req, res) => {
   try {
-    const { name, phone, email, time, people, note } = req.body;
+    const { name, phone, email, date, time, people, note } = req.body;
 
-    if (!name || !phone || !email || !time || !people) {
+    if (!name || !phone || !email || !date || !time || !people) {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
+    }
+
+    // Ghép date + time → reservationTime
+    const reservationTime = new Date(`${date}T${time}:00`);
+
+    if (isNaN(reservationTime.getTime())) {
+      return res.status(400).json({ message: "Thời gian đặt không hợp lệ" });
+    }
+
+    // Không cho đặt trong quá khứ
+    if (reservationTime < new Date()) {
+      return res.status(400).json({ message: "Không thể đặt giờ trong quá khứ" });
     }
 
     const reservation = await Reservation.create({
       name,
       phone,
       email,
+      date,
       time,
+      reservationTime,
       people,
       note,
       status: "PENDING",
     });
 
-    // Auto cancel sau 15 phút nếu chưa xác nhận
-    setTimeout(async () => {
-      const latest = await Reservation.findById(reservation._id);
-      if (latest && latest.status === "PENDING") {
-        latest.status = "CANCELLED";
-        await latest.save();
-        console.log("Auto cancel reservation:", latest._id);
-      }
-    }, 30 * 1000);
+    const cancelAt = new Date(reservationTime.getTime() + 30 * 1000);
+    const delay = cancelAt.getTime() - Date.now();
+
+    // Nếu delay <= 0 thì hủy luôn (phòng edge case)
+    if (delay > 0) {
+      setTimeout(async () => {
+        const latest = await Reservation.findById(reservation._id);
+
+        if (latest && latest.status === "PENDING") {
+          latest.status = "CANCELLED";
+          await latest.save();
+        }
+      }, delay);
+    }
 
     res.status(201).json(reservation);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // XÁC NHẬN (PENDING → COMPLETED)
 export const confirmReservation = async (req, res) => {
