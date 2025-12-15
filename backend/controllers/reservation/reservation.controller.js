@@ -1,5 +1,12 @@
 import Reservation from "../../model/reservation.model.js";
-
+export const getAllReservations = async (req, res) => {
+  try {
+    const reservations = await Reservation.find().sort({ createdAt: -1 });
+    res.json(reservations);
+  } catch (err) {
+    res.status(500).json({ message: "Không lấy được danh sách reservation" });
+  }
+};
 export const createReservation = async (req, res) => {
   try {
     const { name, phone, email, time, people, note } = req.body;
@@ -59,7 +66,6 @@ export const confirmReservation = async (req, res) => {
   }
 };
 
-
 // HỦY (chỉ khi PENDING)
 export const cancelReservation = async (req, res) => {
   try {
@@ -95,9 +101,9 @@ export const deleteReservation = async (req, res) => {
       return res.status(404).json({ message: "Không tìm thấy lịch hẹn" });
     }
 
-    if (reservation.status !== "COMPLETED") {
+    if (reservation.status === "PENDING") {
       return res.status(400).json({
-        message: "Chỉ được xóa lịch hẹn đã COMPLETED",
+        message: "Không được xóa lịch hẹn khi đang ở trạng thái chờ",
       });
     }
 

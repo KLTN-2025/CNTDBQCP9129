@@ -43,6 +43,7 @@ import Recipes from "./page/admin/Recipes";
 import Orders from "./page/admin/Orders";
 import Contacts from "./page/admin/Contacts";
 import ImportReceipts from "./page/admin/importReceipts";
+import Reservations from "./page/admin/Reservations";
 // store
 import useCartStore from "./store/cartStore";
 import Vouchers from "./page/admin/Vouchers";
@@ -210,6 +211,7 @@ useEffect(() => {
             <Route path="vouchers" element={<Vouchers />} />
             <Route path="contacts" element={<Contacts />} />
             <Route path="import-receipts" element={<ImportReceipts />} />
+            <Route path="reservations" element={<Reservations />} />
           </Route>
           {/* blog route */}
           <Route path="/blogs">

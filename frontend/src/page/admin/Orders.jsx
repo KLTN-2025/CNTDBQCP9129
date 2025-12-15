@@ -70,12 +70,12 @@ export default function Orders() {
 
     socket.on("order_changed", (change) => {
       if (change.type === "insert") {
-        setOrders((prev) => [change.data, ...prev]); // Thêm vào đầu
+        setOrders((prev) => [change.data, ...prev]); 
         playTingSound();
         if (document.hidden) {
           setNewOrderCount((prev) => prev + 1);
         }
-        toast.success("🎉 Có đơn hàng mới!");
+        toast.success("Có đơn hàng mới!");
       } else if (change.type === "update") {
         setOrders((prev) =>
           prev.map((o) => {

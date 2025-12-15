@@ -5,7 +5,7 @@ import http from "http";
 import { Server } from "socket.io";
 import { connectDB } from './config/db.js';
 import { watchOrders } from './config/orderWatcher.js';
-import { watchReservations } from './config/reservationWatcjer.js';
+import { watchReservations } from './config/reservationWatcher.js';
 import authRouter from './router/auth.router.js';
 import blogCategoryRouter from './router/blogCategory.router.js';
 import blogRouter from './router/blog.router.js';

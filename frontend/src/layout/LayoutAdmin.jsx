@@ -8,6 +8,7 @@ import { PiNotepadBold } from "react-icons/pi";
 import { CiGift } from "react-icons/ci";
 import { MdOutlineMessage } from "react-icons/md";
 import { TbReceipt } from "react-icons/tb";
+import { FaTable } from "react-icons/fa";
 export default function LayoutAdmin() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const activePath = location.pathname;
@@ -87,6 +88,19 @@ export default function LayoutAdmin() {
               >
                 <PenSquare className="w-5 h-5 mr-3" />
                 <span>Quản lý sản phẩm</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/admin/reservations"
+                className={`w-full flex items-center px-6 py-3 text-left transition-colors ${
+                  activePath.includes("products")
+                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                <FaTable className="w-5 h-5 mr-3" />
+                <span>Quản lý đặt bàn</span>
               </Link>
             </li>
             <li>
