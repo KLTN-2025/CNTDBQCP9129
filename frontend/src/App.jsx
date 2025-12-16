@@ -45,6 +45,7 @@ import Orders from "./page/admin/Orders";
 import Contacts from "./page/admin/Contacts";
 import ImportReceipts from "./page/admin/importReceipts";
 import Reservations from "./page/admin/Reservations";
+import OfflineOrderPage from "./page/offlineOrder/OfflineOrderPage";
 // store
 import useCartStore from "./store/cartStore";
 import Vouchers from "./page/admin/Vouchers";
@@ -222,6 +223,8 @@ useEffect(() => {
             />
             <Route path=":categorySlug" element={<NewsPage />} />
           </Route>
+          {/* offline order route */}
+          <Route path="/order/offline" element={<OfflineOrderPage />} />
           {/* about me route */}
           <Route path="contact" element={<ContactPage />} />
           {/* about me route */}

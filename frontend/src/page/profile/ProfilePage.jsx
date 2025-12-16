@@ -119,6 +119,23 @@ const ProfilePage = () => {
                       </Link>
                     </li>
                   )}
+                  {!isCustomer && (
+                    <li>
+                      <Link
+                        to="/order/offline"
+                        className="flex items-center gap-4 p-3 rounded-xl transition-all duration-200 hover:bg-gray-50 text-gray-700"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                          <img
+                            src="/order-offline.png"
+                            className="w-6 h-6 object-contain"
+                            alt="gọi món"
+                          />
+                        </div>
+                        <span className="font-medium">Gọi món</span>
+                      </Link>
+                    </li>
+                  )}
                 </ul>
               </nav>
 

@@ -1,7 +1,7 @@
 import axiosClient from "./axiosClient";
 
 const orderApi = {
-  createOrder: async(data) => {
+  createOrderOffline: async(data) => {
     const res = await axiosClient.post('/orders', data);
     return res.data
   },
