@@ -8,7 +8,11 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
+    // thẻ bàn
+    pagerNumber: {
+      type: Number,
+      default: null,
+    },
     // Voucher áp dụng (nếu có)
     voucherId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -35,8 +39,8 @@ const orderSchema = new mongoose.Schema(
 
     // Thông tin giao hàng
     delivery: {
-      name: { type: String, required: true },
-      phone: { type: String, required: true },
+      name: { type: String, default: null },
+      phone: { type: String, default: null },
       address: { type: String, default: null },
       note: { type: String, default: "" },
       deliveryTime: { type: String, default: "Càng sớm càng tốt" }, 
