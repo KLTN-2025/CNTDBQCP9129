@@ -10,7 +10,6 @@ export const createOrderOffline = async (req, res) => {
 
   try {
     const { userId, items, pagerNumber } = req.body;
-
     // VALIDATE
     if (!items || !items.length) {
       await session.abortTransaction();
@@ -20,6 +19,10 @@ export const createOrderOffline = async (req, res) => {
     if (!pagerNumber) {
       await session.abortTransaction();
       return res.status(400).json({ message: "Thiếu số thẻ" });
+    }
+    if (pagerNumber <= 0) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: "Số thẻ phải lớn hơn 0" });
     }
 
     // CHECK THẺ ĐANG DÙNG

@@ -115,7 +115,7 @@ const OfflineOrderPage = () => {
       toast.error("Vui lòng nhập số thẻ bàn");
       return;
     }
-    if (pagerNumber <= 0) {
+    if (parseInt(pagerNumber) <= 0) {
       toast.error("Số thẻ phải lớn hơn 0");
       return;
     }
