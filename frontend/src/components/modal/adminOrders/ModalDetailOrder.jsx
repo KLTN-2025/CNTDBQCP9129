@@ -3,6 +3,7 @@ import useLockBodyScroll from "../../../hooks/useLockBodyScroll";
 import { formatCurrencyVN } from "../../../utils/formatCurrencyVN";
 import { useMemo } from "react";
 import { formatDatetimeVNOfVNPAY } from "../../../utils/formatDatetimeVNOfVNPAY";
+
 const ModalOrderDetail = ({
   isOpenModal,
   setIsOpenModal,
@@ -10,6 +11,7 @@ const ModalOrderDetail = ({
   openByCustomer = false,
 }) => {
   useLockBodyScroll(isOpenModal);
+  
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString("vi-VN", {
       year: "numeric",
@@ -20,12 +22,14 @@ const ModalOrderDetail = ({
       second: "2-digit",
     });
   };
+
   const subTotal = useMemo(() => {
     return orderData.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
   }, [orderData.items]);
+
   const getStatusBadge = (status) => {
     const statusConfig = {
       PROCESSING: { label: "Đang xử lý", color: "bg-yellow-500" },
@@ -81,6 +85,8 @@ const ModalOrderDetail = ({
   };
 
   if (!orderData) return null;
+
+  const isOnlineOrder = orderData.orderType === "ONLINE";
 
   return (
     <Modal
@@ -153,7 +159,7 @@ const ModalOrderDetail = ({
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-2">Loại đơn hàng</p>
-                <span className="inline-block bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                <span className={`inline-block ${isOnlineOrder ? 'bg-purple-500' : 'bg-blue-500'} text-white px-3 py-1 rounded-full text-sm font-medium`}>
                   {getOrderTypeLabel(orderData.orderType)}
                 </span>
               </div>
@@ -202,66 +208,119 @@ const ModalOrderDetail = ({
             </div>
           )}
 
-          {/* Thông tin giao hàng */}
+          {/* Thông tin giao hàng / Thẻ bàn */}
           <div className="border border-gray-200 rounded-lg p-5 bg-white shadow-sm">
             <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-gray-800">
-              <svg
-                className="w-5 h-5 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              Thông tin giao hàng
+              {isOnlineOrder ? (
+                <>
+                  <svg
+                    className="w-5 h-5 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Thông tin giao hàng
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-5 h-5 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                    />
+                  </svg>
+                  Thông tin thẻ bàn
+                </>
+              )}
             </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-start py-2">
+            
+            {isOnlineOrder ? (
+              // Đơn ONLINE - Hiển thị thông tin giao hàng
+              <div className="space-y-3">
+                <div className="flex justify-between items-start py-2">
                   <span className="text-gray-600">Giờ lấy hàng:</span>
                   <span className="font-medium text-right max-w-md italic text-green-600 bg-green-50 px-2 py-1 rounded">
-                    {orderData.delivery.deliveryTime}
-                  </span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-600">Người nhận:</span>
-                <span className="font-medium text-gray-900">
-                  {orderData.delivery?.name}
-                </span>
-              </div>
-              <div className="flex justify-between py-2 border-b border-gray-100">
-                <span className="text-gray-600">Số điện thoại:</span>
-                <span className="font-medium text-gray-900">
-                  {orderData.delivery?.phone}
-                </span>
-              </div>
-              {orderData.delivery?.address && (
-                <div className="flex justify-between items-start py-2 border-b border-gray-100">
-                  <span className="text-gray-600">Địa chỉ:</span>
-                  <span className="font-medium text-right max-w-md text-gray-900">
-                    {orderData.delivery.address}
+                    {orderData.delivery?.deliveryTime || "Càng sớm càng tốt"}
                   </span>
                 </div>
-              )}
-              {orderData.delivery?.note && (
-                <div className="flex justify-between items-start py-2">
-                  <span className="text-gray-600">Ghi chú:</span>
-                  <span className="font-medium text-right max-w-md italic text-orange-600 bg-orange-50 px-2 py-1 rounded">
-                    {orderData.delivery.note}
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Người nhận:</span>
+                  <span className="font-medium text-gray-900">
+                    {orderData.delivery?.name || "N/A"}
                   </span>
                 </div>
-              )}
-            </div>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Số điện thoại:</span>
+                  <span className="font-medium text-gray-900">
+                    {orderData.delivery?.phone || "N/A"}
+                  </span>
+                </div>
+                {orderData.delivery?.address && (
+                  <div className="flex justify-between items-start py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Địa chỉ:</span>
+                    <span className="font-medium text-right max-w-md text-gray-900">
+                      {orderData.delivery.address}
+                    </span>
+                  </div>
+                )}
+                {orderData.delivery?.note && (
+                  <div className="flex justify-between items-start py-2">
+                    <span className="text-gray-600">Ghi chú:</span>
+                    <span className="font-medium text-right max-w-md italic text-orange-600 bg-orange-50 px-2 py-1 rounded">
+                      {orderData.delivery.note}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // Đơn OFFLINE - Hiển thị thông tin thẻ bàn
+              <div className="space-y-3">
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-gray-600">Số thẻ bàn:</span>
+                  <span className="font-bold text-2xl text-blue-600 bg-blue-50 px-4 py-2 rounded-lg">
+                    #{orderData.pagerNumber || "N/A"}
+                  </span>
+                </div>
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-800">
+                    <svg
+                      className="w-4 h-4 inline mr-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    Khách hàng thanh toán và nhận đồ trực tiếp tại quầy
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sản phẩm */}
@@ -396,14 +455,19 @@ const ModalOrderDetail = ({
                     {formatCurrencyVN(subTotal)}
                   </span>
                 </div>
-                <div className="flex justify-between text-base">
-                  <span className="text-gray-600">Phí ship: </span>
-                  <span className="font-semibold text-gray-900">
-                    {orderData.delivery?.address
-                      ? formatCurrencyVN(20000)
-                      : formatCurrencyVN(0)}
-                  </span>
-                </div>
+                
+                {/* Chỉ hiển thị phí ship cho đơn ONLINE */}
+                {isOnlineOrder && (
+                  <div className="flex justify-between text-base">
+                    <span className="text-gray-600">Phí ship:</span>
+                    <span className="font-semibold text-gray-900">
+                      {orderData.delivery?.address
+                        ? formatCurrencyVN(20000)
+                        : formatCurrencyVN(0)}
+                    </span>
+                  </div>
+                )}
+                
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">Tạm tính:</span>
                   <span className="font-semibold text-gray-900">

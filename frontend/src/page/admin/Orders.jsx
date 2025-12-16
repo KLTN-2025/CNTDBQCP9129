@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Search } from "lucide-react";
 import { toast } from "react-toastify";
 import orderApi from "../../api/orderApi";
 import { io } from "socket.io-client";
@@ -10,8 +9,8 @@ import { AiOutlineEye } from "react-icons/ai";
 import { BsClipboardCheckFill } from "react-icons/bs";
 import ModalOrderDetail from "../../components/modal/adminOrders/ModalDetailOrder";
 import ModalConfirmCompleteOrder from "../../components/modal/adminOrders/ModalConfirmCompleteOrder";
+
 export default function Orders() {
-  const [searchTerm, setSearchTerm] = useState("");
   const [orders, setOrders] = useState([]);
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [isOpenModalDetail, setIsOpenModalDetail] = useState(false);
@@ -20,17 +19,25 @@ export default function Orders() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
+  
+  // Filter states
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [orderTypeFilter, setOrderTypeFilter] = useState("ALL");
+  const [paymentFilter, setPaymentFilter] = useState("ALL"); 
+  const [sortOrder, setSortOrder] = useState("DESC"); 
+  
   const observer = useRef();
+
   const loadOrders = async (pageNum, isInitial = false) => {
     if (loading) return;
     try {
       setLoading(true);
-      const res = await orderApi.getAllOrders({ page: pageNum, limit: 5 });
+      const res = await orderApi.getAllOrders({ page: pageNum, limit: 20 });
 
       if (isInitial) {
         setOrders(res.orders);
       } else {
-        setOrders((prev) => [...prev, ...res.orders]); // Append thêm
+        setOrders((prev) => [...prev, ...res.orders]);
       }
 
       setHasMore(res.hasMore);
@@ -56,10 +63,12 @@ export default function Orders() {
     },
     [loading, hasMore]
   );
+
   // Load orders khi page thay đổi
   useEffect(() => {
     loadOrders(page, page === 1);
   }, [page]);
+
   // Socket setup
   useEffect(() => {
     const socket = io("http://localhost:5000");
@@ -70,12 +79,17 @@ export default function Orders() {
 
     socket.on("order_changed", (change) => {
       if (change.type === "insert") {
-        setOrders((prev) => [change.data, ...prev]); // Thêm vào đầu
+        setOrders((prev) => [change.data, ...prev]);
         playTingSound();
         if (document.hidden) {
           setNewOrderCount((prev) => prev + 1);
         }
-        toast.success("Có đơn hàng mới!");
+        
+        // Thông báo có đơn mới với thông tin loại đơn
+        const orderType = change.data.orderType === "ONLINE" ? "Online" : "Tại quán";
+        const statusText = change.data.status === "PROCESSING" ? "Đang xử lý" : 
+                          change.data.status === "COMPLETED" ? "Hoàn tất" : "Đã hủy";
+        toast.success(`Đơn ${orderType} mới - ${statusText}!`);
       } else if (change.type === "update") {
         setOrders((prev) =>
           prev.map((o) => {
@@ -115,6 +129,7 @@ export default function Orders() {
       document.title = "Quản lý đơn hàng";
     }
   }, [newOrderCount]);
+
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -127,10 +142,35 @@ export default function Orders() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
-  // Filter orders theo search
-  const filteredOrders = orders.filter((order) =>
-    order.delivery?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter và sort orders
+  const filteredOrders = orders
+    .filter((order) => {
+      // Filter theo status
+      if (statusFilter !== "ALL" && order.status !== statusFilter) return false;
+      
+      // Filter theo order type
+      if (orderTypeFilter === "ONLINE" && order.orderType !== "ONLINE") return false;
+      if (orderTypeFilter === "OFFLINE" && order.orderType !== "OFFLINE") return false;
+      
+      // Filter theo payment status
+      if (paymentFilter !== "ALL" && order.paymentStatus !== paymentFilter) return false;
+      
+      return true;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return sortOrder === "DESC" ? dateB - dateA : dateA - dateB;
+    });
+
+  // Đếm số lượng theo trạng thái
+  const statusCounts = {
+    ALL: orders.length,
+    PROCESSING: orders.filter(o => o.status === "PROCESSING").length,
+    COMPLETED: orders.filter(o => o.status === "COMPLETED").length,
+    CANCELLED: orders.filter(o => o.status === "CANCELLED").length,
+  };
+
   const handleCompleteOrder = async (orderId) => {
     try {
       const res = await orderApi.completeOrder(orderId);
@@ -144,6 +184,7 @@ export default function Orders() {
       setIsOpenConfirmComplete(false);
     }
   };
+
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
       {/* Header */}
@@ -162,16 +203,77 @@ export default function Orders() {
           </div>
         </div>
 
-        {/* Ô tìm kiếm */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm tên khách hàng..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
-          />
+        {/* Tabs trạng thái đơn hàng */}
+        <div className="flex gap-2 mb-4 flex-wrap">
+          {[
+            { key: "ALL", label: "Tất cả", color: "bg-gray-100 text-gray-800" },
+            { key: "PROCESSING", label: "Đang xử lý", color: "bg-yellow-100 text-yellow-800" },
+            { key: "COMPLETED", label: "Hoàn tất", color: "bg-green-100 text-green-800" },
+            { key: "CANCELLED", label: "Đã hủy", color: "bg-red-100 text-red-800" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key)}
+              className={`px-4 py-2 rounded-lg font-medium transition-all cursor-pointer ${
+                statusFilter === tab.key
+                  ? `${tab.color} ring-2 ring-offset-1`
+                  : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              {tab.label} ({statusCounts[tab.key]})
+            </button>
+          ))}
+        </div>
+
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Loại đơn */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Loại đơn
+            </label>
+            <select
+              value={orderTypeFilter}
+              onChange={(e) => setOrderTypeFilter(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
+            >
+              <option value="ALL">Tất cả</option>
+              <option value="ONLINE">Online</option>
+              <option value="OFFLINE">Tại quán</option>
+            </select>
+          </div>
+
+          {/* Thanh toán */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Thanh toán
+            </label>
+            <select
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
+            >
+              <option value="ALL">Tất cả</option>
+              <option value="PENDING">Đang chờ</option>
+              <option value="SUCCESS">Thành công</option>
+              <option value="FAILED">Thất bại</option>
+            </select>
+          </div>
+
+          {/* Sắp xếp */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Sắp xếp
+            </label>
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none cursor-pointer"
+            >
+              <option value="DESC">Mới nhất</option>
+              <option value="ASC">Cũ nhất</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -183,13 +285,12 @@ export default function Orders() {
               {[
                 "STT",
                 "Mã đơn",
+                "Loại",
                 "Thời gian",
                 "Tổng tiền",
-                "Tiền khuyến mãi",
-                "Thông tin giao hàng",
-                "Sản phẩm",
-                "Tình trạng thanh toán",
-                "Tình trạng đơn hàng",
+                "Số lượng món",
+                "Thanh toán",
+                "Trạng thái",
                 "Thao tác",
               ].map((head) => (
                 <th
@@ -209,70 +310,36 @@ export default function Orders() {
                 ref={index === filteredOrders.length - 1 ? lastOrderRef : null}
               >
                 <td className="px-6 py-4 text-sm">{index + 1}</td>
-                <td className="px-6 py-4 text-sm">#{order._id?.slice(-8)}</td>
+                <td className="px-6 py-4 text-sm font-mono">#{order._id?.slice(-6)}</td>
                 <td className="px-6 py-4 text-sm">
+                  {order.orderType === "ONLINE" ? (
+                    <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-semibold">
+                      ONLINE
+                    </span>
+                  ) : (
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
+                      TẠI QUÁN
+                    </span>
+                  )}
+                </td>
+                <td className="px-6 py-4 text-sm whitespace-nowrap">
                   {formatDatetimeVN(order.createdAt)}
                 </td>
-                <td className="px-6 py-4 text-sm">
+                <td className="px-6 py-4 text-sm font-semibold text-green-600">
                   {formatCurrencyVN(order.totalPrice)}
                 </td>
-                <td className="px-6 py-4">
-                  {formatCurrencyVN(order.voucherDiscount)}
-                </td>
-                <td className="px-6 py-4 text-sm max-w-[300px] whitespace-break-spaces">
-                  <div className="flex flex-col">
-                    <span>
-                      <strong>Giờ lấy hàng: </strong>{" "}
-                      {order.delivery.deliveryTime}
-                    </span>
-                    <span>
-                      <strong>Tên: </strong> {order.delivery.name}
-                    </span>
-                    <span>
-                      <strong>Số điện thoại: </strong> {order.delivery.phone}
-                    </span>
-                    <span>
-                      <strong>Địa chỉ: </strong>{" "}
-                      {order.delivery.address || "Đến quán lấy"}
-                    </span>
-                    <span>
-                      <strong>Hướng dẫn giao hàng: </strong>{" "}
-                      {order.delivery.note || "Không có"}
-                    </span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm max-w-[300px]">
-                  <div className="flex flex-col space-y-1">
-                    {order.items.map((item, idx) => (
-                      <div key={idx} className="p-1 border rounded bg-gray-50">
-                        <p>
-                          <strong>Tên món:</strong> {item.name}
-                        </p>
-                        <p>
-                          <strong>Số lượng:</strong> {item.quantity}
-                        </p>
-                        <p>
-                          <strong>Ghi chú:</strong> {item.note || "Không có"}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+                <td className="px-6 py-4 text-sm text-center">
+                  <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded font-medium">
+                    {order.items.length} món
+                  </span>
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <span
                     className={`
-                      ${
-                        order.paymentStatus === "PENDING"
-                          ? "text-yellow-500"
-                          : ""
-                      }
-                      ${
-                        order.paymentStatus === "SUCCESS"
-                          ? "text-green-600"
-                          : ""
-                      }
-                      ${order.paymentStatus === "FAILED" ? "text-red-600" : ""}
-                      font-semibold
+                      px-2 py-1 rounded text-xs font-semibold
+                      ${order.paymentStatus === "PENDING" ? "bg-yellow-100 text-yellow-700" : ""}
+                      ${order.paymentStatus === "SUCCESS" ? "bg-green-100 text-green-700" : ""}
+                      ${order.paymentStatus === "FAILED" ? "bg-red-100 text-red-700" : ""}
                     `}
                   >
                     {order.paymentStatus === "PENDING" && "Đang chờ"}
@@ -283,22 +350,10 @@ export default function Orders() {
                 <td className="px-6 py-4 text-sm">
                   <span
                     className={`
-                      px-4 py-2 rounded-lg inline-block whitespace-nowrap
-                      ${
-                        order.status === "PROCESSING"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : ""
-                      }
-                      ${
-                        order.status === "COMPLETED"
-                          ? "bg-green-100 text-green-800"
-                          : ""
-                      }
-                      ${
-                        order.status === "CANCELLED"
-                          ? "bg-red-100 text-red-800"
-                          : ""
-                      }
+                      px-3 py-1 rounded-full text-xs font-semibold inline-block whitespace-nowrap
+                      ${order.status === "PROCESSING" ? "bg-yellow-100 text-yellow-800" : ""}
+                      ${order.status === "COMPLETED" ? "bg-green-100 text-green-800" : ""}
+                      ${order.status === "CANCELLED" ? "bg-red-100 text-red-800" : ""}
                     `}
                   >
                     {order.status === "PROCESSING" && "Đang xử lý"}
@@ -328,7 +383,7 @@ export default function Orders() {
                             setOrderData(order);
                           }}
                         >
-                          <BsClipboardCheckFill className="w-4 h-4" />
+                          <BsClipboardCheckFill className="w-5 h-5" />
                         </button>
                       )}
                   </div>
@@ -348,9 +403,9 @@ export default function Orders() {
             Đã hiển thị tất cả đơn hàng
           </div>
         )}
-        {orders.length === 0 && !loading && (
+        {filteredOrders.length === 0 && !loading && (
           <div className="text-center py-12 text-gray-500">
-            Chưa có đơn hàng nào
+            Không có đơn hàng nào phù hợp với bộ lọc
           </div>
         )}
       </div>
