@@ -1,147 +1,143 @@
 import "./App.css";
-import LayoutPage from "./layout/LayoutPage";
 import { useEffect } from "react";
 import {
   Routes,
   Route,
-  useNavigate,
   Navigate,
+  useNavigate,
   useLocation,
 } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { ToastContainer } from "react-toastify";
 import { ParallaxProvider } from "react-scroll-parallax";
 
+import LayoutPage from "./layout/LayoutPage";
+import LayoutAdmin from "./layout/LayoutAdmin";
+
+import useAuthStore from "./store/authStore";
+import useCartStore from "./store/cartStore";
+import cartApi from "./api/cartApi";
+
 // Pages
 import HomePage from "./page/home/HomePage";
 import LoginPage from "./page/auth/LoginPage";
 import RegisterPage from "./page/auth/RegisterPage";
 import VerifyEmailPage from "./page/auth/VerifyEmailPage";
-import useAuthStore from "./store/authStore";
 import ForgotPassword from "./page/auth/forgotPassword";
 import ResetPassword from "./page/auth/ResetPassword";
-import ErrorPage from "./error/ErrorPage";
 import ProfilePage from "./page/profile/ProfilePage";
 import ChangePassword from "./page/profile/ChangePassword";
 import OrderHistory from "./page/profile/OrderHistory";
-import LayoutAdmin from "./layout/LayoutAdmin";
 import BlogDetailPage from "./page/Blog/BlogDetailPage";
 import NewsPage from "./page/news/NewsPage";
 import AboutMePage from "./page/about/AboutMePage";
-import CheckOut from "./page/checkout/CheckOut";
 import ContactPage from "./page/contact/ContactPage";
 import ReservationPage from "./page/reservation/ReservationPage";
-// admin page
-import BlogCategory from "./page/admin/BlogCategory";
-import Users from "./page/admin/Users";
-import Blogs from "./page/admin/Blogs";
 import ShopPage from "./page/shop/ShopPage";
+import MenuPage from "./page/menu/MenuPage";
+import CheckOut from "./page/checkout/CheckOut";
+import OfflineOrderPage from "./page/offlineOrder/OfflineOrderPage";
+import PaymentResult from "./page/paymentResult/PaymentResult";
+import ErrorPage from "./error/ErrorPage";
+
+// Admin pages
+import Users from "./page/admin/Users";
+import BlogCategory from "./page/admin/BlogCategory";
+import Blogs from "./page/admin/Blogs";
 import ProductCategory from "./page/admin/ProductCategory";
 import Products from "./page/admin/Products";
-import MenuPage from "./page/menu/MenuPage";
 import Ingredients from "./page/admin/Ingredients";
 import Recipes from "./page/admin/Recipes";
 import Orders from "./page/admin/Orders";
+import Vouchers from "./page/admin/Vouchers";
 import Contacts from "./page/admin/Contacts";
 import ImportReceipts from "./page/admin/importReceipts";
 import Reservations from "./page/admin/Reservations";
-import OfflineOrderPage from "./page/offlineOrder/OfflineOrderPage";
-// store
-import useCartStore from "./store/cartStore";
-import Vouchers from "./page/admin/Vouchers";
-import PaymentResult from "./page/paymentResult/PaymentResult";
-import cartApi from "./api/cartApi";
+
 function App() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-  const { logout, user } = useAuthStore();
-  const { cart, setCart } = useCartStore();
   const location = useLocation();
-  // Check token khi app load
+
+  const token = localStorage.getItem("token");
+  const { user, logout } = useAuthStore();
+  const { cart, setCart } = useCartStore();
+
+  /* ================= TOKEN CHECK ================= */
   useEffect(() => {
-    if (token) {
+    if (!token) return;
+
+    try {
+      const { exp } = jwtDecode(token);
+      if (Date.now() >= exp * 1000) {
+        logout();
+        setCart([]);
+        localStorage.clear();
+        navigate("/account/login");
+      }
+    } catch {
+      logout();
+      setCart([]);
+      localStorage.clear();
+      navigate("/account/login");
+    }
+  }, [token]);
+
+  /* ================= CART ================= */
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchCart = async () => {
       try {
-        const { exp } = jwtDecode(token); // exp là timestamp (giây)
-        if (Date.now() >= exp * 1000) {
-          // Token hết hạn
-          setCart([]);
-          localStorage.removeItem("cart");
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          logout();
-          navigate("/account/login");
-        }
+        const res = await cartApi.getCart(user.id);
+        setCart(res?.items || []);
+        res?.items
+          ? localStorage.setItem("cart", JSON.stringify(res.items))
+          : localStorage.removeItem("cart");
       } catch {
         setCart([]);
         localStorage.removeItem("cart");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        logout();
-        navigate("/account/login");
       }
-    }
-  }, [token, navigate]);
-useEffect(() => {
-  const fetchCart = async () => {
-    try {
-      const res = await cartApi.getCart(user.id);
+    };
 
-      if (res?.items) {
-        setCart(res.items);
-        localStorage.setItem("cart", JSON.stringify(res.items));
-      } else {
-        setCart([]);
-        localStorage.removeItem("cart");
-      }
-    } catch (error) {
-      console.error("Chưa có cart:", error);
-      setCart([]);
-      localStorage.removeItem("cart");
-    }
-  };
-
-  if (user?.id) {
     fetchCart();
-  }
-}, [user?.id]);
+  }, [user?.id]);
 
-  // Route bảo vệ cho các trang cần token
-  const PrivateRoute = ({ children }) => {
-    const token = localStorage.getItem("token");
-    if (!token) return <Navigate to="/account/login" replace />;
-    return children;
-  };
+  /* ================= GUARDS ================= */
   const redirectTo =
     new URLSearchParams(location.search).get("redirect") || "/profile";
-  const GuestRoute = ({ children }) => {
-    const { user } = useAuthStore();
-    if (user) return <Navigate to={redirectTo} replace />;
+
+  const GuestRoute = ({ children }) =>
+    user ? <Navigate to={redirectTo} replace /> : children;
+
+  const GuestOnly = ({ children }) =>
+    user ? <Navigate to="/profile" replace /> : children;
+
+  // Admin + Staff
+  const AdminGuard = ({ children }) => {
+    if (!user) return <Navigate to="/account/login" replace />;
+    if (user.role === "customer") return <Navigate to="/error" replace />;
     return children;
   };
-  const GuestOnly = ({ children }) => {
-    const { user } = useAuthStore();
-    if (user) return <Navigate to="/profile" replace />;
+
+  // Admin ONLY
+  const AdminOnlyGuard = ({ children }) => {
+    if (!user) return <Navigate to="/account/login" replace />;
+    if (user.role !== "admin") return <Navigate to="/error" replace />;
     return children;
   };
+
+  /* ================= RENDER ================= */
   return (
     <ParallaxProvider>
       <LayoutPage>
-        <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnHover
-          theme="dark"
-        />
+        <ToastContainer theme="dark" autoClose={2000} />
+
         <Routes>
-          {/* home route */}
           <Route path="/" element={<HomePage />} />
 
-          {/* auth route */}
+          {/* AUTH */}
           <Route path="/account">
-            <Route index element={<Navigate to="/account/login" replace />} />
+            <Route index element={<Navigate to="login" replace />} />
             <Route
               path="login"
               element={
@@ -183,67 +179,91 @@ useEffect(() => {
               }
             />
           </Route>
-          {/* profile route */}
+
+          {/* PROFILE */}
           <Route
             path="/profile"
-            element={!user ? <Navigate to="/account/login" /> : <ProfilePage />}
+            element={user ? <ProfilePage /> : <Navigate to="/account/login" />}
           >
             <Route path="orders-history" element={<OrderHistory />} />
             <Route path="change-password" element={<ChangePassword />} />
           </Route>
-          {/* admin route */}
+
+          {/* ADMIN */}
           <Route
             path="/admin"
             element={
-              user?.role === "customer" ? (
-                <Navigate to="/error" />
-              ) : (
+              <AdminGuard>
                 <LayoutAdmin />
-              )
+              </AdminGuard>
             }
           >
-            <Route path="users" element={<Users />} />
+            <Route
+              path="users"
+              element={
+                <AdminOnlyGuard>
+                  <Users />
+                </AdminOnlyGuard>
+              }
+            />
             <Route path="blog-category" element={<BlogCategory />} />
             <Route path="blogs" element={<Blogs />} />
             <Route path="product-category" element={<ProductCategory />} />
             <Route path="products" element={<Products />} />
             <Route path="ingredients" element={<Ingredients />} />
-            <Route path="recipes" element={<Recipes />} />
+            <Route
+              path="recipes"
+              element={
+                <AdminOnlyGuard>
+                  <Recipes />
+                </AdminOnlyGuard>
+              }
+            />
             <Route path="orders" element={<Orders />} />
             <Route path="vouchers" element={<Vouchers />} />
-            <Route path="contacts" element={<Contacts />} />
+            <Route
+              path="contacts"
+              element={
+                <AdminOnlyGuard>
+                  <Contacts />
+                </AdminOnlyGuard>
+              }
+            />
             <Route path="import-receipts" element={<ImportReceipts />} />
             <Route path="reservations" element={<Reservations />} />
           </Route>
-          {/* blog route */}
-          <Route path="/blogs">
-            <Route
-              path=":categorySlug/:nameBlogSlug"
-              element={<BlogDetailPage />}
-            />
-            <Route path=":categorySlug" element={<NewsPage />} />
-          </Route>
-          {/* offline order route */}
-          <Route path="/order/offline" element={<OfflineOrderPage />} />
-          {/* about me route */}
-          <Route path="contact" element={<ContactPage />} />
-          {/* about me route */}
-          <Route path="/about-me" element={<AboutMePage />} />
-          {/* shop route */}
+
+          {/* OTHER */}
+          <Route
+            path="/blogs/:categorySlug/:nameBlogSlug"
+            element={<BlogDetailPage />}
+          />
+          <Route path="/blogs/:categorySlug" element={<NewsPage />} />
+          <Route
+            path="/order/offline"
+            element={
+              <AdminGuard>
+                <OfflineOrderPage />
+              </AdminGuard>
+            }
+          />
           <Route path="/shop" element={<ShopPage />} />
-          {/* check out route */}
+          <Route path="/menu/:categorySlug?" element={<MenuPage />} />
           <Route
             path="/checkout"
             element={
-              cart?.length > 0 && user ? <CheckOut /> : <Navigate to="/menu" />
+              cart?.length && user ? <CheckOut /> : <Navigate to="/menu" />
             }
           />
-          {/* reservation route */}
           <Route path="/reservation" element={<ReservationPage />} />
-          {/* payment result route */}
           <Route path="/payment-result" element={<PaymentResult />} />
-          {/* menu route */}
-          <Route path="/menu/:categorySlug?" element={<MenuPage />} />
+          <Route
+            path="/contact"
+            element={
+              user ? <ContactPage /> : <Navigate to="/account/login" replace />
+            }
+          />
+          <Route path="/about-me" element={<AboutMePage />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>
       </LayoutPage>
