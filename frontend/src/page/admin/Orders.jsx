@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { toast } from "react-toastify";
 import orderApi from "../../api/orderApi";
 import { io } from "socket.io-client";
@@ -19,13 +19,13 @@ export default function Orders() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
-  
+
   // Filter states
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [orderTypeFilter, setOrderTypeFilter] = useState("ALL");
   const [paymentFilter, setPaymentFilter] = useState("ALL"); 
   const [sortOrder, setSortOrder] = useState("DESC"); 
-  
+
   const observer = useRef();
 
   const loadOrders = async (pageNum, isInitial = false) => {
@@ -64,7 +64,6 @@ export default function Orders() {
     [loading, hasMore]
   );
 
-  // Load orders khi page thay đổi
   useEffect(() => {
     loadOrders(page, page === 1);
   }, [page]);
@@ -85,7 +84,6 @@ export default function Orders() {
           setNewOrderCount((prev) => prev + 1);
         }
         
-        // Thông báo có đơn mới với thông tin loại đơn
         const orderType = change.data.orderType === "ONLINE" ? "Online" : "Tại quán";
         const statusText = change.data.status === "PROCESSING" ? "Đang xử lý" : 
                           change.data.status === "COMPLETED" ? "Hoàn tất" : "Đã hủy";
@@ -121,7 +119,6 @@ export default function Orders() {
     return () => socket.disconnect();
   }, []);
 
-  // Cập nhật tab title
   useEffect(() => {
     if (newOrderCount > 0) {
       document.title = `(${newOrderCount}) Đơn hàng mới`;
@@ -136,34 +133,28 @@ export default function Orders() {
         setNewOrderCount(0);
       }
     };
-
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () =>
       document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
-  // Filter và sort orders
-  const filteredOrders = orders
-    .filter((order) => {
-      // Filter theo status
-      if (statusFilter !== "ALL" && order.status !== statusFilter) return false;
-      
-      // Filter theo order type
-      if (orderTypeFilter === "ONLINE" && order.orderType !== "ONLINE") return false;
-      if (orderTypeFilter === "OFFLINE" && order.orderType !== "OFFLINE") return false;
-      
-      // Filter theo payment status
-      if (paymentFilter !== "ALL" && order.paymentStatus !== paymentFilter) return false;
-      
-      return true;
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-      return sortOrder === "DESC" ? dateB - dateA : dateA - dateB;
-    });
+  // Filter và sort orders dùng useMemo
+  const filteredOrders = useMemo(() => {
+    return orders
+      .filter((order) => {
+        if (statusFilter !== "ALL" && order.status !== statusFilter) return false;
+        if (orderTypeFilter !== "ALL" && order.orderType !== orderTypeFilter) return false;
+        if (paymentFilter !== "ALL" && order.paymentStatus !== paymentFilter) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+        return sortOrder === "DESC" ? dateB - dateA : dateA - dateB;
+      });
+  }, [orders, statusFilter, orderTypeFilter, paymentFilter, sortOrder]);
 
-  // Đếm số lượng theo trạng thái
+  // Đếm số lượng theo trạng thái giữ nguyên
   const statusCounts = {
     ALL: orders.length,
     PROCESSING: orders.filter(o => o.status === "PROCESSING").length,
@@ -227,7 +218,6 @@ export default function Orders() {
 
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {/* Loại đơn */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Loại đơn
@@ -243,7 +233,6 @@ export default function Orders() {
             </select>
           </div>
 
-          {/* Thanh toán */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Thanh toán
@@ -260,7 +249,6 @@ export default function Orders() {
             </select>
           </div>
 
-          {/* Sắp xếp */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Sắp xếp
@@ -307,7 +295,7 @@ export default function Orders() {
               <tr
                 key={order._id}
                 className="hover:bg-gray-50"
-                ref={index === filteredOrders.length - 1 ? lastOrderRef : null}
+                ref={index === orders.length - 1 ? lastOrderRef : null}
               >
                 <td className="px-6 py-4 text-sm">{index + 1}</td>
                 <td className="px-6 py-4 text-sm font-mono">#{order._id?.slice(-6)}</td>
@@ -409,6 +397,7 @@ export default function Orders() {
           </div>
         )}
       </div>
+
       {isOpenModalDetail && (
         <ModalOrderDetail
           isOpenModal={isOpenModalDetail}

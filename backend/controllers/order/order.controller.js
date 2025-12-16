@@ -139,7 +139,7 @@ export const createOrderOffline = async (req, res) => {
 export const getOrders = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 20; // Load 5 đơn mỗi lần
+    const limit = 20; // Load 20 đơn mỗi lần
     const skip = (page - 1) * limit;
 
     const orders = await Order.find()

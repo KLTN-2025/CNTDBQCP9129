@@ -126,7 +126,7 @@ const ModalOrderDetail = ({
             </div>
             <button
               onClick={() => setIsOpenModal(false)}
-              className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+              className="text-white hover:bg-white/20 rounded-full cursor-pointer p-2 transition-colors"
             >
               <svg
                 className="w-6 h-6"
