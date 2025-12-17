@@ -9,7 +9,6 @@ import { AiOutlineEye } from "react-icons/ai";
 import ModalDetailReceipt from "../../components/modal/importReceipt/ModalDetailReceipt";
 import ModalCreateExportReceipt from "../../components/modal/importReceipt/ModalCreateExportReceipt";
 import { FaMinus } from "react-icons/fa";
-import { FiRefreshCw } from "react-icons/fi";
 
 export default function ImportReceipts() {
   const [receipts, setReceipts] = useState([]);
