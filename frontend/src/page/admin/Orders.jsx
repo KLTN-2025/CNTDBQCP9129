@@ -177,36 +177,29 @@ export default function Orders() {
   };
 
   // Quick date selections
-  const handleQuickDate = (type) => {
-    const today = new Date();
-    const todayStr = getTodayString();
-    
-    switch (type) {
-      case "today":
-        setStartDate(todayStr);
-        setEndDate(todayStr);
-        break;
-      case "yesterday":
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split("T")[0];
-        setStartDate(yesterdayStr);
-        setEndDate(yesterdayStr);
-        break;
-      case "week":
-        const weekAgo = new Date(today);
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        setStartDate(weekAgo.toISOString().split("T")[0]);
-        setEndDate(todayStr);
-        break;
-      case "month":
-        const monthAgo = new Date(today);
-        monthAgo.setMonth(monthAgo.getMonth() - 1);
-        setStartDate(monthAgo.toISOString().split("T")[0]);
-        setEndDate(todayStr);
-        break;
-    }
-  };
+const handleQuickDate = (type) => {
+  const today = new Date();
+  const todayStr = getTodayString();
+  
+  switch (type) {
+    case "today":
+      setStartDate(todayStr);
+      setEndDate(todayStr);
+      break;
+    case "yesterday":
+      setStartDate(new Date(today.setDate(today.getDate() - 1)).toISOString().split("T")[0]);
+      setEndDate(new Date(today).toISOString().split("T")[0]);
+      break;
+    case "week":
+      setStartDate(new Date(today.setDate(today.getDate() - 7)).toISOString().split("T")[0]);
+      setEndDate(todayStr);
+      break;
+    case "month":
+      setStartDate(new Date(today.setMonth(today.getMonth() - 1)).toISOString().split("T")[0]);
+      setEndDate(todayStr);
+      break;
+  }
+};
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
