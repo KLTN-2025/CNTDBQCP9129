@@ -102,7 +102,6 @@ function App() {
     fetchCart();
   }, [user?.id]);
 
-  /* ================= GUARDS ================= */
   const redirectTo =
     new URLSearchParams(location.search).get("redirect") || "/profile";
 

@@ -25,7 +25,7 @@ export const isAdmin = (req, res, next) => {
   }
 };
 export const isAdminOrStaff = (req, res, next) => {
-  if (req.user && ["admin", "staff"].includes(req.user.role)) {
+  if (req.user && ["admin", "manager"].includes(req.user.role)) {
     return next();
   }
   return res

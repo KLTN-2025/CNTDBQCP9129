@@ -6,12 +6,12 @@ import {
   toggleIngredientStatus,
   updateIngredient,
 } from "../controllers/ingredient/ingredient.controller.js";
-
+import { verifyToken, isAdminOrStaff, isAdmin } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
-router.get("/", getAllIngredients);
-router.post("/", createIngredient);
-router.put("/:id", updateIngredient);
-router.delete("/:id", deleteIngredient);
-router.patch("/:id", toggleIngredientStatus);
+router.get("/", verifyToken, isAdminOrStaff, getAllIngredients);
+router.post("/", verifyToken, isAdminOrStaff, createIngredient);
+router.put("/:id", verifyToken, isAdmin, updateIngredient);
+router.delete("/:id", verifyToken, isAdmin, deleteIngredient);
+router.patch("/:id", verifyToken, isAdminOrStaff, toggleIngredientStatus);
 export default router;

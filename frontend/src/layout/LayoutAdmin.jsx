@@ -75,20 +75,21 @@ export default function LayoutAdmin() {
                 <span>Quản lý đơn hàng</span>
               </Link>
             </li>
-
-            <li>
-              <Link
-                to="/admin/product-category"
-                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
-                  activePath.includes("product-category")
-                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                <PenSquare className="w-5 h-5 mr-3 flex-shrink-0" />
-                <span>Quản lý loại sản phẩm</span>
-              </Link>
-            </li>
+            {isAdmin && (
+              <li>
+                <Link
+                  to="/admin/product-category"
+                  className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
+                    activePath.includes("product-category")
+                      ? "bg-green-50 text-green-600 border-l-4 border-green-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <PenSquare className="w-5 h-5 mr-3 flex-shrink-0" />
+                  <span>Quản lý loại sản phẩm</span>
+                </Link>
+              </li>
+            )}
 
             <li>
               <Link
@@ -117,20 +118,21 @@ export default function LayoutAdmin() {
                 <span>Quản lý đặt bàn</span>
               </Link>
             </li>
-
-            <li>
-              <Link
-                to="/admin/vouchers"
-                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
-                  activePath.includes("vouchers")
-                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                <CiGift className="w-5 h-5 mr-3 flex-shrink-0" />
-                <span>Quản lý voucher</span>
-              </Link>
-            </li>
+            {isAdmin && (
+              <li>
+                <Link
+                  to="/admin/vouchers"
+                  className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
+                    activePath.includes("vouchers")
+                      ? "bg-green-50 text-green-600 border-l-4 border-green-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <CiGift className="w-5 h-5 mr-3 flex-shrink-0" />
+                  <span>Quản lý voucher</span>
+                </Link>
+              </li>
+            )}
 
             <li>
               <Link
@@ -175,35 +177,37 @@ export default function LayoutAdmin() {
                 <span>Quản lý phiếu nhập kho</span>
               </Link>
             </li>
+            {isAdmin && (
+              <li>
+                <Link
+                  to="/admin/blog-category"
+                  className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
+                    activePath.includes("blog-category")
+                      ? "bg-green-50 text-green-600 border-l-4 border-green-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <FileCog className="w-5 h-5 mr-3 flex-shrink-0" />
+                  <span>Quản lý loại bài viết</span>
+                </Link>
+              </li>
+            )}
 
-            <li>
-              <Link
-                to="/admin/blog-category"
-                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
-                  activePath.includes("blog-category")
-                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                <FileCog className="w-5 h-5 mr-3 flex-shrink-0" />
-                <span>Quản lý loại bài viết</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                to="/admin/blogs"
-                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
-                  activePath.includes("blogs")
-                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                <PenSquare className="w-5 h-5 mr-3 flex-shrink-0" />
-                <span>Quản lý bài viết</span>
-              </Link>
-            </li>
-
+            {isAdmin && (
+              <li>
+                <Link
+                  to="/admin/blogs"
+                  className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
+                    activePath.includes("blogs")
+                      ? "bg-green-50 text-green-600 border-l-4 border-green-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <PenSquare className="w-5 h-5 mr-3 flex-shrink-0" />
+                  <span>Quản lý bài viết</span>
+                </Link>
+              </li>
+            )}
             {isAdmin && (
               <li>
                 <Link

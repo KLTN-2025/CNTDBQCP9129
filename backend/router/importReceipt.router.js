@@ -6,12 +6,12 @@ import {
   getReceiptsByDateRange,
   createExportReceipt
 } from "../controllers/importReceipt/importReceipt.controller.js";
-
+import { verifyToken, isAdminOrStaff } from "../middleware/auth.middleware.js";
 const router = express.Router();
-router.post("/import", createImportReceipt);
-router.post("/export", createExportReceipt);
-router.get("/", getImportReceipts);
-router.get("/getByDate", getReceiptsByDateRange);
-router.get("/:id", getImportReceiptById);
+router.post("/import", verifyToken, isAdminOrStaff, createImportReceipt);
+router.post("/export", verifyToken, isAdminOrStaff, createExportReceipt);
+router.get("/", verifyToken, isAdminOrStaff, getImportReceipts);
+router.get("/getByDate", verifyToken, isAdminOrStaff, getReceiptsByDateRange);
+router.get("/:id", verifyToken, isAdminOrStaff, getImportReceiptById);
 
 export default router;
