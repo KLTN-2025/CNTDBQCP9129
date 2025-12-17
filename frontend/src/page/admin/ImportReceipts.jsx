@@ -111,10 +111,6 @@ export default function ImportReceipts() {
 
         {/* Date Range Filter */}
         <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <label className="block text-sm font-semibold text-blue-900 mb-3">
-            📅 Lọc theo ngày
-          </label>
-
           {/* Quick buttons */}
           <div className="flex gap-2 mb-3 flex-wrap">
             {[
