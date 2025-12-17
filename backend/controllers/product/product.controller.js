@@ -1,6 +1,8 @@
 import Product from "../../model/product.model.js";
 import ProductCategory from "../../model/productCategory.model.js";
 import Recipe from "../../model/recipe.model.js";
+import Ingredient from "../../model/ingredient.model.js";
+
 //  Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
   try {
@@ -30,7 +32,7 @@ export const createProduct = async (req, res) => {
       description,
       image,
       price,
-      discount: discount || 0, // mặc định 0%
+      discount: discount || 0,
     });
 
     await product.save();
@@ -40,10 +42,14 @@ export const createProduct = async (req, res) => {
     res.status(500).json({ message: "Tạo sản phẩm thất bại" });
   }
 };
+
 // Lấy tối đa 10 sản phẩm mới nhất
 export const getLimitedProducts = async (req, res) => {
   try {
-    let products = await Product.aggregate([{ $sample: { size: 10 } }]);
+    let products = await Product.aggregate([
+      { $sort: { createdAt: -1 } },
+      { $limit: 10 },
+    ]);
 
     products = await Product.populate(products, {
       path: "productCategoryId",
@@ -58,6 +64,7 @@ export const getLimitedProducts = async (req, res) => {
     res.status(500).json({ message: "Lấy sản phẩm giới hạn thất bại" });
   }
 };
+
 // Lấy tất cả sản phẩm
 export const getAllProducts = async (req, res) => {
   try {
@@ -122,7 +129,7 @@ export const updateProduct = async (req, res) => {
 
     const existingProduct = await Product.findOne({
       name: name.trim(),
-      _id: { $ne: req.params.id }, // bỏ qua product hiện tại
+      _id: { $ne: req.params.id },
     });
 
     if (existingProduct) {
@@ -225,7 +232,6 @@ export const updateProductStatus = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    // Kiểm tra xem sản phẩm có đang được dùng trong công thức không
     const isUsed = await Recipe.exists({ productId: id });
     if (isUsed) {
       return res.status(400).json({
@@ -243,18 +249,64 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Xóa sản phẩm thất bại" });
   }
 };
+
+// update tự động
 const autoUpdateProductStatus = async (products) => {
+  // Lọc products đang bật
+  const activeProducts = products.filter(p => p.status);
+  
+  if (activeProducts.length === 0) {
+    return products;
+  }
+
+  const productIds = activeProducts.map(p => p._id);
+
+  // Query ALL recipes của products đang bật 
+  const recipes = await Recipe.find({ 
+    productId: { $in: productIds } 
+  }).lean();
+
+  // Lấy ALL ingredient IDs từ recipes 
+  const ingredientIds = new Set();
+  recipes.forEach(recipe => {
+    recipe.items.forEach(item => {
+      ingredientIds.add(item.ingredientId.toString());
+    });
+  });
+
+  // Query ALL ingredients một lần 
+  const ingredients = await Ingredient.find({
+    _id: { $in: Array.from(ingredientIds) }
+  }).lean();
+
+  // Map ingredients by ID để tra cứu
+  const ingredientMap = new Map();
+  ingredients.forEach(ing => {
+    ingredientMap.set(ing._id.toString(), ing);
+  });
+
+  // Map recipes by productId
+  const recipeMap = new Map();
+  recipes.forEach(recipe => {
+    recipeMap.set(recipe.productId.toString(), recipe);
+  });
+
+  // Check từng product
+  const bulkOps = [];
+  
   for (let product of products) {
-    // Nếu sản phẩm đã false thì bỏ qua
     if (!product.status) continue;
 
-    const recipe = await Recipe.findOne({ productId: product._id }).populate(
-      "items.ingredientId"
-    );
-
-    // Không có công thức -> auto false
+    const recipe = recipeMap.get(product._id.toString());
+    
+    // Không có công thức -> tắt
     if (!recipe) {
-      await Product.findByIdAndUpdate(product._id, { status: false });
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: product._id },
+          update: { status: false }
+        }
+      });
       product.status = false;
       continue;
     }
@@ -262,7 +314,7 @@ const autoUpdateProductStatus = async (products) => {
     let isValid = true;
 
     for (let item of recipe.items) {
-      const ingredient = item.ingredientId;
+      const ingredient = ingredientMap.get(item.ingredientId.toString());
 
       // Nguyên liệu không tồn tại / bị tắt / không đủ số lượng
       if (
@@ -276,9 +328,19 @@ const autoUpdateProductStatus = async (products) => {
     }
 
     if (!isValid) {
-      await Product.findByIdAndUpdate(product._id, { status: false });
+      bulkOps.push({
+        updateOne: {
+          filter: { _id: product._id },
+          update: { status: false }
+        }
+      });
       product.status = false;
     }
+  }
+
+  // Bulk update tất cả products cần tắt 
+  if (bulkOps.length > 0) {
+    await Product.bulkWrite(bulkOps);
   }
 
   return products;
