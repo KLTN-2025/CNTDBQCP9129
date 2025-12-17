@@ -1,7 +1,6 @@
 import axiosClient from "./axiosClient";
 
 const importReceiptApi = {
-  // ✅ SỬA LẠI HÀM NÀY
   getAll: async ({ startDate, endDate } = {}) => {
     const params = new URLSearchParams();
     if (startDate) params.append('startDate', startDate);

@@ -102,7 +102,7 @@ export const createReservation = async (req, res) => {
   }
 };
 
-// XÁC NHẬN (PENDING → COMPLETED)
+// XÁC NHẬN (PENDING -> COMPLETED)
 export const confirmReservation = async (req, res) => {
   try {
     const { id } = req.params;

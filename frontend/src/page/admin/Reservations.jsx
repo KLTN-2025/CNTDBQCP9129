@@ -17,12 +17,10 @@ export default function Reservations() {
   const [newReservationCount, setNewReservationCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // Date filter states
   const getTodayString = () => new Date().toISOString().split("T")[0];
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());
 
-  // Format date helper
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -33,7 +31,6 @@ export default function Reservations() {
     });
   };
 
-  // Load reservations theo date range
   const loadReservations = async () => {
     if (loading) return;
     try {
@@ -49,12 +46,10 @@ export default function Reservations() {
     }
   };
 
-  // Load lần đầu và khi thay đổi date
   useEffect(() => {
     loadReservations();
   }, [startDate, endDate]);
 
-  // Update document title when new reservations arrive
   useEffect(() => {
     if (newReservationCount > 0) {
       document.title = `(${newReservationCount}) Lịch hẹn mới`;

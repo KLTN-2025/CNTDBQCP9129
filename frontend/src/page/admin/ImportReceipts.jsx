@@ -19,12 +19,10 @@ export default function ImportReceipts() {
   const [isOpenModalDetailReceipt, setIsOpenModalDetailReceipt] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Date filter states
   const getTodayString = () => new Date().toISOString().split('T')[0];
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());
 
-  // Load receipts theo date range
   const loadReceipts = async () => {
     if (loading) return;
     try {
@@ -38,7 +36,6 @@ export default function ImportReceipts() {
     }
   };
 
-  // Load lần đầu và khi thay đổi date
   useEffect(() => {
     loadReceipts();
   }, [startDate, endDate]);
@@ -47,7 +44,6 @@ export default function ImportReceipts() {
     document.title = "Quản lý phiếu nhập/xuất";
   }, []);
 
-  // Quick date selections
   const handleQuickDate = (type) => {
     const todayStr = getTodayString();
 

@@ -19,18 +19,15 @@ export default function Orders() {
   const [isOpenConfirmComplete, setIsOpenConfirmComplete] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Filter states
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [orderTypeFilter, setOrderTypeFilter] = useState("ALL");
   const [paymentFilter, setPaymentFilter] = useState("ALL");
   const [sortOrder, setSortOrder] = useState("DESC");
 
-  // Date filter states
   const getTodayString = () => new Date().toISOString().split('T')[0];
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());
 
-  // Load orders theo date range
   const loadOrders = async () => {
     if (loading) return;
     try {
@@ -47,7 +44,6 @@ export default function Orders() {
     }
   };
 
-  // Load lần đầu và khi thay đổi date
   useEffect(() => {
     loadOrders();
   }, [startDate, endDate]);
