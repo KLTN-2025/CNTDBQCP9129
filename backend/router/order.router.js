@@ -4,7 +4,7 @@ import { verifyToken, isAdminOrStaff } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 router.get('/', verifyToken, isAdminOrStaff, getOrders);
-router.get('/:orderId', verifyToken, isAdminOrStaff, getOrderById);
+router.get('/:orderId', verifyToken, getOrderById);
 router.get('/user/:userId', verifyToken, getAllOrdersByUserId);
 router.post('/', verifyToken, isAdminOrStaff, createOrderOffline); 
 router.patch("/:id/complete", verifyToken, isAdminOrStaff, completeOrder);

@@ -8,7 +8,7 @@ import { CiGift } from "react-icons/ci";
 import { MdOutlineMessage } from "react-icons/md";
 import { TbReceipt } from "react-icons/tb";
 import { FaTable } from "react-icons/fa";
-
+import Dashboard from "../page/admin/Dashboard";
 import useAuthStore from "../store/authStore";
 
 export default function LayoutAdmin() {
@@ -241,14 +241,7 @@ export default function LayoutAdmin() {
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6">
           {isRootAdmin ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <h2 className="text-2xl font-semibold mb-2">
-                Chào mừng đến trang quản trị
-              </h2>
-              <p className="text-gray-500">
-                Hãy chọn một mục trong menu để bắt đầu quản lý.
-              </p>
-            </div>
+            <Dashboard/>
           ) : (
             <Outlet />
           )}

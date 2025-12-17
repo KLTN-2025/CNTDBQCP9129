@@ -53,7 +53,7 @@ import Vouchers from "./page/admin/Vouchers";
 import Contacts from "./page/admin/Contacts";
 import ImportReceipts from "./page/admin/importReceipts";
 import Reservations from "./page/admin/Reservations";
-
+import Dashboard from "./page/admin/Dashboard";
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,7 +62,7 @@ function App() {
   const { user, logout } = useAuthStore();
   const { cart, setCart } = useCartStore();
 
-  /* ================= TOKEN CHECK ================= */
+  /*TOKEN CHECK */
   useEffect(() => {
     if (!token) return;
 
@@ -82,7 +82,7 @@ function App() {
     }
   }, [token]);
 
-  /* ================= CART ================= */
+  /* CART */
   useEffect(() => {
     if (!user?.id) return;
 
@@ -125,7 +125,7 @@ function App() {
     return children;
   };
 
-  /* ================= RENDER ================= */
+  /* RENDER */
   return (
     <ParallaxProvider>
       <LayoutPage>

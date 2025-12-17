@@ -21,6 +21,7 @@ import contactRouter from './router/contact.router.js';
 import paymentRouter from './router/payment.router.js';
 import importReceiptRouter from './router/importReceipt.router.js';
 import reserVationRouter from './router/reservation.router.js';
+import dashboardRouter from './router/dashboard.router.js';
 dotenv.config();
 
 const app = express();
@@ -57,6 +58,7 @@ app.use("/api/contacts", contactRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/import-receipts", importReceiptRouter);
 app.use("/api/reservations", reserVationRouter);
+app.use("/api/dashboard", dashboardRouter)
 
 // ---- Socket.IO logic ----
 io.on("connection", (socket) => {
