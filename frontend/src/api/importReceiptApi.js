@@ -1,8 +1,13 @@
 import axiosClient from "./axiosClient";
 
 const importReceiptApi = {
-  getAll: async () => {
-    const res = await axiosClient.get('/import-receipts');
+  // ✅ SỬA LẠI HÀM NÀY
+  getAll: async ({ startDate, endDate } = {}) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    
+    const res = await axiosClient.get(`/import-receipts?${params.toString()}`);
     return res.data;
   },
 
@@ -15,15 +20,10 @@ const importReceiptApi = {
     const res = await axiosClient.post('/import-receipts/import', data);
     return res.data;
   },
+  
   createExport: async (data) => {
     const res = await axiosClient.post('/import-receipts/export', data);
     return res.data;
-  },
-  getByDateRange: async (startDate, endDate) => {
-    const response = await axiosClient.get('/import-receipts/getByDate', {
-      params: { startDate, endDate }
-    });
-    return response.data;
   },
 }
 
