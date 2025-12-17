@@ -13,17 +13,14 @@ import { FiRefreshCw } from "react-icons/fi";
 
 export default function ImportReceipts() {
   const [receipts, setReceipts] = useState([]);
-  const [isOpenModalCreateImportReceipt, setIsOpenModalCreateImportReceipt] =
-    useState(false);
-  const [isOpenModalCreateExportReceipt, setIsOpenModalCreateExportReceipt] =
-    useState(false);
+  const [isOpenModalCreateImportReceipt, setIsOpenModalCreateImportReceipt] = useState(false);
+  const [isOpenModalCreateExportReceipt, setIsOpenModalCreateExportReceipt] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
-  const [isOpenModalDetailReceipt, setIsOpenModalDetailReceipt] =
-    useState(false);
+  const [isOpenModalDetailReceipt, setIsOpenModalDetailReceipt] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Date filter states
-  const getTodayString = () => new Date().toISOString().split("T")[0];
+  const getTodayString = () => new Date().toISOString().split('T')[0];
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());
 
@@ -35,9 +32,7 @@ export default function ImportReceipts() {
       const res = await importReceiptApi.getAll({ startDate, endDate });
       setReceipts(res.receipts || []);
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Lỗi khi tải phiếu nhập kho"
-      );
+      toast.error(error.response?.data?.message || "Lỗi khi tải phiếu nhập kho");
     } finally {
       setLoading(false);
     }
@@ -101,6 +96,14 @@ export default function ImportReceipts() {
           </div>
           <div className="flex gap-x-3">
             <button
+              onClick={loadReceipts}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              <FiRefreshCw className={loading ? "animate-spin" : ""} />
+              Làm mới
+            </button>
+            <button
               onClick={() => setIsOpenModalCreateExportReceipt(true)}
               className="flex items-center cursor-pointer space-x-2 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
             >
@@ -119,6 +122,7 @@ export default function ImportReceipts() {
 
         {/* Date Range Filter */}
         <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+
           {/* Quick buttons */}
           <div className="flex gap-2 mb-3 flex-wrap">
             {[
@@ -219,7 +223,7 @@ export default function ImportReceipts() {
                 </td>
                 <td className="px-6 py-4 text-sm text-center">
                   <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded font-medium">
-                    {receipt.items.length} 
+                    {receipt.items.length} NVL
                   </span>
                 </td>
                 <td

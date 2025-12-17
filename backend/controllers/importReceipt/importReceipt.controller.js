@@ -138,7 +138,6 @@ export const createExportReceipt = async (req, res) => {
   }
 };
 
-// ✅ HÀM MỚI - Lấy phiếu theo ngày (MẶC ĐỊNH HÔM NAY)
 export const getImportReceipts = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;

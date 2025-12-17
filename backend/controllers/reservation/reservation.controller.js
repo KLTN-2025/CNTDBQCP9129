@@ -1,12 +1,56 @@
 import Reservation from "../../model/reservation.model.js";
+
+// GET ALL với date filter (mặc định hôm nay)
 export const getAllReservations = async (req, res) => {
   try {
-    const reservations = await Reservation.find().sort({ createdAt: -1 });
-    res.json(reservations);
+    const { startDate, endDate } = req.query;
+
+    const dateFilter = {};
+    
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      
+      dateFilter.createdAt = {
+        $gte: start,
+        $lte: end
+      };
+    } else {
+      // MẶC ĐỊNH: Chỉ lấy lịch hẹn HÔM NAY
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      dateFilter.createdAt = {
+        $gte: today,
+        $lt: tomorrow
+      };
+    }
+
+    const reservations = await Reservation.find(dateFilter)
+      .sort({ createdAt: -1 });
+
+    const total = reservations.length;
+
+    res.json({
+      reservations,
+      total,
+      dateRange: {
+        start: startDate || new Date().toISOString().split('T')[0],
+        end: endDate || new Date().toISOString().split('T')[0]
+      }
+    });
   } catch (err) {
+    console.error("GET RESERVATIONS ERROR:", err);
     res.status(500).json({ message: "Không lấy được danh sách reservation" });
   }
 };
+
 export const createReservation = async (req, res) => {
   try {
     const { name, phone, email, date, time, people, note } = req.body;
@@ -57,7 +101,6 @@ export const createReservation = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // XÁC NHẬN (PENDING → COMPLETED)
 export const confirmReservation = async (req, res) => {

@@ -1,8 +1,12 @@
 import axiosClient from "./axiosClient";
 
 const reservationApi = {
-  getAll: async () => {
-    const res = await axiosClient.get("/reservations");
+  getAll: async ({ startDate, endDate } = {}) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    
+    const res = await axiosClient.get(`/reservations?${params.toString()}`);
     return res.data;
   },
 
@@ -13,12 +17,12 @@ const reservationApi = {
 
   confirm: async (id) => {
     const res = await axiosClient.patch(`/reservations/${id}/confirm`);
-    return res.data;
+    return res.data.reservation; 
   },
 
   cancel: async (id) => {
     const res = await axiosClient.patch(`/reservations/${id}/cancel`);
-    return res.data;
+    return res.data.reservation; 
   },
 
   delete: async (id) => {

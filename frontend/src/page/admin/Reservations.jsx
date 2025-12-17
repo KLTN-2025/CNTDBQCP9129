@@ -15,6 +15,12 @@ export default function Reservations() {
   const [isOpenCancel, setIsOpenCancel] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [newReservationCount, setNewReservationCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  // Date filter states
+  const getTodayString = () => new Date().toISOString().split("T")[0];
+  const [startDate, setStartDate] = useState(getTodayString());
+  const [endDate, setEndDate] = useState(getTodayString());
 
   // Format date helper
   const formatDate = (dateString) => {
@@ -27,18 +33,26 @@ export default function Reservations() {
     });
   };
 
-  // Fetch reservations
+  // Load reservations theo date range
+  const loadReservations = async () => {
+    if (loading) return;
+    try {
+      setLoading(true);
+      const res = await reservationApi.getAll({ startDate, endDate });
+      setReservations(res.reservations || []);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Lỗi khi tải lịch hẹn"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load lần đầu và khi thay đổi date
   useEffect(() => {
-    const fetchReservations = async () => {
-      try {
-        const res = await reservationApi.getAll();
-        setReservations(res);
-      } catch (error) {
-        toast.error("Lỗi khi tải lịch hẹn");
-      }
-    };
-    fetchReservations();
-  }, []);
+    loadReservations();
+  }, [startDate, endDate]);
 
   // Update document title when new reservations arrive
   useEffect(() => {
@@ -61,6 +75,7 @@ export default function Reservations() {
       document.title = "Quản lý lịch hẹn - Admin";
     };
   }, [newReservationCount]);
+
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
@@ -93,6 +108,40 @@ export default function Reservations() {
 
     return () => socket.disconnect();
   }, []);
+
+  // Quick date selections
+  const handleQuickDate = (type) => {
+    const todayStr = getTodayString();
+
+    switch (type) {
+      case "today":
+        setStartDate(todayStr);
+        setEndDate(todayStr);
+        break;
+      case "yesterday": {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split("T")[0];
+        setStartDate(yesterdayStr);
+        setEndDate(yesterdayStr);
+        break;
+      }
+      case "week": {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        setStartDate(weekAgo.toISOString().split("T")[0]);
+        setEndDate(todayStr);
+        break;
+      }
+      case "month": {
+        const monthAgo = new Date();
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        setStartDate(monthAgo.toISOString().split("T")[0]);
+        setEndDate(todayStr);
+        break;
+      }
+    }
+  };
 
   // Confirm reservation
   const handleConfirm = async () => {
@@ -142,11 +191,67 @@ export default function Reservations() {
     <div className="w-full bg-white rounded-lg shadow-sm">
       {/* Header */}
       <div className="p-6 border-b">
-        <h2 className="text-2xl font-bold">Quản lý lịch hẹn</h2>
-        <p className="text-gray-600 mt-1">Danh sách đặt lịch</p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Quản lý lịch hẹn</h2>
+            <p className="text-gray-600 mt-1">
+              Danh sách đặt lịch ({reservations.length} lịch hẹn)
+            </p>
+          </div>
+        </div>
+
+        {/* Date Range Filter */}
+        <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          {/* Quick buttons */}
+          <div className="flex gap-2 mb-3 flex-wrap">
+            {[
+              { key: "today", label: "Hôm nay" },
+              { key: "yesterday", label: "Hôm qua" },
+              { key: "week", label: "7 ngày" },
+              { key: "month", label: "30 ngày" },
+            ].map((btn) => (
+              <button
+                key={btn.key}
+                onClick={() => handleQuickDate(btn.key)}
+                className="px-3 py-1.5 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Date inputs */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Từ ngày
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                max={endDate}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Đến ngày
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                min={startDate}
+                max={getTodayString()}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+              />
+            </div>
+          </div>
+        </div>
 
         {/* Search */}
-        <div className="relative mt-4">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
             type="text"
@@ -200,14 +305,13 @@ export default function Reservations() {
                   <td className="px-6 py-4">{r.people}</td>
                   <td className="px-6 py-4">
                     <span
-                      className={`px-2 py-1 rounded text-xs font-semibold
-    ${
-      r.status === "PENDING"
-        ? "bg-yellow-100 text-yellow-700"
-        : r.status === "COMPLETED"
-        ? "bg-green-100 text-green-700"
-        : "bg-red-100 text-red-700"
-    }`}
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                        r.status === "PENDING"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : r.status === "COMPLETED"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
                     >
                       {r.status === "PENDING"
                         ? "Đang chờ khách"
@@ -265,6 +369,19 @@ export default function Reservations() {
               ))}
           </tbody>
         </table>
+
+        {loading && (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+            <p className="text-gray-500 mt-2">Đang tải lịch hẹn...</p>
+          </div>
+        )}
+
+        {reservations.length === 0 && !loading && (
+          <div className="text-center py-12 text-gray-500">
+            Không có lịch hẹn nào trong khoảng thời gian này
+          </div>
+        )}
       </div>
 
       {/* Modal Xác nhận lịch hẹn */}

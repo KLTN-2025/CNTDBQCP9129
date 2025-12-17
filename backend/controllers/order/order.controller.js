@@ -140,7 +140,7 @@ export const createOrderOffline = async (req, res) => {
   }
 };
 
-// Lấy danh sách tất cả order (cho admin) - ĐÃ CẢI TIẾN
+// Lấy danh sách tất cả order (cho admin) 
 export const getOrders = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
