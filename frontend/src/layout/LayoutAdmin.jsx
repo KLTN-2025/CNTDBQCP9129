@@ -25,14 +25,14 @@ export default function LayoutAdmin() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       <aside
-        className={`bg-white border-r border-gray-200 h-screen transition-all duration-300 ${
+        className={`bg-white border-r border-gray-200 h-screen transition-all duration-300 flex flex-col ${
           isSidebarOpen ? "w-64" : "w-0"
         } overflow-hidden`}
       >
-        {/* Logo */}
-        <div className="flex items-center px-6 h-16 border-b border-gray-200 shrink-0">
+        {/* Logo - Fixed */}
+        <div className="flex items-center px-6 h-16 border-b border-gray-200 flex-shrink-0">
           <Link to="/" className="flex items-center space-x-3">
             <img
               src="/logo-coffee.png"
@@ -43,19 +43,20 @@ export default function LayoutAdmin() {
           </Link>
         </div>
 
+        {/* Menu - Scrollable */}
         <div className="flex-1 overflow-y-auto">
-          <ul className="space-y-3 mt-6 pb-40">
+          <ul className="space-y-3 mt-6 pb-6 px-3">
             {isAdmin && (
               <li>
                 <Link
                   to="/admin/users"
-                  className={`flex items-center px-6 py-3 transition-colors ${
+                  className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                     activePath.includes("users")
-                      ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                      ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
-                  <Users className="w-5 h-5 mr-3" />
+                  <Users className="w-5 h-5 mr-3 flex-shrink-0" />
                   <span>Quản lý người dùng</span>
                 </Link>
               </li>
@@ -64,13 +65,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/orders"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("orders")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <PiNotepadBold className="w-5 h-5 mr-3" />
+                <PiNotepadBold className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý đơn hàng</span>
               </Link>
             </li>
@@ -78,13 +79,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/product-category"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("product-category")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <PenSquare className="w-5 h-5 mr-3" />
+                <PenSquare className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý loại sản phẩm</span>
               </Link>
             </li>
@@ -92,13 +93,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/products"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("products")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <PenSquare className="w-5 h-5 mr-3" />
+                <PenSquare className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý sản phẩm</span>
               </Link>
             </li>
@@ -106,13 +107,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/reservations"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("reservations")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <FaTable className="w-5 h-5 mr-3" />
+                <FaTable className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý đặt bàn</span>
               </Link>
             </li>
@@ -120,13 +121,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/vouchers"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("vouchers")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <CiGift className="w-5 h-5 mr-3" />
+                <CiGift className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý voucher</span>
               </Link>
             </li>
@@ -134,13 +135,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/ingredients"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("ingredients")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <MdWarehouse className="w-5 h-5 mr-3" />
+                <MdWarehouse className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý kho</span>
               </Link>
             </li>
@@ -149,13 +150,13 @@ export default function LayoutAdmin() {
               <li>
                 <Link
                   to="/admin/recipes"
-                  className={`flex items-center px-6 py-3 transition-colors ${
+                  className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                     activePath.includes("recipes")
-                      ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                      ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
-                  <MdOutlineAppRegistration className="w-5 h-5 mr-3" />
+                  <MdOutlineAppRegistration className="w-5 h-5 mr-3 flex-shrink-0" />
                   <span>Quản lý công thức</span>
                 </Link>
               </li>
@@ -164,13 +165,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/import-receipts"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("import-receipts")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <TbReceipt className="w-5 h-5 mr-3" />
+                <TbReceipt className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý phiếu nhập kho</span>
               </Link>
             </li>
@@ -178,13 +179,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/blog-category"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("blog-category")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <FileCog className="w-5 h-5 mr-3" />
+                <FileCog className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý loại bài viết</span>
               </Link>
             </li>
@@ -192,13 +193,13 @@ export default function LayoutAdmin() {
             <li>
               <Link
                 to="/admin/blogs"
-                className={`flex items-center px-6 py-3 transition-colors ${
+                className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                   activePath.includes("blogs")
-                    ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                    ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                     : "text-gray-700 hover:bg-gray-50"
                 }`}
               >
-                <PenSquare className="w-5 h-5 mr-3" />
+                <PenSquare className="w-5 h-5 mr-3 flex-shrink-0" />
                 <span>Quản lý bài viết</span>
               </Link>
             </li>
@@ -207,13 +208,13 @@ export default function LayoutAdmin() {
               <li>
                 <Link
                   to="/admin/contacts"
-                  className={`flex items-center px-6 py-3 transition-colors ${
+                  className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
                     activePath.includes("contacts")
-                      ? "bg-green-50 text-green-600 border-r-4 border-green-600"
+                      ? "bg-green-50 text-green-600 border-l-4 border-green-600"
                       : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
-                  <MdOutlineMessage className="w-5 h-5 mr-3" />
+                  <MdOutlineMessage className="w-5 h-5 mr-3 flex-shrink-0" />
                   <span>Quản lý lời nhắn</span>
                 </Link>
               </li>
@@ -222,9 +223,9 @@ export default function LayoutAdmin() {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col w-full">
+      <div className="flex-1 flex flex-col w-full overflow-hidden">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center px-6 shrink-0">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center px-6 flex-shrink-0">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 hover:bg-gray-100 rounded-lg"

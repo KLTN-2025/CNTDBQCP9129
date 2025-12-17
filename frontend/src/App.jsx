@@ -257,12 +257,7 @@ function App() {
           />
           <Route path="/reservation" element={<ReservationPage />} />
           <Route path="/payment-result" element={<PaymentResult />} />
-          <Route
-            path="/contact"
-            element={
-              user ? <ContactPage /> : <Navigate to="/account/login" replace />
-            }
-          />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/about-me" element={<AboutMePage />} />
           <Route path="*" element={<ErrorPage />} />
         </Routes>

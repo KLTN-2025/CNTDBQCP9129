@@ -1,6 +1,6 @@
 import express from 'express'
 import { createContact, deleteContact, getAllContacts, getReadContacts, getUnreadContacts, markAsRead } from '../controllers/contact/contact.controller.js';
-
+import { verifyToken, isAdminOrStaff } from '../middleware/auth.middleware.js';
 const router = express.Router();
 router.get('/', getAllContacts);
 router.post('/', createContact);
