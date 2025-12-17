@@ -68,7 +68,7 @@ export const createImportReceipt = async (req, res) => {
       ing.quantity += Number(it.quantity);
       ing.totalCost += Number(it.totalCost);
       ing.lastPrice = Number(it.pricePerUnit);
-
+      ing.status = true;
       await ing.save();
     }
     receipt = await receipt.populate("createdBy", "name email");

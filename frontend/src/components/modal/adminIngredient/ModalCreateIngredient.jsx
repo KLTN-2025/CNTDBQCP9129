@@ -44,7 +44,7 @@ const ModalCreateIngredient = ({
 
       if (!response.message) {
         toast.success("Thêm nguyên liệu thành công!");
-        setIngredients((prev) => [...prev, response]);
+        setIngredients((prev) => [response, ...prev]);
         setIsOpenModalCreateIngredient(false);
       } else {
         toast.error(response.message);
