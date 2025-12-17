@@ -44,6 +44,7 @@ export default function ImportReceipts() {
     document.title = "Quản lý phiếu nhập/xuất";
   }, []);
 
+  // Quick date selections
   const handleQuickDate = (type) => {
     const todayStr = getTodayString();
 
@@ -92,14 +93,6 @@ export default function ImportReceipts() {
           </div>
           <div className="flex gap-x-3">
             <button
-              onClick={loadReceipts}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 cursor-pointer"
-            >
-              <FiRefreshCw className={loading ? "animate-spin" : ""} />
-              Làm mới
-            </button>
-            <button
               onClick={() => setIsOpenModalCreateExportReceipt(true)}
               className="flex items-center cursor-pointer space-x-2 bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
             >
@@ -118,6 +111,9 @@ export default function ImportReceipts() {
 
         {/* Date Range Filter */}
         <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <label className="block text-sm font-semibold text-blue-900 mb-3">
+            📅 Lọc theo ngày
+          </label>
 
           {/* Quick buttons */}
           <div className="flex gap-2 mb-3 flex-wrap">
@@ -219,7 +215,7 @@ export default function ImportReceipts() {
                 </td>
                 <td className="px-6 py-4 text-sm text-center">
                   <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded font-medium">
-                    {receipt.items.length} NVL
+                    {receipt.items.length} 
                   </span>
                 </td>
                 <td
