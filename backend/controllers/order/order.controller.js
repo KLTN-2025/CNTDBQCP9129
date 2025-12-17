@@ -3,6 +3,7 @@ import Order from "../../model/order.model.js";
 import Product from "../../model/product.model.js";
 import Recipe from "../../model/recipe.model.js";
 import Ingredient from "../../model/ingredient.model.js";
+
 // Tạo orderOffline 
 export const createOrderOffline = async (req, res) => {
   const session = await mongoose.startSession();
@@ -138,29 +139,59 @@ export const createOrderOffline = async (req, res) => {
     session.endSession();
   }
 };
-// Lấy danh sách tất cả order (cho admin)
+
+// Lấy danh sách tất cả order (cho admin) - ĐÃ CẢI TIẾN
 export const getOrders = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 20; // Load 20 đơn mỗi lần
-    const skip = (page - 1) * limit;
+    const { startDate, endDate } = req.query;
 
-    const orders = await Order.find()
+    // Tạo query filter theo ngày
+    const dateFilter = {};
+    
+    if (startDate && endDate) {
+      // Nếu có cả startDate và endDate
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999);
+      
+      dateFilter.createdAt = {
+        $gte: start,
+        $lte: end
+      };
+    } else {
+      // MẶC ĐỊNH: Chỉ lấy đơn hàng HÔM NAY
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      dateFilter.createdAt = {
+        $gte: today,
+        $lt: tomorrow
+      };
+    }
+
+    // Query orders với date filter
+    const orders = await Order.find(dateFilter)
       .populate("userId", "name email role")
       .populate("voucherId", "code")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .sort({ createdAt: -1 });
 
-    const total = await Order.countDocuments();
+    const total = orders.length;
 
     res.json({
       orders,
-      hasMore: skip + orders.length < total,
-      currentPage: page,
-      totalOrders: total
+      total,
+      dateRange: {
+        start: startDate || new Date().toISOString().split('T')[0],
+        end: endDate || new Date().toISOString().split('T')[0]
+      }
     });
   } catch (err) {
+    console.error("GET ORDERS ERROR:", err);
     res.status(500).json({ message: "Lấy danh sách đơn hàng thất bại" });
   }
 };

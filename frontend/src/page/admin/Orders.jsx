@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import orderApi from "../../api/orderApi";
 import { io } from "socket.io-client";
@@ -7,6 +7,7 @@ import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import playTingSound from "../../utils/playTingSound";
 import { AiOutlineEye } from "react-icons/ai";
 import { BsClipboardCheckFill } from "react-icons/bs";
+import { FiRefreshCw } from "react-icons/fi";
 import ModalOrderDetail from "../../components/modal/adminOrders/ModalDetailOrder";
 import ModalConfirmCompleteOrder from "../../components/modal/adminOrders/ModalConfirmCompleteOrder";
 
@@ -16,31 +17,29 @@ export default function Orders() {
   const [isOpenModalDetail, setIsOpenModalDetail] = useState(false);
   const [orderData, setOrderData] = useState(null);
   const [isOpenConfirmComplete, setIsOpenConfirmComplete] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
   // Filter states
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [orderTypeFilter, setOrderTypeFilter] = useState("ALL");
-  const [paymentFilter, setPaymentFilter] = useState("ALL"); 
-  const [sortOrder, setSortOrder] = useState("DESC"); 
+  const [paymentFilter, setPaymentFilter] = useState("ALL");
+  const [sortOrder, setSortOrder] = useState("DESC");
 
-  const observer = useRef();
+  // Date filter states
+  const getTodayString = () => new Date().toISOString().split('T')[0];
+  const [startDate, setStartDate] = useState(getTodayString());
+  const [endDate, setEndDate] = useState(getTodayString());
 
-  const loadOrders = async (pageNum, isInitial = false) => {
+  // Load orders theo date range
+  const loadOrders = async () => {
     if (loading) return;
     try {
       setLoading(true);
-      const res = await orderApi.getAllOrders({ page: pageNum, limit: 20 });
-
-      if (isInitial) {
-        setOrders(res.orders);
-      } else {
-        setOrders((prev) => [...prev, ...res.orders]);
-      }
-
-      setHasMore(res.hasMore);
+      const res = await orderApi.getAllOrders({ 
+        startDate, 
+        endDate 
+      });
+      setOrders(res.orders || []);
     } catch (error) {
       toast.error(error.response?.data?.message || "Lỗi khi tải đơn hàng");
     } finally {
@@ -48,25 +47,10 @@ export default function Orders() {
     }
   };
 
-  const lastOrderRef = useCallback(
-    (node) => {
-      if (loading) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore) {
-          setPage((prev) => prev + 1);
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore]
-  );
-
+  // Load lần đầu và khi thay đổi date
   useEffect(() => {
-    loadOrders(page, page === 1);
-  }, [page]);
+    loadOrders();
+  }, [startDate, endDate]);
 
   // Socket setup
   useEffect(() => {
@@ -78,15 +62,26 @@ export default function Orders() {
 
     socket.on("order_changed", (change) => {
       if (change.type === "insert") {
-        setOrders((prev) => [change.data, ...prev]);
+        // Kiểm tra nếu order mới nằm trong khoảng date đang filter
+        const orderDate = new Date(change.data.createdAt).toISOString().split('T')[0];
+        const isInDateRange = orderDate >= startDate && orderDate <= endDate;
+        
+        if (isInDateRange) {
+          setOrders((prev) => [change.data, ...prev]);
+        }
+        
         playTingSound();
         if (document.hidden) {
           setNewOrderCount((prev) => prev + 1);
         }
-        
+
         const orderType = change.data.orderType === "ONLINE" ? "Online" : "Tại quán";
-        const statusText = change.data.status === "PROCESSING" ? "Đang xử lý" : 
-                          change.data.status === "COMPLETED" ? "Hoàn tất" : "Đã hủy";
+        const statusText =
+          change.data.status === "PROCESSING"
+            ? "Đang xử lý"
+            : change.data.status === "COMPLETED"
+            ? "Hoàn tất"
+            : "Đã hủy";
         toast.success(`Đơn ${orderType} mới - ${statusText}!`);
       } else if (change.type === "update") {
         setOrders((prev) =>
@@ -117,7 +112,7 @@ export default function Orders() {
     });
 
     return () => socket.disconnect();
-  }, []);
+  }, [startDate, endDate]);
 
   useEffect(() => {
     if (newOrderCount > 0) {
@@ -142,9 +137,12 @@ export default function Orders() {
   const filteredOrders = useMemo(() => {
     return orders
       .filter((order) => {
-        if (statusFilter !== "ALL" && order.status !== statusFilter) return false;
-        if (orderTypeFilter !== "ALL" && order.orderType !== orderTypeFilter) return false;
-        if (paymentFilter !== "ALL" && order.paymentStatus !== paymentFilter) return false;
+        if (statusFilter !== "ALL" && order.status !== statusFilter)
+          return false;
+        if (orderTypeFilter !== "ALL" && order.orderType !== orderTypeFilter)
+          return false;
+        if (paymentFilter !== "ALL" && order.paymentStatus !== paymentFilter)
+          return false;
         return true;
       })
       .sort((a, b) => {
@@ -154,12 +152,12 @@ export default function Orders() {
       });
   }, [orders, statusFilter, orderTypeFilter, paymentFilter, sortOrder]);
 
-  // Đếm số lượng theo trạng thái giữ nguyên
+  // Đếm số lượng theo trạng thái
   const statusCounts = {
     ALL: orders.length,
-    PROCESSING: orders.filter(o => o.status === "PROCESSING").length,
-    COMPLETED: orders.filter(o => o.status === "COMPLETED").length,
-    CANCELLED: orders.filter(o => o.status === "CANCELLED").length,
+    PROCESSING: orders.filter((o) => o.status === "PROCESSING").length,
+    COMPLETED: orders.filter((o) => o.status === "COMPLETED").length,
+    CANCELLED: orders.filter((o) => o.status === "CANCELLED").length,
   };
 
   const handleCompleteOrder = async (orderId) => {
@@ -170,9 +168,43 @@ export default function Orders() {
       );
       toast.success("Đơn hàng đã hoàn thành");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
+      toast.error(
+        err.response?.data?.message || "Lỗi khi cập nhật trạng thái"
+      );
     } finally {
       setIsOpenConfirmComplete(false);
+    }
+  };
+
+  // Quick date selections
+  const handleQuickDate = (type) => {
+    const today = new Date();
+    const todayStr = getTodayString();
+    
+    switch (type) {
+      case "today":
+        setStartDate(todayStr);
+        setEndDate(todayStr);
+        break;
+      case "yesterday":
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split("T")[0];
+        setStartDate(yesterdayStr);
+        setEndDate(yesterdayStr);
+        break;
+      case "week":
+        const weekAgo = new Date(today);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        setStartDate(weekAgo.toISOString().split("T")[0]);
+        setEndDate(todayStr);
+        break;
+      case "month":
+        const monthAgo = new Date(today);
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        setStartDate(monthAgo.toISOString().split("T")[0]);
+        setEndDate(todayStr);
+        break;
     }
   };
 
@@ -190,7 +222,59 @@ export default function Orders() {
                 </span>
               )}
             </h2>
-            <p className="text-gray-600 mt-1">Danh sách đơn hàng</p>
+            <p className="text-gray-600 mt-1">
+              Danh sách đơn hàng ({filteredOrders.length} đơn)
+            </p>
+          </div>
+        </div>
+
+        {/* Date Range Filter */}
+        <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          {/* Quick buttons */}
+          <div className="flex gap-2 mb-3 flex-wrap">
+            {[
+              { key: "today", label: "Hôm nay" },
+              { key: "yesterday", label: "Hôm qua" },
+              { key: "week", label: "7 ngày" },
+              { key: "month", label: "30 ngày" },
+            ].map((btn) => (
+              <button
+                key={btn.key}
+                onClick={() => handleQuickDate(btn.key)}
+                className="px-3 py-1.5 bg-white border border-blue-300 rounded-lg text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Date inputs */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Từ ngày
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                max={endDate}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Đến ngày
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                min={startDate}
+                max={getTodayString()}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+              />
+            </div>
           </div>
         </div>
 
@@ -198,9 +282,21 @@ export default function Orders() {
         <div className="flex gap-2 mb-4 flex-wrap">
           {[
             { key: "ALL", label: "Tất cả", color: "bg-gray-100 text-gray-800" },
-            { key: "PROCESSING", label: "Đang xử lý", color: "bg-yellow-100 text-yellow-800" },
-            { key: "COMPLETED", label: "Hoàn tất", color: "bg-green-100 text-green-800" },
-            { key: "CANCELLED", label: "Đã hủy", color: "bg-red-100 text-red-800" },
+            {
+              key: "PROCESSING",
+              label: "Đang xử lý",
+              color: "bg-yellow-100 text-yellow-800",
+            },
+            {
+              key: "COMPLETED",
+              label: "Hoàn tất",
+              color: "bg-green-100 text-green-800",
+            },
+            {
+              key: "CANCELLED",
+              label: "Đã hủy",
+              color: "bg-red-100 text-red-800",
+            },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -292,13 +388,11 @@ export default function Orders() {
           </thead>
           <tbody className="bg-white divide-y">
             {filteredOrders.map((order, index) => (
-              <tr
-                key={order._id}
-                className="hover:bg-gray-50"
-                ref={index === orders.length - 1 ? lastOrderRef : null}
-              >
+              <tr key={order._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm">{index + 1}</td>
-                <td className="px-6 py-4 text-sm font-mono">#{order._id?.slice(-6)}</td>
+                <td className="px-6 py-4 text-sm font-mono">
+                  #{order._id?.slice(-6)}
+                </td>
                 <td className="px-6 py-4 text-sm">
                   {order.orderType === "ONLINE" ? (
                     <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-semibold">
@@ -325,9 +419,21 @@ export default function Orders() {
                   <span
                     className={`
                       px-2 py-1 rounded text-xs font-semibold
-                      ${order.paymentStatus === "PENDING" ? "bg-yellow-100 text-yellow-700" : ""}
-                      ${order.paymentStatus === "SUCCESS" ? "bg-green-100 text-green-700" : ""}
-                      ${order.paymentStatus === "FAILED" ? "bg-red-100 text-red-700" : ""}
+                      ${
+                        order.paymentStatus === "PENDING"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : ""
+                      }
+                      ${
+                        order.paymentStatus === "SUCCESS"
+                          ? "bg-green-100 text-green-700"
+                          : ""
+                      }
+                      ${
+                        order.paymentStatus === "FAILED"
+                          ? "bg-red-100 text-red-700"
+                          : ""
+                      }
                     `}
                   >
                     {order.paymentStatus === "PENDING" && "Đang chờ"}
@@ -339,9 +445,21 @@ export default function Orders() {
                   <span
                     className={`
                       px-3 py-1 rounded-full text-xs font-semibold inline-block whitespace-nowrap
-                      ${order.status === "PROCESSING" ? "bg-yellow-100 text-yellow-800" : ""}
-                      ${order.status === "COMPLETED" ? "bg-green-100 text-green-800" : ""}
-                      ${order.status === "CANCELLED" ? "bg-red-100 text-red-800" : ""}
+                      ${
+                        order.status === "PROCESSING"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : ""
+                      }
+                      ${
+                        order.status === "COMPLETED"
+                          ? "bg-green-100 text-green-800"
+                          : ""
+                      }
+                      ${
+                        order.status === "CANCELLED"
+                          ? "bg-red-100 text-red-800"
+                          : ""
+                      }
                     `}
                   >
                     {order.status === "PROCESSING" && "Đang xử lý"}
@@ -380,20 +498,17 @@ export default function Orders() {
             ))}
           </tbody>
         </table>
+
         {loading && (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
-            <p className="text-gray-500 mt-2">Đang tải thêm đơn hàng...</p>
+            <p className="text-gray-500 mt-2">Đang tải đơn hàng...</p>
           </div>
         )}
-        {!hasMore && orders.length > 0 && (
-          <div className="text-center py-8 text-gray-500">
-            Đã hiển thị tất cả đơn hàng
-          </div>
-        )}
+
         {filteredOrders.length === 0 && !loading && (
           <div className="text-center py-12 text-gray-500">
-            Không có đơn hàng nào phù hợp với bộ lọc
+            Không có đơn hàng nào trong khoảng thời gian này
           </div>
         )}
       </div>

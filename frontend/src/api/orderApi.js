@@ -5,9 +5,13 @@ const orderApi = {
     const res = await axiosClient.post('/orders', data);
     return res.data
   },
-  getAllOrders: async(params) => {
-    const res = await axiosClient.get('/orders', { params }); 
-    return res.data
+  getAllOrders: async ({ startDate, endDate }) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    
+    const res = await axiosClient.get(`/orders?${params.toString()}`);
+    return res.data; 
   },
   getAllOrdersByUserId: async(userId) => {
     const res = await axiosClient.get(`/orders/user/${userId}`); 
