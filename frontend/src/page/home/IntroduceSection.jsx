@@ -1,6 +1,5 @@
 import React from "react";
 import { Parallax } from "react-scroll-parallax";
-import { Link } from "react-router-dom";
 const IntroduceSection = () => {
   return (
     <div className="w-full px-20 pb-10 flex items-center gap-x-6 max-lg:flex-col max-lg:pt-10 max-lg:gap-y-8 max-sm:px-4">
@@ -47,9 +46,6 @@ const IntroduceSection = () => {
             <img src="/sticker-tea.png" alt="sticker" className="w-16 max-md:w-10" />
           </Parallax>
         </div>
-        <Link to='/menu/ca-phe-phin'>
-          <button className="w-full bg-blue-300 py-2 font-bold cursor-pointer">Thử ngay</button>
-        </Link>
       </div>
     </div>
   );

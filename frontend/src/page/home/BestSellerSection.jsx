@@ -5,15 +5,19 @@ import { useState } from "react";
 import productApi from "../../api/productApi";
 import { toast } from "react-toastify";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
+import ModalDetailProductSelling from "../../components/modal/ModalDetailProductSelling";
 const BestSellerSection = () => {
   const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isOpenModalDetailProduct, setIsOpenModalDetailProduct] =
+    useState(false);
   useEffect(() => {
     const getTopSellingProducts = async () => {
       try {
         const res = await productApi.getTopSellingProducts();
         setProducts(res);
       } catch (error) {
-        toast.error(error);
+        toast.error(error.response.data.message);
       }
     };
     getTopSellingProducts();
@@ -26,7 +30,20 @@ const BestSellerSection = () => {
       </div>
       <div className="grid grid-cols-4 flex-1 pb-20 max-lg:py-10 gap-6 w-full gap-x-20 max-lg:grid-cols-2 max-lg:gap-x-6">
         {products.map((product) => (
-          <div className="flex flex-col items-center justify-center">
+          <div
+            className="flex flex-col relative items-center pb-10 justify-center cursor-pointer"
+            onClick={() => {
+              if (product.status) {
+                setIsOpenModalDetailProduct(true);
+                setSelectedProduct(product);
+              }
+            }}
+          >
+            {!product.status && (
+              <div className="absolute top-0 left-0 w-full h-full bg-black/30 rounded-xl z-10 flex items-center justify-center">
+                <p className="text-white font-bold">Hết hàng</p>
+              </div>
+            )}
             <img
               src={product.image}
               className="lg:w-[400px] hover:scale-125 transition duration-500"
@@ -42,6 +59,13 @@ const BestSellerSection = () => {
           </div>
         ))}
       </div>
+      {isOpenModalDetailProduct && (
+        <ModalDetailProductSelling
+          isOpenModalDetailProduct={isOpenModalDetailProduct}
+          setIsOpenModalDetailProduct={setIsOpenModalDetailProduct}
+          selectedProduct={selectedProduct}
+        />
+      )}
     </div>
   );
 };
