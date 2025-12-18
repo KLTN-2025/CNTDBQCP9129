@@ -228,11 +228,18 @@ function App() {
                 </AdminOnlyGuard>
               }
             />
+            <Route
+              path="dashboard"
+              element={
+                <AdminOnlyGuard>
+                  <Dashboard />
+                </AdminOnlyGuard>
+              }
+            />
             <Route path="import-receipts" element={<ImportReceipts />} />
             <Route path="reservations" element={<Reservations />} />
           </Route>
 
-          {/* OTHER */}
           <Route
             path="/blogs/:categorySlug/:nameBlogSlug"
             element={<BlogDetailPage />}

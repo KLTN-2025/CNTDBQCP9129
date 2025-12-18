@@ -8,7 +8,7 @@ import { CiGift } from "react-icons/ci";
 import { MdOutlineMessage } from "react-icons/md";
 import { TbReceipt } from "react-icons/tb";
 import { FaTable } from "react-icons/fa";
-import Dashboard from "../page/admin/Dashboard";
+import { FaChartColumn } from "react-icons/fa6";
 import useAuthStore from "../store/authStore";
 
 export default function LayoutAdmin() {
@@ -39,13 +39,28 @@ export default function LayoutAdmin() {
               className="h-10 w-auto cursor-pointer"
               alt="logo"
             />
-            <span className="text-sm font-bold text-black">DASH BOARD</span>
+            <span className="text-sm font-bold text-black">Hệ thống Coffee Go</span>
           </Link>
         </div>
 
         {/* Menu - Scrollable */}
         <div className="flex-1 overflow-y-auto">
           <ul className="space-y-3 mt-6 pb-6 px-3">
+            {isAdmin && (
+              <li>
+                <Link
+                  to="/admin/dashboard"
+                  className={`flex items-center px-3 py-3 rounded-lg transition-colors ${
+                    activePath.includes("dashboard")
+                      ? "bg-green-50 text-green-600 border-l-4 border-green-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <FaChartColumn className="w-5 h-5 mr-3 flex-shrink-0" />
+                  <span>Thống kê hệ thống</span>
+                </Link>
+              </li>
+            )}
             {isAdmin && (
               <li>
                 <Link
@@ -241,7 +256,14 @@ export default function LayoutAdmin() {
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6">
           {isRootAdmin ? (
-            <Dashboard/>
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <h2 className="text-2xl font-semibold mb-2">
+                Chào mừng đến trang quản trị
+              </h2>
+              <p className="text-gray-500">
+                Hãy chọn một mục trong menu để bắt đầu quản lý.
+              </p>
+            </div>
           ) : (
             <Outlet />
           )}
