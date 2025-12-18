@@ -28,7 +28,7 @@ import dashboardApi from "../../api/dashboardApi";
 import { formatCurrencyVN } from "../../utils/formatCurrencyVN";
 import { toast } from "react-toastify";
 
-const COLORS = ["#10b981", "#f59e0b", "#ef4444", "#3b82f6", "#8b5cf6"];
+const COLORS = ["#bb0c0c", "#ede324", "#3cb755", "#8b5cf6", "#3b82f6"];
 
 // Component hiển thị khi không có dữ liệu
 const EmptyState = ({ message = "Chưa có dữ liệu" }) => (
@@ -434,7 +434,7 @@ export default function Dashboard() {
                   {pieOrderType.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
+                      fill={COLORS[index % COLORS.length + 3]}
                     />
                   ))}
                 </Pie>
