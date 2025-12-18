@@ -5,13 +5,16 @@ import Carousel from "../../components/carousel/Carousel";
 const BannerSection = () => {
     const bannerImages = [
     {
-      images: ["/banner.jpg"],
+      images: ["/banner4.png"],
     },
     {
       images: ["/banner2.jpg"],
     },
     {
       images: ["/banner3.jpg"],
+    },
+    {
+      images: ["/banner.jpg"],
     },
   ];
   return (
