@@ -2,7 +2,7 @@ import Product from "../../model/product.model.js";
 import ProductCategory from "../../model/productCategory.model.js";
 import Recipe from "../../model/recipe.model.js";
 import Ingredient from "../../model/ingredient.model.js";
-
+import Order from "../../model/order.model.js";
 //  Tạo sản phẩm mới
 export const createProduct = async (req, res) => {
   try {
@@ -249,7 +249,57 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Xóa sản phẩm thất bại" });
   }
 };
+export const getTopSellingProducts = async (req, res) => {
+  try {
+    let products = await Order.aggregate([
+      // Unwind items array để tách từng sản phẩm
+      { $unwind: "$items" },
+      // Group theo productId và tính tổng số lượng
+      {
+        $group: {
+          _id: "$items.productId",
+          totalSold: { $sum: "$items.quantity" }
+        }
+      },
+      // Sắp xếp giảm dần theo số lượng bán
+      { $sort: { totalSold: -1 } },
+      // Lấy 4 sản phẩm đầu
+      { $limit: 4 },
+      // Join với collection products
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product"
+        }
+      },
+      { $unwind: "$product" },
+      // Merge data
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ["$product", { totalSold: "$totalSold" }]
+          }
+        }
+      }
+    ]);
 
+    // Populate productCategoryId
+    products = await Product.populate(products, {
+      path: "productCategoryId",
+      select: "name"
+    });
+
+    // Tự động cập nhật trạng thái sản phẩm
+    products = await autoUpdateProductStatus(products);
+    
+    res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lấy sản phẩm bán chạy thất bại" });
+  }
+};
 // update tự động
 const autoUpdateProductStatus = async (products) => {
   // Lọc products đang bật

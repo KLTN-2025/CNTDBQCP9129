@@ -26,7 +26,7 @@ const ViewShopSection = () => {
     },
   ];
   return (
-    <div className="w-full px-20 pb-10 flex lg:items-center gap-x-6 max-lg:flex-col max-lg:pt-10 max-lg:gap-y-8 max-md:px-10 max-sm:px-4">
+    <div className="w-full px-20 pb-10 flex pt-20 lg:items-center gap-x-6 max-lg:flex-col max-lg:pt-10 max-lg:gap-y-8 max-md:px-10 max-sm:px-4">
       <div className="flex flex-col gap-y-14">
         <div>
           <p className="font-bold text-2xl">SIGNATURE </p>

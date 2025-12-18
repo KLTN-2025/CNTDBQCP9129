@@ -15,6 +15,10 @@ const productApi = {
     const res = await axiosClient.get("/products");
     return res.data;
   },
+  getTopSellingProducts: async () => {
+    const res = await axiosClient.get("/products/top-selling");
+    return res.data;
+  },
   // Lấy products theo category slug
   getByCategory: async (slugCategory) => {
     const res = await axiosClient.get(`/products/${slugCategory}`);
