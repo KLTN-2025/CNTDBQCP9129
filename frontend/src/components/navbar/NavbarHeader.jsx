@@ -17,13 +17,15 @@ const NavbarHeader = ({ isOpenSidebar, setIsOpenSidebar }) => {
           <News />
           <BookingTable />
         </div>
-        <Link to="/" className="w-full flex items-center justify-center">
-          <img
-            src="/logo-coffee.png"
-            className="w-30 h-26 max-lg:w-16 max-lg:h-14 rounded-full shrink-0 object-cover cursor-pointer select-none "
-            alt="logo coffee go"
-          />
-        </Link>
+        <div className="w-full flex items-center justify-center">
+          <Link to="/">
+            <img
+              src="/logo-coffee.png"
+              className="w-30 h-26 max-lg:w-16 max-lg:h-14 rounded-full shrink-0 object-cover cursor-pointer select-none "
+              alt="logo coffee go"
+            />
+          </Link>
+        </div>
 
         <div className="flex items-center justify-end font-bold gap-x-12 max-xl:gap-x-3 w-full max-lg:hidden">
           <Contact />

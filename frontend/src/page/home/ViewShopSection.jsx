@@ -44,7 +44,7 @@ const ViewShopSection = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 w-full rounded-2xl h-[500px] overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1">
+      <div className={`grid grid-cols-1 w-full rounded-2xl lg:h-[500px] overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1`}>
         <Carousel images={viewShopImages} />
       </div>
     </div>

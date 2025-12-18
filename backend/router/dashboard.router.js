@@ -7,14 +7,14 @@ import {
   getOrderTypeStats, 
   getOrderStatusStats 
 } from '../controllers/dashboard/dashboard.controller.js';
-import { verifyToken, isAdminOrStaff } from '../middleware/auth.middleware.js';
+import { verifyToken, isAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.get('/overview', verifyToken, isAdminOrStaff, getOverviewStats);
-router.get('/revenue', verifyToken, isAdminOrStaff, getRevenueStats);
-router.get('/top-products', verifyToken, isAdminOrStaff, getTopProducts);
-router.get('/order-type', verifyToken, isAdminOrStaff, getOrderTypeStats);
-router.get('/order-status', verifyToken, isAdminOrStaff, getOrderStatusStats);
+router.get('/overview', verifyToken, isAdmin, getOverviewStats);
+router.get('/revenue', verifyToken, isAdmin, getRevenueStats);
+router.get('/top-products', verifyToken, isAdmin, getTopProducts);
+router.get('/order-type', verifyToken, isAdmin, getOrderTypeStats);
+router.get('/order-status', verifyToken, isAdmin, getOrderStatusStats);
 
 export default router;

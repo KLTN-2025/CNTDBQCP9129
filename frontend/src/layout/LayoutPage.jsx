@@ -29,7 +29,7 @@ const LayoutPage = ({ children }) => {
           isOpenSidebar ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <Sidebar />
+        <Sidebar setIsOpenSidebar={setIsOpenSidebar}/>
       </div>
       <div className={`w-full pb-20 min-h-screen ${!isAdminRoute ? "pt-20" : "pt-0"} `}>
         {children}

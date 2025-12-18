@@ -58,8 +58,7 @@ export default function Carousel({images}) {
           >
             {images.map((item, idx) => (
               <SwiperSlide key={idx}>
-                <div className="relative w-full h-[70vh] md:h-[85vh]">
-
+                <div className="relative w-full h-full">
                   <img
                     src={item.images[0]}
                     alt={item.title}
@@ -71,9 +70,9 @@ export default function Carousel({images}) {
           </Swiper>
 
           {/* Custom Navigation Buttons */}
-          <button className="swiper-button-prev-custom absolute left-6 top-1/2 -translate-y-1/2 z-30 w-14 h-14 rounded-full cursor-pointer bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
+          <button className="swiper-button-prev-custom absolute left-6 top-1/2 -translate-y-1/2 z-30 w-14 h-14 max-md:w-8 max-md:h-8 rounded-full cursor-pointer bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
             <svg
-              className="w-6 h-6 transform group-hover:-translate-x-1 transition-transform"
+              className="w-6 h-6 max-md:h-5 max-md:w-5 transform group-hover:-translate-x-1 transition-transform"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -87,9 +86,9 @@ export default function Carousel({images}) {
             </svg>
           </button>
 
-          <button className="swiper-button-next-custom absolute right-6 top-1/2 -translate-y-1/2 z-30 w- cursor-pointer w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
+          <button className="swiper-button-next-custom absolute right-6 max-md:w-8 max-md:h-8 top-1/2 -translate-y-1/2 z-30 w- cursor-pointer w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110 group">
             <svg
-              className="w-6 h-6 transform group-hover:translate-x-1 transition-transform"
+              className="w-6 h-6 max-md:h-5 max-md:w-5 transform group-hover:translate-x-1 transition-transform"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

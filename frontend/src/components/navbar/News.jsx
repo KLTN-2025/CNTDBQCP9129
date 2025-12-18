@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
-import React from 'react'
 
-const News = () => {
+const News = ({setIsOpenSidebar}) => {
   return (
     <div>
-      <Link to="/blogs/coffeeholic">
+      <Link to="/blogs/coffeeholic"
+       onClick={() => setIsOpenSidebar(false)}
+      >
        <span className='hover:text-green-700 cursor-pointer'>TIN TỨC</span>
       </Link>
     </div>

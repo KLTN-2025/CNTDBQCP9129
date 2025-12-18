@@ -47,7 +47,7 @@ const ContactPage = () => {
           alt="banner"
         />
       </div>
-      <div className="flex mt-10 px-20 max-lg:flex-col max-lg:px-4 gap-x-12">
+      <div className="flex mt-10 px-20 max-lg:flex-col max-lg:gap-y-6 max-lg:px-4 gap-x-12">
         <div className="flex flex-col w-full gap-y-2">
           <img
             src="/coffee-go-contact.png"
