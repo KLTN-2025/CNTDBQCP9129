@@ -26,7 +26,7 @@ const ViewShopSection = () => {
     },
   ];
   return (
-    <div className="w-full px-20 pb-10 flex items-center gap-x-6 max-lg:flex-col max-lg:pt-10 max-lg:gap-y-8 max-sm:px-4">
+    <div className="w-full px-20 pb-10 flex lg:items-center gap-x-6 max-lg:flex-col max-lg:pt-10 max-lg:gap-y-8 max-md:px-10 max-sm:px-4">
       <div className="flex flex-col gap-y-14">
         <div>
           <p className="font-bold text-2xl">SIGNATURE </p>
@@ -44,7 +44,7 @@ const ViewShopSection = () => {
         </Link>
       </div>
 
-      <div className={`grid grid-cols-1 w-full rounded-2xl lg:h-[500px] overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1`}>
+      <div className={`grid grid-cols-1 w-full rounded-2xl md:h-[400px] lg:h-[500[px] overflow-hidden shadow-md max-lg:w-full max-lg:grid-cols-1`}>
         <Carousel images={viewShopImages} />
       </div>
     </div>

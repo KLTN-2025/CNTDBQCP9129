@@ -19,9 +19,9 @@ const BannerSection = () => {
         <Carousel
          images={bannerImages}
         />
-        <div className="absolute top-[20%] right-[10%] z-[20]">
+        <div className="absolute top-[20%] right-[10%] z-[20] max-md:top-[38%] max-md:right-[16%]">
           <Parallax speed={10}>
-            <img src="/sticker.png" alt="sticker" className="w-24 max-md:w-16" />
+            <img src="/sticker.png" alt="sticker" className="w-24 max-md:w-8" />
           </Parallax>
         </div>
       </div>
