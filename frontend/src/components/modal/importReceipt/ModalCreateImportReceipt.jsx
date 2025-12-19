@@ -10,6 +10,8 @@ const ModalCreateImportReceipt = ({
   isOpenModalCreateImportReceipt,
   setIsOpenModalCreateImportReceipt,
   setReceipts,
+  startDate,
+  endDate,
 }) => {
   useLockBodyScroll(isOpenModalCreateImportReceipt);
 
@@ -42,7 +44,7 @@ const ModalCreateImportReceipt = ({
     const selectedIds = items
       .map((item, idx) => (idx !== currentIndex ? item.ingredientId : null))
       .filter(Boolean);
-    
+
     return ingredients.filter((ing) => !selectedIds.includes(ing._id));
   };
 
@@ -104,7 +106,12 @@ const ModalCreateImportReceipt = ({
 
       if (response?._id) {
         toast.success("Tạo phiếu nhập thành công!");
-        setReceipts((prev) => [response, ...prev]);
+        const createdDate = new Date(response.createdAt);
+        const start = new Date(`${startDate}T00:00:00`);
+        const end = new Date(`${endDate}T23:59:59`);
+        if (createdDate >= start && createdDate <= end) {
+          setReceipts((prev) => [response, ...prev]);
+        }
         setIsOpenModalCreateImportReceipt(false);
       } else {
         toast.error(response.message || "Lỗi tạo phiếu nhập");
@@ -156,9 +163,12 @@ const ModalCreateImportReceipt = ({
 
           {items.map((item, idx) => {
             const availableIngredients = getAvailableIngredients(idx);
-            
+
             return (
-              <div key={idx} className="border rounded-lg p-3 space-y-3 relative">
+              <div
+                key={idx}
+                className="border rounded-lg p-3 space-y-3 relative"
+              >
                 {/* Remove row */}
                 {items.length > 1 && (
                   <button

@@ -12,6 +12,8 @@ const ModalCreateExportReceipt = ({
   isOpenModalCreateExportReceipt,
   setIsOpenModalCreateExportReceipt,
   setReceipts,
+  startDate,
+  endDate,
 }) => {
   useLockBodyScroll(isOpenModalCreateExportReceipt);
 
@@ -46,7 +48,9 @@ const ModalCreateExportReceipt = ({
     try {
       const data = await ingredientApi.getAll();
       // Sắp xếp theo alphabet
-      const sortedData = data.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+      const sortedData = data.sort((a, b) =>
+        a.name.localeCompare(b.name, "vi")
+      );
       setIngredients(sortedData);
     } catch {
       toast.error("Lỗi tải nguyên liệu");
@@ -86,7 +90,13 @@ const ModalCreateExportReceipt = ({
 
       if (res?._id) {
         toast.success("Xuất kho thành công");
-        setReceipts((prev) => [res, ...prev]);
+        const createdDate = new Date(res.createdAt); 
+        const start = new Date(`${startDate}T00:00:00`);
+        const end = new Date(`${endDate}T23:59:59`);
+
+        if (createdDate >= start && createdDate <= end) {
+          setReceipts((prev) => [res, ...prev]);
+        }
         setIsOpenModalCreateExportReceipt(false);
         reset();
       }
@@ -137,10 +147,15 @@ const ModalCreateExportReceipt = ({
 
           {fields.map((field, idx) => {
             const availableIngredients = getAvailableIngredients(idx);
-            const selectedIngredient = getSelectedIngredient(watch(`items.${idx}.ingredientId`));
+            const selectedIngredient = getSelectedIngredient(
+              watch(`items.${idx}.ingredientId`)
+            );
 
             return (
-              <div key={field.id} className="border p-3 rounded-lg relative space-y-3">
+              <div
+                key={field.id}
+                className="border p-3 rounded-lg relative space-y-3"
+              >
                 {fields.length > 1 && (
                   <button
                     type="button"
@@ -155,7 +170,9 @@ const ModalCreateExportReceipt = ({
                 <div>
                   <label className="font-medium">Nguyên liệu</label>
                   <select
-                    {...register(`items.${idx}.ingredientId`, { required: true })}
+                    {...register(`items.${idx}.ingredientId`, {
+                      required: true,
+                    })}
                     className="w-full border px-3 py-2 rounded-lg"
                   >
                     <option value="">-- Chọn nguyên liệu --</option>
@@ -171,15 +188,20 @@ const ModalCreateExportReceipt = ({
                 {selectedIngredient && (
                   <div className="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg">
                     <div>
-                      <label className="text-sm text-gray-600">Số lượng hiện tại</label>
+                      <label className="text-sm text-gray-600">
+                        Số lượng hiện tại
+                      </label>
                       <p className="font-semibold text-gray-800">
                         {selectedIngredient.quantity} {selectedIngredient.unit}
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm text-gray-600">Tổng tiền hiện tại</label>
+                      <label className="text-sm text-gray-600">
+                        Tổng tiền hiện tại
+                      </label>
                       <p className="font-semibold text-gray-800">
-                        {selectedIngredient.totalCost?.toLocaleString('vi-VN')} ₫
+                        {selectedIngredient.totalCost?.toLocaleString("vi-VN")}{" "}
+                        ₫
                       </p>
                     </div>
                   </div>
@@ -216,11 +238,14 @@ const ModalCreateExportReceipt = ({
           <div>
             <label className="font-medium">Ghi chú *</label>
             <textarea
-              {...register("note", { 
+              {...register("note", {
                 required: "Ghi chú không được để trống",
-                validate: (value) => value.trim() !== "" || "Ghi chú không được để trống"
+                validate: (value) =>
+                  value.trim() !== "" || "Ghi chú không được để trống",
               })}
-              className={`w-full border px-3 py-2 rounded-lg ${errors.note ? 'border-red-500' : ''}`}
+              className={`w-full border px-3 py-2 rounded-lg ${
+                errors.note ? "border-red-500" : ""
+              }`}
               rows={3}
               placeholder="Hết hạn / hỏng / kiểm kê..."
             />

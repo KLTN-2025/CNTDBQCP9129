@@ -47,7 +47,7 @@ export default function Orders() {
     loadOrders();
   }, [startDate, endDate]);
 
-  // Socket setup - chỉ mount 1 lần
+  // Socket setup 
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
@@ -101,7 +101,7 @@ export default function Orders() {
     });
 
     return () => socket.disconnect();
-  }, []); // mount 1 lần
+  }, []); 
 
   useEffect(() => {
     if (newOrderCount > 0) {

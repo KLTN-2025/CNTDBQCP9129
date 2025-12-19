@@ -279,6 +279,8 @@ export default function ImportReceipts() {
           isOpenModalCreateImportReceipt={isOpenModalCreateImportReceipt}
           setIsOpenModalCreateImportReceipt={setIsOpenModalCreateImportReceipt}
           setReceipts={setReceipts}
+          startDate={startDate}
+          endDate={endDate}
         />
       )}
       {isOpenModalCreateExportReceipt && (
@@ -286,6 +288,8 @@ export default function ImportReceipts() {
           isOpenModalCreateExportReceipt={isOpenModalCreateExportReceipt}
           setIsOpenModalCreateExportReceipt={setIsOpenModalCreateExportReceipt}
           setReceipts={setReceipts}
+                    startDate={startDate}
+          endDate={endDate}
         />
       )}
       {/* Modal chi tiết phiếu nhập */}
