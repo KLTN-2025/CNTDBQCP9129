@@ -7,7 +7,6 @@ import { formatDatetimeVN } from "../../utils/formatDatetimeVN";
 import playTingSound from "../../utils/playTingSound";
 import { AiOutlineEye } from "react-icons/ai";
 import { BsClipboardCheckFill } from "react-icons/bs";
-import { FiRefreshCw } from "react-icons/fi";
 import ModalOrderDetail from "../../components/modal/adminOrders/ModalDetailOrder";
 import ModalConfirmCompleteOrder from "../../components/modal/adminOrders/ModalConfirmCompleteOrder";
 
@@ -24,7 +23,14 @@ export default function Orders() {
   const [paymentFilter, setPaymentFilter] = useState("ALL");
   const [sortOrder, setSortOrder] = useState("DESC");
 
-  const getTodayString = () => new Date().toISOString().split('T')[0];
+  const getTodayString = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());
 
@@ -32,9 +38,9 @@ export default function Orders() {
     if (loading) return;
     try {
       setLoading(true);
-      const res = await orderApi.getAllOrders({ 
-        startDate, 
-        endDate 
+      const res = await orderApi.getAllOrders({
+        startDate,
+        endDate,
       });
       setOrders(res.orders || []);
     } catch (error) {
@@ -48,7 +54,7 @@ export default function Orders() {
     loadOrders();
   }, [startDate, endDate]);
 
-  // Socket setup
+  // Socket setup - chỉ mount 1 lần
   useEffect(() => {
     const socket = io("http://localhost:5000");
 
@@ -58,20 +64,24 @@ export default function Orders() {
 
     socket.on("order_changed", (change) => {
       if (change.type === "insert") {
-        // Kiểm tra nếu order mới nằm trong khoảng date đang filter
-        const orderDate = new Date(change.data.createdAt).toISOString().split('T')[0];
-        const isInDateRange = orderDate >= startDate && orderDate <= endDate;
-        
+        // Convert createdAt sang giờ VN +7h
+        const orderDate = new Date(change.data.createdAt);
+        const orderDateVN = new Date(orderDate.getTime() + 7 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0];
+        const isInDateRange = orderDateVN >= startDate && orderDateVN <= endDate;
+
         if (isInDateRange) {
           setOrders((prev) => [change.data, ...prev]);
         }
-        
+
         playTingSound();
         if (document.hidden) {
           setNewOrderCount((prev) => prev + 1);
         }
 
-        const orderType = change.data.orderType === "ONLINE" ? "Online" : "Tại quán";
+        const orderType =
+          change.data.orderType === "ONLINE" ? "Online" : "Tại quán";
         const statusText =
           change.data.status === "PROCESSING"
             ? "Đang xử lý"
@@ -108,7 +118,7 @@ export default function Orders() {
     });
 
     return () => socket.disconnect();
-  }, [startDate, endDate]);
+  }, []); // mount 1 lần
 
   useEffect(() => {
     if (newOrderCount > 0) {
@@ -164,38 +174,57 @@ export default function Orders() {
       );
       toast.success("Đơn hàng đã hoàn thành");
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Lỗi khi cập nhật trạng thái"
-      );
+      toast.error(err.response?.data?.message || "Lỗi khi cập nhật trạng thái");
     } finally {
       setIsOpenConfirmComplete(false);
     }
   };
 
   // Quick date selections
-const handleQuickDate = (type) => {
-  const today = new Date();
-  const todayStr = getTodayString();
-  
-  switch (type) {
-    case "today":
-      setStartDate(todayStr);
-      setEndDate(todayStr);
-      break;
-    case "yesterday":
-      setStartDate(new Date(today.setDate(today.getDate() - 1)).toISOString().split("T")[0]);
-      setEndDate(new Date(today).toISOString().split("T")[0]);
-      break;
-    case "week":
-      setStartDate(new Date(today.setDate(today.getDate() - 7)).toISOString().split("T")[0]);
-      setEndDate(todayStr);
-      break;
-    case "month":
-      setStartDate(new Date(today.setMonth(today.getMonth() - 1)).toISOString().split("T")[0]);
-      setEndDate(todayStr);
-      break;
-  }
-};
+  const handleQuickDate = (type) => {
+    const today = new Date();
+    const todayStr = getTodayString();
+
+    switch (type) {
+      case "today":
+        setStartDate(todayStr);
+        setEndDate(todayStr);
+        break;
+      case "yesterday": {
+        const y = new Date(today);
+        y.setDate(today.getDate() - 1);
+        const str = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(y.getDate()).padStart(2, "0")}`;
+        setStartDate(str);
+        setEndDate(str);
+        break;
+      }
+      case "week": {
+        const w = new Date(today);
+        w.setDate(today.getDate() - 7);
+        const str = `${w.getFullYear()}-${String(w.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(w.getDate()).padStart(2, "0")}`;
+        setStartDate(str);
+        setEndDate(todayStr);
+        break;
+      }
+      case "month": {
+        const m = new Date(today);
+        m.setDate(today.getDate() - 30); // chính xác 30 ngày
+        const str = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(m.getDate()).padStart(2, "0")}`;
+        setStartDate(str);
+        setEndDate(todayStr);
+        break;
+      }
+    }
+  };
 
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">

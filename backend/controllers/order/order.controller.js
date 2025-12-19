@@ -144,37 +144,16 @@ export const createOrderOffline = async (req, res) => {
 export const getOrders = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-
-    // Tạo query filter theo ngày
     const dateFilter = {};
-    
+
     if (startDate && endDate) {
-      // Nếu có cả startDate và endDate
-      const start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-      
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
-      
-      dateFilter.createdAt = {
-        $gte: start,
-        $lte: end
-      };
-    } else {
-      // MẶC ĐỊNH: Chỉ lấy đơn hàng HÔM NAY
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      
-      dateFilter.createdAt = {
-        $gte: today,
-        $lt: tomorrow
-      };
+      const start = new Date(`${startDate}T00:00:00+07:00`);
+      const end = new Date(`${endDate}T23:59:59+07:00`);
+          console.log(start);
+    console.log(end);
+      dateFilter.createdAt = { $gte: start, $lte: end };
     }
 
-    // Query orders với date filter
     const orders = await Order.find(dateFilter)
       .populate("userId", "name email role")
       .populate("voucherId", "code")
@@ -186,9 +165,9 @@ export const getOrders = async (req, res) => {
       orders,
       total,
       dateRange: {
-        start: startDate || new Date().toISOString().split('T')[0],
-        end: endDate || new Date().toISOString().split('T')[0]
-      }
+        start: startDate || new Date().toLocaleDateString('sv').split(' ')[0],
+        end: endDate || new Date().toLocaleDateString('sv').split(' ')[0],
+      },
     });
   } catch (err) {
     console.error("GET ORDERS ERROR:", err);
