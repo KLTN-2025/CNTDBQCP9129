@@ -3,17 +3,19 @@ import { Plus, Search, Edit2, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import userApi from "../../api/userApi";
 import ModalUpdateRoleUser from "../../components/modal/adminUser/ModalUpdateRoleUser";
+
 export default function Orders() {
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setusers] = useState([]);
   const [getUsersByRouter, setGetUsersByRouter] = useState("users");
   const [isOpenModalUpdateRoleUser, setIsOpenModalUpdateRoleUser] =
     useState(false);
-  const [selectedUser, setSelectedUser] = useState(null)
-  // Lấy danh sách user theo button
+  const [selectedUser, setSelectedUser] = useState(null);
+
   useEffect(() => {
     document.title = "Quản lý người dùng";
   }, []);
+
   useEffect(() => {
     const getAllUsersByButton = async () => {
       try {
@@ -25,7 +27,6 @@ export default function Orders() {
     };
     getAllUsersByButton();
   }, [getUsersByRouter]);
-  console.log(users);
 
   const handleUpdateRoleUser = async () => {
     try {
@@ -33,15 +34,14 @@ export default function Orders() {
         role: selectedUser.role
       });
       setusers((prev) => prev.map((u) => (u._id === selectedUser._id ? res : u)));
-      console.log("res", res);
       toast.success("Phân quyền thành công");
     } catch (err) {
       toast.error(err.response?.data?.message || "Lỗi khi Phân quyền");
     } finally {
-        setIsOpenModalUpdateRoleUser(false);
+      setIsOpenModalUpdateRoleUser(false);
     }
   };
-  console.log(1);
+
   return (
     <div className="w-full mx-auto bg-white rounded-lg shadow-sm">
       {/* Header */}
@@ -137,7 +137,20 @@ export default function Orders() {
                     {user.name}
                   </td>
                   <td className="px-6 py-4 text-sm">{user.email}</td>
-                  <td className="px-6 py-4">{user.role}</td>
+                  {/* Vai trò với màu đẹp */}
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                        user.role === "admin"
+                          ? "bg-orange-100 text-orange-700"
+                          : user.role === "manager"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {user.role}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 text-sm">
                     <button
                       className="text-blue-600 hover:text-blue-800 cursor-pointer"

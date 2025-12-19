@@ -172,10 +172,10 @@ export default function Contacts() {
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900 max-w-md">
                     <button
-                      className={`px-4 py-2 rounded-md text-white whitespace-nowrap ${
+                      className={`px-2 py-1 rounded-md whitespace-nowrap ${
                         contact.status === "read"
-                          ? "bg-yellow-600"
-                          : "bg-blue-600"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-blue-100 text-blue-700"
                       }`}
                     >
                       {contact.status === "read" ? "Đã đọc" : "Chưa đọc"}

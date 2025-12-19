@@ -14,7 +14,6 @@ export default function Vouchers() {
   const [vouchers, setVouchers] = useState([]);
   const [isOpenModalCreateVoucher, setIsOpenModalCreateVoucher] =
     useState(false);
-  // const [isOpenModalUpdateProduct, setIsOpenModalUpdateProduct] = useState(false);
   const [
     isOpenModalConfirmDeativateVoucher,
     setIsOpenModalConfirmDeativateVoucher,
@@ -208,17 +207,17 @@ export default function Vouchers() {
                   </td>
 
                   {/* Trạng thái */}
-                  <td className="px-6 py-4 text-sm">
-                    <button
+                  <td className="px-2 py-1 text-sm">
+                    <td
                       className={`${
                         voucher.status === "upcoming"
-                          ? "bg-blue-600"
+                          ? "bg-blue-100 text-blue-700"
                           : voucher.status === "expired"
-                          ? "bg-yellow-600"
+                          ? "bg-yellow-100 text-yellow-700"
                           : voucher.status === "active"
-                          ? "bg-green-600"
-                          : "bg-red-600"
-                      } text-white px-4 py-2 whitespace-nowrap rounded-lg`}
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      } px-2 py-1 whitespace-nowrap rounded-lg`}
                     >
                       {voucher.status === "upcoming"
                         ? "Chưa tới ngày"
@@ -227,7 +226,7 @@ export default function Vouchers() {
                         : voucher.status === "active"
                         ? "Đang hoạt động"
                         : "Vô hiệu hóa"}
-                    </button>
+                    </td>
                   </td>
 
                   {/* Hành động */}
