@@ -1,9 +1,9 @@
 import axiosClient from "./axiosClient";
 
-const productApi = {
+const chatbotApi = {
   sendMess: async(message) => {
     const res = await axiosClient.post('/chat', message);
     return res.data;
   }
 }
-export default productApi;
+export default chatbotApi;
