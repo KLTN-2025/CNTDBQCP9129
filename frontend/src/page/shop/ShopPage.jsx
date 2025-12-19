@@ -94,7 +94,7 @@ const ShopPage = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-500 font-medium mb-1">Giờ mở cửa</p>
-                  <p className="text-gray-800 font-bold text-xl">07:00 - 22:00</p>
+                  <p className="text-gray-800 font-bold text-xl">08:00 - 23:00</p>
                 </div>
               </div>
 
