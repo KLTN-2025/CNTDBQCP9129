@@ -36,7 +36,7 @@ Quy tắc:
 - product là TÊN CHUNG của đồ uống
 - KHÔNG chứa: đá, nóng, dừa, size
 - Nếu người dùng hỏi mô tả, hương vị, thành phần -> DESCRIBE_PRODUCT
-
+- Nếu người dùng họ chỉ điền mỗi tên sản phẩm thì mày gửi vào mục DESCRIBE_PRODUCT nào hỏi giá, tiền, bao nhiêu thì đưa vào ASK_PRICE
 Ví dụ hợp lệ:
 {"intent":"ASK_PRICE","product":"latte"}
 {"intent":"ASK_PRICE","product":"Mít sấy"}

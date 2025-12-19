@@ -30,7 +30,7 @@ export const ruleBasedAnswer = (message) => {
     text.includes("tuyển dụng") ||
     text.includes("việc làm")
   ) {
-    return "Coffee Go hiện tại chưa tuyển người.Mọi thông tin chúng tôi sẽ cập nhật ở trang tin tức";
+    return "Coffee Go hiện tại chưa tuyển người. Mọi thông tin chúng tôi sẽ cập nhật ở trang tin tức";
   }
 
   // địa chỉ
@@ -45,6 +45,10 @@ export const ruleBasedAnswer = (message) => {
   // chào hỏi
   if (["hi", "hello", "xin chào"].includes(text)) {
     return "Chào bạn 👋 Mình có thể giúp gì cho bạn?";
+  }
+  // tạm biệt
+  if (["cảm ơn", "ok", "oke"].includes(text)) {
+    return "Tạm biệt. Bạn thắc mắc gì cứ hỏi mình nhé!?";
   }
 
   // không match
