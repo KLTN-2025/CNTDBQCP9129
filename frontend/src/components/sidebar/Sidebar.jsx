@@ -9,25 +9,25 @@ const NavbarHeader = ({setIsOpenSidebar}) => {
   return (
     <div className="bg-secondaryColor w-full font-bold rounded-tr-xs rounded-br-xs">
       <div className="w-full py-4 border-b-2 px-2 border-black">
-        <UserLogin setIsOpenSidebar={setIsOpenSidebar}/>
+        <UserLogin setIsOpenSidebar={setIsOpenSidebar} sidebar={true}/>
       </div>
       <div className="w-full py-4 border-b-2 px-2 border-black cursor-pointer">
-        <Cart setIsOpenSidebar={setIsOpenSidebar}/>
+        <Cart setIsOpenSidebar={setIsOpenSidebar} sidebar={true}/>
       </div>
       <div className="w-full py-4 border-b-2 px-2 border-black cursor-pointer">
-        <AboutMe setIsOpenSidebar={setIsOpenSidebar}/>
+        <AboutMe setIsOpenSidebar={setIsOpenSidebar} sidebar={true}/>
       </div>
       <div className="w-full py-2 border-b-2 px-2 border-black cursor-pointer">
-        <Menu setIsOpenSidebar={setIsOpenSidebar}/>
+        <Menu setIsOpenSidebar={setIsOpenSidebar} sidebar={true}/>
       </div>
       <div className="w-full py-2 border-b-2 px-2 border-black cursor-pointer">
-        <News setIsOpenSidebar={setIsOpenSidebar}/>
+        <News setIsOpenSidebar={setIsOpenSidebar} sidebar={true}/>
       </div>
       <div className="w-full py-2 border-b-2 px-2 border-black cursor-pointer">
-        <BookingTable setIsOpenSidebar={setIsOpenSidebar}/>
+        <BookingTable setIsOpenSidebar={setIsOpenSidebar} sidebar={true}/>
       </div>
       <div className="w-full py-2 border-b-2 px-2 border-black cursor-pointer">
-        <Contact setIsOpenSidebar={setIsOpenSidebar}/>
+        <Contact setIsOpenSidebar={setIsOpenSidebar} sidebar={true}/>
       </div>
     </div>
   );

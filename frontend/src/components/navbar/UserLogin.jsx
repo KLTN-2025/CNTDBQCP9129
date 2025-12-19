@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import useCartStore from "../../store/cartStore";
-const UserLogin = ({setIsOpenSidebar}) => {
+const UserLogin = ({setIsOpenSidebar, sidebar = false}) => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const { setCart } = useCartStore();
@@ -19,7 +19,11 @@ const UserLogin = ({setIsOpenSidebar}) => {
       <div className="flex flex-col font-normal">
         <Link to="/profile">
           <button className="text-sm hover:text-green-700 cursor-pointer font-semibold"
-           onClick={() => setIsOpenSidebar(false)}
+           onClick={() => {
+            if(sidebar){
+              setIsOpenSidebar(false);
+            }
+           }}
           >
             Tài khoản
           </button>

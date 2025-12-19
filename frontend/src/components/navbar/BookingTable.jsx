@@ -1,12 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
-const BookingTable = ({ setIsOpenSidebar }) => {
+const BookingTable = ({ setIsOpenSidebar, sidebar = false }) => {
   return (
     <div>
       <Link to="/reservation">
         <span
           className="hover:text-green-700 cursor-pointer"
-          onClick={() => setIsOpenSidebar(false)}
+          onClick={() => {
+            if (sidebar) {
+              setIsOpenSidebar(false);
+            }
+          }}
         >
           ĐẶT BÀN
         </span>
