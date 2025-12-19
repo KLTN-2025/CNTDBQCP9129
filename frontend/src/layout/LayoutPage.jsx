@@ -3,13 +3,15 @@ import { useLocation } from "react-router-dom";
 import NavbarHeader from "../components/navbar/NavbarHeader";
 import Sidebar from "../components/sidebar/Sidebar";
 import Footer from "../components/Footer";
+import AIChatBox from "../components/chatbot";
 
 const LayoutPage = ({ children }) => {
   const [isOpenSidebar, setIsOpenSidebar] = useState(false);
-  const location = useLocation(); 
+  const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+  
   return (
-    <div className="w-full flex flex-col mx-auto">
+    <div className="w-full relative flex flex-col mx-auto">
       {!isAdminRoute && (
         <NavbarHeader
           isOpenSidebar={isOpenSidebar}
@@ -29,11 +31,20 @@ const LayoutPage = ({ children }) => {
           isOpenSidebar ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <Sidebar setIsOpenSidebar={setIsOpenSidebar}/>
+        <Sidebar setIsOpenSidebar={setIsOpenSidebar} />
       </div>
-      <div className={`w-full pb-20 min-h-screen ${!isAdminRoute ? "pt-20" : "pt-0"} `}>
+      
+      <div
+        className={`w-full pb-20 min-h-screen ${
+          !isAdminRoute ? "pt-20" : "pt-0"
+        } `}
+      >
         {children}
       </div>
+      
+      {/* AI Chat Box Component */}
+      {!isAdminRoute && <AIChatBox />}
+      
       {!isAdminRoute && (
         <div>
           <Footer />
