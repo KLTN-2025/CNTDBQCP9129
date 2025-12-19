@@ -64,17 +64,7 @@ export default function Orders() {
 
     socket.on("order_changed", (change) => {
       if (change.type === "insert") {
-        // Convert createdAt sang giờ VN +7h
-        const orderDate = new Date(change.data.createdAt);
-        const orderDateVN = new Date(orderDate.getTime() + 7 * 60 * 60 * 1000)
-          .toISOString()
-          .split("T")[0];
-        const isInDateRange = orderDateVN >= startDate && orderDateVN <= endDate;
-
-        if (isInDateRange) {
           setOrders((prev) => [change.data, ...prev]);
-        }
-
         playTingSound();
         if (document.hidden) {
           setNewOrderCount((prev) => prev + 1);
@@ -180,7 +170,6 @@ export default function Orders() {
     }
   };
 
-  // Quick date selections
   const handleQuickDate = (type) => {
     const today = new Date();
     const todayStr = getTodayString();
