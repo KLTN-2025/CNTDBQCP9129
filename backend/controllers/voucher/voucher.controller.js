@@ -108,7 +108,11 @@ export const createVoucher = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Thời gian kết thúc phải lớn hơn hiện tại" });
-
+    if (start < now) {
+      return res
+        .status(400)
+        .json({ message: "Thời gian bắt đầu không được nhỏ hơn hiện tại" });
+    }
     // Tạo voucher
     const voucher = new Voucher({
       code: code.toUpperCase(),
@@ -166,41 +170,57 @@ export const getVouchers = async (req, res) => {
 export const applyVoucher = async (req, res) => {
   try {
     const { voucherCode, items, total, userId } = req.body;
-    const { discount, voucherId } = await calculateVoucherDiscount({ voucherCode, items, total, userId });
-    res.json({voucherId, voucherCode, discount });
+    const { discount, voucherId } = await calculateVoucherDiscount({
+      voucherCode,
+      items,
+      total,
+      userId,
+    });
+    res.json({ voucherId, voucherCode, discount });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 // Hàm tính discount của voucher
-export const calculateVoucherDiscount = async ({ voucherCode, items, total, userId }) => {
+export const calculateVoucherDiscount = async ({
+  voucherCode,
+  items,
+  total,
+  userId,
+}) => {
   const voucher = await Voucher.findOne({ code: voucherCode });
   if (!voucher) throw new Error("Voucher không tồn tại");
   if (voucher.status !== "active") throw new Error("Voucher không khả dụng");
   console.log(items);
   const now = new Date();
-  if (now < new Date(voucher.startDate)) throw new Error("Voucher chưa đến hạn");
+  if (now < new Date(voucher.startDate))
+    throw new Error("Voucher chưa đến hạn");
   if (now > new Date(voucher.endDate)) throw new Error("Voucher đã hết hạn");
 
   if (total < voucher.conditions.minOrderValue)
     throw new Error("Đơn hàng chưa đủ điều kiện voucher");
 
   const usedCount = await Order.countDocuments({ userId, voucherCode });
-  if (usedCount >= voucher.perUserLimit) throw new Error("Bạn đã hết lượt dùng cho voucher này");
+  if (usedCount >= voucher.perUserLimit)
+    throw new Error("Bạn đã hết lượt dùng cho voucher này");
 
   if (voucher.conditions.applicableCategories.length > 0) {
-    const allItemsMatch = items.every(productCategoryId =>
+    const allItemsMatch = items.every((productCategoryId) =>
       voucher.conditions.applicableCategories.includes(productCategoryId)
     );
-    if (!allItemsMatch) throw new Error(
-      "Có sản phẩm không thuộc trong danh mục khuyến mãi của voucher"
-    );
+    if (!allItemsMatch)
+      throw new Error(
+        "Có sản phẩm không thuộc trong danh mục khuyến mãi của voucher"
+      );
   }
 
   let discount = 0;
   if (voucher.discountType === "percent") {
     discount = total * (voucher.discountValue / 100);
-    if (voucher.conditions.maxDiscountAmount != null && voucher.conditions.maxDiscountAmount > 0) {
+    if (
+      voucher.conditions.maxDiscountAmount != null &&
+      voucher.conditions.maxDiscountAmount > 0
+    ) {
       discount = Math.min(discount, voucher.conditions.maxDiscountAmount);
     }
     discount = Math.min(discount, total);
@@ -208,7 +228,7 @@ export const calculateVoucherDiscount = async ({ voucherCode, items, total, user
     discount = Math.min(voucher.discountValue, total);
   }
 
-  return { voucherId: voucher._id, voucherCode, discount};
+  return { voucherId: voucher._id, voucherCode, discount };
 };
 
 export const getAvailableVouchers = async (req, res) => {
@@ -219,7 +239,7 @@ export const getAvailableVouchers = async (req, res) => {
       startDate: { $lte: now },
       endDate: { $gte: now },
       status: { $ne: "inactive" },
-      $expr: { $lt: ["$usedCount", "$usageLimit"] } 
+      $expr: { $lt: ["$usedCount", "$usageLimit"] },
     })
       .sort({ createdAt: -1 })
       .limit(3)
