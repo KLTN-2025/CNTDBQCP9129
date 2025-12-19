@@ -33,7 +33,10 @@ const ModalCreateImportReceipt = ({
   const fetchIngredients = async () => {
     try {
       const data = await ingredientApi.getAll();
-      setIngredients(data);
+      const sortedData = data.sort((a, b) =>
+        a.name.localeCompare(b.name, "vi")
+      );
+      setIngredients(sortedData);
     } catch {
       toast.error("Lỗi tải danh sách nguyên liệu");
     }
