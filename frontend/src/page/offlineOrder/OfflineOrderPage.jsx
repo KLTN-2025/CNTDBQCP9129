@@ -27,7 +27,7 @@ const OfflineOrderPage = () => {
       const data = await productApi.getAllProducts();
       // Chỉ lấy sản phẩm còn bán
       setProducts(data.filter((p) => p.status === true));
-    } catch (error) {
+    } catch {
       toast.error("Lỗi khi tải danh sách món");
     } finally {
       setLoading(false);
@@ -111,6 +111,9 @@ const OfflineOrderPage = () => {
 
   // Tạo đơn
   const handleCreateOrder = async () => {
+    if(submitting){
+      return
+    }
     if (!pagerNumber.trim()) {
       toast.error("Vui lòng nhập số thẻ bàn");
       return;
