@@ -1,5 +1,6 @@
 export const ruleBasedAnswer = (message) => {
   const text = message.toLowerCase();
+  // giờ mở cửa
   if (
     text.includes("giờ mở cửa") ||
     text.includes("mở mấy giờ") ||
@@ -7,7 +8,7 @@ export const ruleBasedAnswer = (message) => {
   ) {
     return "Coffee Go mở cửa từ 8h đến 23h mỗi ngày. Bạn hãy đến quán trải nghiệm nhé!";
   }
-  
+  // ship
   if (
     text.includes("quán có ship") ||
     text.includes("mày có ship") ||
@@ -15,7 +16,7 @@ export const ruleBasedAnswer = (message) => {
   ) {
     return "Coffee Go có ship ạ bán kính 10km quanh khu vực quận Hải Châu ạ. Phí ship là 20k nha";
   }
-
+  // khuyến mãi
   if (
     text.includes("Khuyến mãi") ||
     text.includes("sale") ||
@@ -23,7 +24,7 @@ export const ruleBasedAnswer = (message) => {
   ) {
     return "Coffee Go đang có những voucher hấp dẫn bạn lấy mã ở mục thực đơn nha";
   }
-
+  // tuyển dụng
   if (
     text.includes("nhân viên") ||
     text.includes("tuyển dụng") ||
