@@ -149,8 +149,6 @@ export const getOrders = async (req, res) => {
     if (startDate && endDate) {
       const start = new Date(`${startDate}T00:00:00+07:00`);
       const end = new Date(`${endDate}T23:59:59+07:00`);
-          console.log(start);
-    console.log(end);
       dateFilter.createdAt = { $gte: start, $lte: end };
     }
 
@@ -158,16 +156,8 @@ export const getOrders = async (req, res) => {
       .populate("userId", "name email role")
       .populate("voucherId", "code")
       .sort({ createdAt: -1 });
-
-    const total = orders.length;
-
     res.json({
       orders,
-      total,
-      dateRange: {
-        start: startDate || new Date().toLocaleDateString('sv').split(' ')[0],
-        end: endDate || new Date().toLocaleDateString('sv').split(' ')[0],
-      },
     });
   } catch (err) {
     console.error("GET ORDERS ERROR:", err);

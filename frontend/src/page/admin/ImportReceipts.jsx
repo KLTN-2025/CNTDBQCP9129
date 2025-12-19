@@ -18,7 +18,13 @@ export default function ImportReceipts() {
   const [isOpenModalDetailReceipt, setIsOpenModalDetailReceipt] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const getTodayString = () => new Date().toISOString().split('T')[0];
+    const getTodayString = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());
 
@@ -45,6 +51,7 @@ export default function ImportReceipts() {
 
   // Quick date selections
   const handleQuickDate = (type) => {
+    const today = new Date();
     const todayStr = getTodayString();
 
     switch (type) {
@@ -53,24 +60,35 @@ export default function ImportReceipts() {
         setEndDate(todayStr);
         break;
       case "yesterday": {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = yesterday.toISOString().split("T")[0];
-        setStartDate(yesterdayStr);
-        setEndDate(yesterdayStr);
+        const y = new Date(today);
+        y.setDate(today.getDate() - 1);
+        const str = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(y.getDate()).padStart(2, "0")}`;
+        setStartDate(str);
+        setEndDate(str);
         break;
       }
       case "week": {
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        setStartDate(weekAgo.toISOString().split("T")[0]);
+        const w = new Date(today);
+        w.setDate(today.getDate() - 7);
+        const str = `${w.getFullYear()}-${String(w.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(w.getDate()).padStart(2, "0")}`;
+        setStartDate(str);
         setEndDate(todayStr);
         break;
       }
       case "month": {
-        const monthAgo = new Date();
-        monthAgo.setMonth(monthAgo.getMonth() - 1);
-        setStartDate(monthAgo.toISOString().split("T")[0]);
+        const m = new Date(today);
+        m.setDate(today.getDate() - 30); // chính xác 30 ngày
+        const str = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(m.getDate()).padStart(2, "0")}`;
+        setStartDate(str);
         setEndDate(todayStr);
         break;
       }

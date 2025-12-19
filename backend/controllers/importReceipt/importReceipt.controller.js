@@ -177,14 +177,8 @@ export const getImportReceipts = async (req, res) => {
 
     res.json({
       receipts,
-      total,
-      dateRange: {
-        start: startDate || new Date().toISOString().split('T')[0],
-        end: endDate || new Date().toISOString().split('T')[0]
-      }
     });
   } catch (err) {
-    console.error("GET RECEIPTS ERROR:", err);
     res.status(500).json({ message: "Lấy danh sách phiếu thất bại" });
   }
 };
