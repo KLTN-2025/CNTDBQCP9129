@@ -22,6 +22,7 @@ import paymentRouter from './router/payment.router.js';
 import importReceiptRouter from './router/importReceipt.router.js';
 import reserVationRouter from './router/reservation.router.js';
 import dashboardRouter from './router/dashboard.router.js';
+import aiRouter from './router/ai.router.js';
 dotenv.config();
 
 const app = express();
@@ -58,9 +59,10 @@ app.use("/api/contacts", contactRouter);
 app.use("/api/payment", paymentRouter);
 app.use("/api/import-receipts", importReceiptRouter);
 app.use("/api/reservations", reserVationRouter);
-app.use("/api/dashboard", dashboardRouter)
+app.use("/api/dashboard", dashboardRouter);
+app.use("/api/ai", aiRouter);
 
-// ---- Socket.IO logic ----
+// socket
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
@@ -68,18 +70,11 @@ io.on("connection", (socket) => {
     socket.join("admin_room");
     console.log("Admin joined:", socket.id);
   });
-
-  // socket.on("join_user", (userId) => {
-  //   socket.join(`user_${userId}`);
-  //   console.log(`User ${userId} joined:`, socket.id);
-  // });
-
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
   });
 });
 
-// ---- Start server ----
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, async () => {
   await connectDB();
