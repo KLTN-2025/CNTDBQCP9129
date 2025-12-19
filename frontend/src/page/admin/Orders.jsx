@@ -9,7 +9,7 @@ import { AiOutlineEye } from "react-icons/ai";
 import { BsClipboardCheckFill } from "react-icons/bs";
 import ModalOrderDetail from "../../components/modal/adminOrders/ModalDetailOrder";
 import ModalConfirmCompleteOrder from "../../components/modal/adminOrders/ModalConfirmCompleteOrder";
-
+import { getTodayString } from "../../utils/getTodayString";
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [newOrderCount, setNewOrderCount] = useState(0);
@@ -23,13 +23,6 @@ export default function Orders() {
   const [paymentFilter, setPaymentFilter] = useState("ALL");
   const [sortOrder, setSortOrder] = useState("DESC");
 
-  const getTodayString = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
-  };
 
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());

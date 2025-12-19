@@ -9,7 +9,7 @@ import { AiOutlineEye } from "react-icons/ai";
 import ModalDetailReceipt from "../../components/modal/importReceipt/ModalDetailReceipt";
 import ModalCreateExportReceipt from "../../components/modal/importReceipt/ModalCreateExportReceipt";
 import { FaMinus } from "react-icons/fa";
-
+import { getTodayString } from "../../utils/getTodayString";
 export default function ImportReceipts() {
   const [receipts, setReceipts] = useState([]);
   const [isOpenModalCreateImportReceipt, setIsOpenModalCreateImportReceipt] = useState(false);
@@ -18,13 +18,6 @@ export default function ImportReceipts() {
   const [isOpenModalDetailReceipt, setIsOpenModalDetailReceipt] = useState(false);
   const [loading, setLoading] = useState(false);
 
-    const getTodayString = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
-  };
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());
 

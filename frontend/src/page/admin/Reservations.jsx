@@ -6,7 +6,7 @@ import ModalConfirmDelete from "../../components/modal/ModalConfirmDelete";
 import ModalConfirm from "../../components/modal/adminReservation/ModalConfirm";
 import { io } from "socket.io-client";
 import playTingSound from "../../utils/playTingSound";
-
+import { getTodayString } from "../../utils/getTodayString";
 export default function Reservations() {
   const [searchTerm, setSearchTerm] = useState("");
   const [reservations, setReservations] = useState([]);
@@ -17,13 +17,7 @@ export default function Reservations() {
   const [newReservationCount, setNewReservationCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const getTodayString = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
-  };
+
   const [startDate, setStartDate] = useState(getTodayString());
   const [endDate, setEndDate] = useState(getTodayString());
 
