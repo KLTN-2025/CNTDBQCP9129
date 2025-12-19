@@ -53,7 +53,7 @@ export const chatAI = async (req, res) => {
 
       case "ASK_RECOMMEND":
         return res.json({
-          reply: "Mình gợi ý Latte hoặc Americano nha ☕",
+          reply: "Mình gợi ý Latte hoặc Bạc xỉu nha ăn kèm mít sấy hết sẩy",
         });
       case "DESCRIBE_PRODUCT": {
         if (!product) {
