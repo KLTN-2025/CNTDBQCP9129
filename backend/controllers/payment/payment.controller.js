@@ -64,7 +64,7 @@ const scheduleOrderCancellation = async (orderId) => {
     } finally {
       session.endSession();
     }
-  }, 15 * 60 * 1000); // 15 phút
+  }, 10 * 1000); // 15 phút
 };
 
 export const createPayment = async (req, res) => {
@@ -255,8 +255,17 @@ export const handleVnpayReturn = async (req, res) => {
         )}`
       );
     }
-
     const orderId = verify.vnp_TxnRef;
+    const orderCancle = await Order.findById(orderId).session(session);
+
+    // Check order đã bị hủy hay chưa
+    if (orderCancle.status === "CANCELLED") {
+      await session.abortTransaction();
+      return res.redirect(
+        `http://localhost:5173/payment-result?&orderId=${orderCancle._id}`
+      );
+    }
+
     const order = await Order.findById(orderId).session(session);
 
     // Không tìm thấy đơn hàng

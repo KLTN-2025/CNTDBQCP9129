@@ -41,9 +41,8 @@ export const ruleBasedAnswer = (message) => {
   ) {
     return "Coffee Go ở 12 Bạch Đằng, quận Hải Châu, thành phố Đà Nẵng";
   }
-
   // chào hỏi
-  if (["hi", "hello", "xin chào"].includes(text)) {
+  if (["hi", "hello", "xin chào", "xin chao"].includes(text)) {
     return "Chào bạn 👋 Mình có thể giúp gì cho bạn?";
   }
   // tạm biệt
