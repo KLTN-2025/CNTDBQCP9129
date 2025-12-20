@@ -19,7 +19,6 @@ export const createIngredient = async (req, res) => {
       return res.status(400).json({ message: "Thiếu dữ liệu bắt buộc" });
     }
 
-    // check trùng
     const exist = await Ingredient.findOne({ name: name.trim() });
     if (exist) {
       return res.status(400).json({ message: "Tên nguyên liệu đã tồn tại" });
@@ -40,7 +39,6 @@ export const createIngredient = async (req, res) => {
 };
 
 
-// Cập nhập trạng thái nguyên liệu trong kho
 export const toggleIngredientStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -56,15 +54,11 @@ export const toggleIngredientStatus = async (req, res) => {
         return res.status(400).json({ message: "Nguyên liệu đã hết phải nhập thêm" });
       }
       newStatus = true;
-
-      // Chỉ bật nguyên liệu, không cập nhật sản phẩm
       await Ingredient.findByIdAndUpdate(id, { status: true });
 
     } else {
       // Click từ true -> false
       newStatus = false;
-
-      // Tắt nguyên liệu
       await Ingredient.findByIdAndUpdate(id, { status: false });
 
       // Tìm tất cả công thức có chứa nguyên liệu này

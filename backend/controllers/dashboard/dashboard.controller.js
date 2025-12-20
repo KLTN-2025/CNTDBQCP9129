@@ -2,7 +2,6 @@ import Order from "../../model/order.model.js";
 import Product from "../../model/product.model.js";
 import User from "../../model/user.model.js";
 import Ingredient from "../../model/ingredient.model.js";
-import Reservation from "../../model/reservation.model.js";
 
 // Lấy thống kê tổng quan
 export const getOverviewStats = async (req, res) => {
@@ -12,23 +11,22 @@ export const getOverviewStats = async (req, res) => {
     let start, end;
     
     if (startDate && endDate) {
-      // Nếu có filter ngày
-      start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-      end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
+      // Client gửi ngày dạng YYYY-MM-DD, chuyển thành 00:00:00 GMT+7
+      start = new Date(startDate + "T00:00:00+07:00");
+      end = new Date(endDate + "T23:59:59.999+07:00");
     } else {
-      // Mặc định hôm nay
-      start = new Date();
-      start.setHours(0, 0, 0, 0);
-      end = new Date(start);
-      end.setHours(23, 59, 59, 999);
+      // Mặc định hôm nay GMT+7
+      const now = new Date();
+      const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+      start = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth(), vietnamTime.getDate(), 0, 0, 0, 0);
+      end = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth(), vietnamTime.getDate(), 23, 59, 59, 999);
     }
 
-    // Thống kê tháng này
-    const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+    // Thống kê tháng này theo GMT+7
+    const now = new Date();
+    const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+    const firstDayOfMonth = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth(), 1, 0, 0, 0, 0);
+    const lastDayOfMonth = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth() + 1, 0, 23, 59, 59, 999);
 
     // Doanh thu theo khoảng thời gian được chọn
     const periodRevenue = await Order.aggregate([
@@ -79,19 +77,13 @@ export const getOverviewStats = async (req, res) => {
       paymentStatus: "SUCCESS",
     });
 
-    // Tổng khách hàng
     const totalCustomers = await User.countDocuments({ role: "customer" });
-    // Tổng nhân viên
     const totalManager = await User.countDocuments({ role: "manager" });
-    // Tổng admin
     const totalAdmin = await User.countDocuments({ role: "admin" });
-    // Tổng sản phẩm đang bán
     const totalProducts = await Product.countDocuments({ status: true });
-    // Tổng sản phẩm đang hết hàng
     const outOfStockProducts = await Product.countDocuments({
       status: false,
     });
-    // Đơn đang xử lý
     const processingOrders = await Order.countDocuments({
       status: "PROCESSING",
     });
@@ -109,9 +101,10 @@ export const getOverviewStats = async (req, res) => {
         },
       ],
     });
+    
     // Tính % tăng trưởng so với tháng trước
-    const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-    const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0, 23, 59, 59);
+    const lastMonthStart = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth() - 1, 1, 0, 0, 0, 0);
+    const lastMonthEnd = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth(), 0, 23, 59, 59, 999);
     
     const lastMonthRevenue = await Order.aggregate([
       {
@@ -131,8 +124,8 @@ export const getOverviewStats = async (req, res) => {
       // Theo khoảng thời gian được chọn (hoặc hôm nay)
       periodRevenue: periodRevenue[0]?.total || 0,
       periodOrders,
-      periodStart: start.toISOString().split("T")[0],
-      periodEnd: end.toISOString().split("T")[0],
+      periodStart: startDate || new Date(start.getTime() + 7 * 60 * 60 * 1000).toISOString().split("T")[0],
+      periodEnd: endDate || new Date(end.getTime() + 7 * 60 * 60 * 1000).toISOString().split("T")[0],
       
       // Tháng này
       monthRevenue: monthRevenue[0]?.total || 0,
@@ -164,101 +157,95 @@ export const getRevenueStats = async (req, res) => {
     let start, end, groupFormat;
 
     if (startDate && endDate) {
-      start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-      end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
+      start = new Date(startDate + "T00:00:00+07:00");
+      end = new Date(endDate + "T23:59:59.999+07:00");
       
-      // Tự động xác định groupFormat dựa vào khoảng thời gian
-      const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
       
       if (daysDiff <= 31) {
-        // <= 1 tháng: group theo ngày
         groupFormat = {
-          year: { $year: "$createdAt" },
-          month: { $month: "$createdAt" },
-          day: { $dayOfMonth: "$createdAt" },
+          year: { $year: { date: "$createdAt", timezone: "+07:00" } },
+          month: { $month: { date: "$createdAt", timezone: "+07:00" } },
+          day: { $dayOfMonth: { date: "$createdAt", timezone: "+07:00" } },
         };
       } else if (daysDiff <= 90) {
-        // <= 3 tháng: group theo tuần
         groupFormat = {
-          year: { $year: "$createdAt" },
-          week: { $week: "$createdAt" },
+          year: { $year: { date: "$createdAt", timezone: "+07:00" } },
+          week: { $week: { date: "$createdAt", timezone: "+07:00" } },
         };
       } else {
-        // > 3 tháng: group theo tháng
         groupFormat = {
-          year: { $year: "$createdAt" },
-          month: { $month: "$createdAt" },
+          year: { $year: { date: "$createdAt", timezone: "+07:00" } },
+          month: { $month: { date: "$createdAt", timezone: "+07:00" } },
         };
       }
     } else {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const now = new Date();
+      const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+      vietnamTime.setHours(0, 0, 0, 0);
 
       switch (period) {
-        case "day": // 7 ngày gần nhất
-          start = new Date(today);
+        case "day": 
+          start = new Date(vietnamTime);
           start.setDate(start.getDate() - 6);
-          end = new Date(today);
+          end = new Date(vietnamTime);
           end.setHours(23, 59, 59, 999);
           groupFormat = {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
-            day: { $dayOfMonth: "$createdAt" },
+            year: { $year: { date: "$createdAt", timezone: "+07:00" } },
+            month: { $month: { date: "$createdAt", timezone: "+07:00" } },
+            day: { $dayOfMonth: { date: "$createdAt", timezone: "+07:00" } },
           };
           break;
 
-        case "week": // 4 tuần gần nhất
-          start = new Date(today);
+        case "week": 
+          start = new Date(vietnamTime);
           start.setDate(start.getDate() - 27);
-          end = new Date(today);
+          end = new Date(vietnamTime);
           end.setHours(23, 59, 59, 999);
           groupFormat = {
-            year: { $year: "$createdAt" },
-            week: { $week: "$createdAt" },
+            year: { $year: { date: "$createdAt", timezone: "+07:00" } },
+            week: { $week: { date: "$createdAt", timezone: "+07:00" } },
           };
           break;
 
-        case "month": // 6 tháng gần nhất
-          start = new Date(today);
+        case "month": 
+          start = new Date(vietnamTime);
           start.setMonth(start.getMonth() - 5);
           start.setDate(1);
-          end = new Date(today);
+          end = new Date(vietnamTime);
           end.setHours(23, 59, 59, 999);
           groupFormat = {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
+            year: { $year: { date: "$createdAt", timezone: "+07:00" } },
+            month: { $month: { date: "$createdAt", timezone: "+07:00" } },
           };
           break;
 
-        case "quarter": // 4 quý gần nhất
-          const currentQuarter = Math.floor(today.getMonth() / 3);
-          start = new Date(today.getFullYear() - 1, currentQuarter * 3, 1);
-          end = new Date(today);
+        case "quarter": 
+          const currentQuarter = Math.floor(vietnamTime.getMonth() / 3);
+          start = new Date(vietnamTime.getFullYear() - 1, currentQuarter * 3, 1, 0, 0, 0, 0);
+          end = new Date(vietnamTime);
           end.setHours(23, 59, 59, 999);
           groupFormat = {
-            year: { $year: "$createdAt" },
+            year: { $year: { date: "$createdAt", timezone: "+07:00" } },
             quarter: {
-              $ceil: { $divide: [{ $month: "$createdAt" }, 3] },
+              $ceil: { $divide: [{ $month: { date: "$createdAt", timezone: "+07:00" } }, 3] },
             },
           };
           break;
 
         default:
-          start = new Date(today);
+          start = new Date(vietnamTime);
           start.setDate(start.getDate() - 6);
-          end = new Date(today);
+          end = new Date(vietnamTime);
           end.setHours(23, 59, 59, 999);
           groupFormat = {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
-            day: { $dayOfMonth: "$createdAt" },
+            year: { $year: { date: "$createdAt", timezone: "+07:00" } },
+            month: { $month: { date: "$createdAt", timezone: "+07:00" } },
+            day: { $dayOfMonth: { date: "$createdAt", timezone: "+07:00" } },
           };
       }
     }
 
-    // Aggregate revenue
     const revenueData = await Order.aggregate([
       {
         $match: {
@@ -278,8 +265,8 @@ export const getRevenueStats = async (req, res) => {
 
     res.json({
       period,
-      startDate: start.toISOString().split("T")[0],
-      endDate: end.toISOString().split("T")[0],
+      startDate: startDate || new Date(start).toISOString().split("T")[0],
+      endDate: endDate || new Date(end).toISOString().split("T")[0],
       data: revenueData,
     });
   } catch (error) {
@@ -294,10 +281,8 @@ export const getTopProducts = async (req, res) => {
 
     let dateFilter = {};
     if (startDate && endDate) {
-      const start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
+      const start = new Date(startDate + "T00:00:00+07:00");
+      const end = new Date(endDate + "T23:59:59.999+07:00");
       dateFilter = { createdAt: { $gte: start, $lte: end } };
     }
 
@@ -331,10 +316,8 @@ export const getOrderTypeStats = async (req, res) => {
 
     let dateFilter = {};
     if (startDate && endDate) {
-      const start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
+      const start = new Date(startDate + "T00:00:00+07:00");
+      const end = new Date(endDate + "T23:59:59.999+07:00");
       dateFilter = { createdAt: { $gte: start, $lte: end } };
     }
 
@@ -362,10 +345,8 @@ export const getOrderStatusStats = async (req, res) => {
 
     let dateFilter = {};
     if (startDate && endDate) {
-      const start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
+      const start = new Date(startDate + "T00:00:00+07:00");
+      const end = new Date(endDate + "T23:59:59.999+07:00");
       dateFilter = { createdAt: { $gte: start, $lte: end } };
     }
 

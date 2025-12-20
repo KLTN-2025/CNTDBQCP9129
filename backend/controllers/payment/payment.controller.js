@@ -74,7 +74,6 @@ export const createPayment = async (req, res) => {
   try {
     const { cartItems, userId, delivery, voucher } = req.body;
 
-    // VALIDATE
     if (!delivery || !delivery.name || !delivery.phone) {
       return res.status(400).json({
         message: "Thiếu thông tin giao hàng",
@@ -87,7 +86,6 @@ export const createPayment = async (req, res) => {
       return res.status(400).json({ message: "Giỏ hàng trống" });
     }
 
-    // BƯỚC 1: TÍNH TIỀN
     let total = 0;
     const detailedItems = [];
 
@@ -135,7 +133,6 @@ export const createPayment = async (req, res) => {
 
     total = Math.round(total);
 
-    // BƯỚC 2: TRỪ KHO NGUYÊN LIỆU
     for (const item of detailedItems) {
       const recipe = await Recipe.findOne({
         productId: item.productId,
@@ -166,7 +163,6 @@ export const createPayment = async (req, res) => {
           }
         );
 
-        // Không trừ được => rollback
         if (!ingredientAfterUpdate) {
           await session.abortTransaction();
           return res.status(400).json({
@@ -174,7 +170,6 @@ export const createPayment = async (req, res) => {
           });
         }
 
-        // Auto tắt nguyên liệu nếu = 0
         if (ingredientAfterUpdate.quantity === 0) {
           ingredientAfterUpdate.status = false;
           await ingredientAfterUpdate.save({ session });
@@ -182,7 +177,6 @@ export const createPayment = async (req, res) => {
       }
     }
 
-    // BƯỚC 3: TẠO ORDER
     const newOrder = new Order({
       userId,
       voucherId: voucher?.voucherId || null,
@@ -193,7 +187,7 @@ export const createPayment = async (req, res) => {
         phone: delivery.phone,
         address: delivery.address || null,
         note: delivery.note || "",
-        deliveryTime: delivery.deliveryTime || "Càng sớm càng tốt", // THÊM DÒNG NÀY
+        deliveryTime: delivery.deliveryTime || "Càng sớm càng tốt", 
       },
       orderType: "ONLINE",
       paymentMethod: "VNPAY",

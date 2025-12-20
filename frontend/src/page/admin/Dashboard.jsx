@@ -39,6 +39,16 @@ const EmptyState = ({ message = "Chưa có dữ liệu" }) => (
   </div>
 );
 
+// Hàm lấy ngày hiện tại theo timezone Việt Nam
+const getVietnamToday = () => {
+  const now = new Date();
+  const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+  const year = vietnamTime.getFullYear();
+  const month = String(vietnamTime.getMonth() + 1).padStart(2, "0");
+  const day = String(vietnamTime.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export default function Dashboard() {
   const [overview, setOverview] = useState(null);
   const [revenueData, setRevenueData] = useState([]);
@@ -48,8 +58,7 @@ export default function Dashboard() {
   const [period, setPeriod] = useState("day");
   const [loading, setLoading] = useState(true);
 
-  // Bộ lọc ngày
-  const today = new Date().toISOString().split("T")[0];
+  const today = getVietnamToday();
   const [dateFilter, setDateFilter] = useState({
     startDate: today,
     endDate: today,
@@ -59,17 +68,17 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadDashboardData();
-  }, [period]);
+  }, []);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = async (filterApplied = isFilterApplied, filter = dateFilter, currentPeriod = period) => {
     try {
       setLoading(true);
-      const params = isFilterApplied ? dateFilter : {};
+      const params = filterApplied ? filter : {};
 
       const [overviewRes, revenueRes, topProductsRes, orderTypeRes, statusRes] =
         await Promise.all([
           dashboardApi.getOverview(params.startDate, params.endDate),
-          dashboardApi.getRevenue(period, params.startDate, params.endDate),
+          dashboardApi.getRevenue(currentPeriod, params.startDate, params.endDate),
           dashboardApi.getTopProducts(5, params.startDate, params.endDate),
           dashboardApi.getOrderType(params.startDate, params.endDate),
           dashboardApi.getOrderStatus(params.startDate, params.endDate),
@@ -87,10 +96,14 @@ export default function Dashboard() {
     }
   };
 
+  const handlePeriodChange = (newPeriod) => {
+    setPeriod(newPeriod);
+    loadDashboardData(isFilterApplied, dateFilter, newPeriod);
+  };
+
   const handleDateChange = (field, value) => {
-    // Kiểm tra không được chọn ngày tương lai
-    const selectedDate = new Date(value);
-    const todayDate = new Date(today);
+    const selectedDate = new Date(value + "T00:00:00");
+    const todayDate = new Date(today + "T00:00:00");
 
     if (selectedDate > todayDate) {
       toast.error("Không thể chọn ngày trong tương lai!");
@@ -101,17 +114,15 @@ export default function Dashboard() {
   };
 
   const handleApplyFilter = () => {
-    // Validate startDate <= endDate
     if (new Date(dateFilter.startDate) > new Date(dateFilter.endDate)) {
       toast.error("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc!");
       return;
     }
     setIsFilterApplied(true);
     setShowDateFilter(true);
-    loadDashboardData();
+    loadDashboardData(true, dateFilter, period);
   };
 
-  // Format data cho biểu đồ doanh thu
   const formatRevenueData = () => {
     if (!revenueData || revenueData.length === 0) {
       return [];
@@ -136,7 +147,6 @@ export default function Dashboard() {
     });
   };
 
-  // Custom Tooltip để format tiền
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
@@ -155,7 +165,6 @@ export default function Dashboard() {
     return null;
   };
 
-  // Format data cho biểu đồ tròn
   const formatPieData = (data, labelMap) => {
     if (!data || data.length === 0) {
       return [];
@@ -346,7 +355,7 @@ export default function Dashboard() {
               ].map((btn) => (
                 <button
                   key={btn.key}
-                  onClick={() => setPeriod(btn.key)}
+                  onClick={() => handlePeriodChange(btn.key)}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     period === btn.key
                       ? "bg-green-600 text-white"

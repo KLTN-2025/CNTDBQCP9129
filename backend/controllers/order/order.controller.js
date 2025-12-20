@@ -4,14 +4,13 @@ import Product from "../../model/product.model.js";
 import Recipe from "../../model/recipe.model.js";
 import Ingredient from "../../model/ingredient.model.js";
 
-// Tạo orderOffline 
 export const createOrderOffline = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     const { userId, items, pagerNumber } = req.body;
-    // VALIDATE
+    // validate
     if (!items || !items.length) {
       await session.abortTransaction();
       return res.status(400).json({ message: "Danh sách món trống" });
@@ -26,7 +25,7 @@ export const createOrderOffline = async (req, res) => {
       return res.status(400).json({ message: "Số thẻ phải lớn hơn 0" });
     }
 
-    // CHECK THẺ ĐANG DÙNG
+    // check thẻ tồn tại
     const pagerInUse = await Order.exists({
       pagerNumber,
       status: "PROCESSING",
@@ -39,7 +38,7 @@ export const createOrderOffline = async (req, res) => {
       });
     }
 
-    // BƯỚC 1: TÍNH TIỀN + CHUẨN HÓA ITEMS
+    // tính tiền format data
     let total = 0;
     const detailedItems = [];
 
@@ -68,7 +67,7 @@ export const createOrderOffline = async (req, res) => {
 
     total = Math.round(total);
 
-    // BƯỚC 2: TRỪ KHO THEO CÔNG THỨC
+    // trừ kho theo công thức
     for (const item of detailedItems) {
       const recipe = await Recipe.findOne({
         productId: item.productId,
@@ -100,7 +99,7 @@ export const createOrderOffline = async (req, res) => {
             message: "Kho không đủ nguyên liệu",
           });
         }
-        // Auto tắt nếu hết
+        // auto tắt nếu false
         if (ingredientAfterUpdate.quantity === 0) {
           ingredientAfterUpdate.status = false;
           await ingredientAfterUpdate.save({ session });
@@ -108,7 +107,7 @@ export const createOrderOffline = async (req, res) => {
       }
     }
 
-    // BƯỚC 3: TẠO ORDER OFFLINE
+    // tạo order offline
     const newOrder = new Order({
       userId,
       items: detailedItems,
@@ -140,7 +139,7 @@ export const createOrderOffline = async (req, res) => {
   }
 };
 
-// Lấy danh sách tất cả order (cho admin) 
+// Lấy danh sách tất cả order
 export const getOrders = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
@@ -179,7 +178,7 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-// Lấy tất cả order theo userId (cho khách hàng xem lịch sử đơn hàng)
+// Lấy tất cả order theo userId 
 export const getAllOrdersByUserId = async (req, res) => {
   try {
     const { userId } = req.params;

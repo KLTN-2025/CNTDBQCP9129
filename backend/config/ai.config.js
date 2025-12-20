@@ -3,7 +3,7 @@ export const AI_CONFIG = {
     model: "gemini-2.5-flash",
     generationConfig: {
       temperature: 0.6,
-      maxOutputTokens: 512,
+      maxOutputTokens: 1000,
     },
   },
 };

@@ -49,7 +49,7 @@ export const chatAI = async (req, res) => {
       };
     });
 
-    // Tạo danh sách tên Best Seller để truyền riêng cho AI dễ nhận biết
+    // Tạo danh sách tên Best Seller
     const bestSellerNames = processedMenu
       .filter((p) => p.isBestSeller)
       .map((p) => p.name);
