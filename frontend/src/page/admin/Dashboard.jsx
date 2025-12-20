@@ -58,6 +58,7 @@ export default function Dashboard() {
   const [period, setPeriod] = useState("day");
   const [loading, setLoading] = useState(true);
 
+  // Bộ lọc ngày - mặc định là ngày hôm nay theo timezone Việt Nam
   const today = getVietnamToday();
   const [dateFilter, setDateFilter] = useState({
     startDate: today,
@@ -73,7 +74,11 @@ export default function Dashboard() {
   const loadDashboardData = async (filterApplied = isFilterApplied, filter = dateFilter, currentPeriod = period) => {
     try {
       setLoading(true);
-      const params = filterApplied ? filter : {};
+      // LUÔN gửi startDate và endDate, giống Orders
+      const params = filterApplied ? filter : { startDate: today, endDate: today };
+      
+      console.log('Dashboard params:', params);
+      console.log('Today:', today);
 
       const [overviewRes, revenueRes, topProductsRes, orderTypeRes, statusRes] =
         await Promise.all([
@@ -83,6 +88,8 @@ export default function Dashboard() {
           dashboardApi.getOrderType(params.startDate, params.endDate),
           dashboardApi.getOrderStatus(params.startDate, params.endDate),
         ]);
+      
+      console.log('Overview response:', overviewRes);
 
       setOverview(overviewRes);
       setRevenueData(revenueRes.data || []);
@@ -102,6 +109,7 @@ export default function Dashboard() {
   };
 
   const handleDateChange = (field, value) => {
+    // Kiểm tra không được chọn ngày tương lai
     const selectedDate = new Date(value + "T00:00:00");
     const todayDate = new Date(today + "T00:00:00");
 
@@ -114,6 +122,7 @@ export default function Dashboard() {
   };
 
   const handleApplyFilter = () => {
+    // Validate startDate <= endDate
     if (new Date(dateFilter.startDate) > new Date(dateFilter.endDate)) {
       toast.error("Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc!");
       return;
@@ -123,6 +132,7 @@ export default function Dashboard() {
     loadDashboardData(true, dateFilter, period);
   };
 
+  // Format data cho biểu đồ doanh thu
   const formatRevenueData = () => {
     if (!revenueData || revenueData.length === 0) {
       return [];
@@ -147,6 +157,7 @@ export default function Dashboard() {
     });
   };
 
+  // Custom Tooltip để format tiền
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
@@ -165,6 +176,7 @@ export default function Dashboard() {
     return null;
   };
 
+  // Format data cho biểu đồ tròn
   const formatPieData = (data, labelMap) => {
     if (!data || data.length === 0) {
       return [];

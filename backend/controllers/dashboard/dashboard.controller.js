@@ -10,23 +10,31 @@ export const getOverviewStats = async (req, res) => {
     
     let start, end;
     
+    // LUÔN cần startDate và endDate từ client
     if (startDate && endDate) {
-      // Client gửi ngày dạng YYYY-MM-DD, chuyển thành 00:00:00 GMT+7
-      start = new Date(startDate + "T00:00:00+07:00");
-      end = new Date(endDate + "T23:59:59.999+07:00");
+      start = new Date(`${startDate}T00:00:00+07:00`);
+      end = new Date(`${endDate}T23:59:59+07:00`);
     } else {
-      // Mặc định hôm nay GMT+7
+      // Fallback nếu client không gửi (không nên xảy ra)
       const now = new Date();
       const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
-      start = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth(), vietnamTime.getDate(), 0, 0, 0, 0);
-      end = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth(), vietnamTime.getDate(), 23, 59, 59, 999);
+      const year = vietnamTime.getFullYear();
+      const month = String(vietnamTime.getMonth() + 1).padStart(2, '0');
+      const day = String(vietnamTime.getDate()).padStart(2, '0');
+      
+      start = new Date(`${year}-${month}-${day}T00:00:00+07:00`);
+      end = new Date(`${year}-${month}-${day}T23:59:59+07:00`);
     }
 
     // Thống kê tháng này theo GMT+7
-    const now = new Date();
-    const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
-    const firstDayOfMonth = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth(), 1, 0, 0, 0, 0);
-    const lastDayOfMonth = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth() + 1, 0, 23, 59, 59, 999);
+    const now2 = new Date();
+    const vietnamTime2 = new Date(now2.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+    const year2 = vietnamTime2.getFullYear();
+    const month2 = vietnamTime2.getMonth() + 1;
+    const firstDayOfMonth = new Date(`${year2}-${String(month2).padStart(2, '0')}-01T00:00:00+07:00`);
+    
+    const lastDay = new Date(year2, month2, 0).getDate();
+    const lastDayOfMonth = new Date(`${year2}-${String(month2).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}T23:59:59+07:00`);
 
     // Doanh thu theo khoảng thời gian được chọn
     const periodRevenue = await Order.aggregate([
@@ -88,7 +96,7 @@ export const getOverviewStats = async (req, res) => {
       status: "PROCESSING",
     });
 
-    // Nguyên liệu sắp hết (quantity <= 500)
+    // Nguyên liệu sắp hết
     const lowStockIngredients = await Ingredient.countDocuments({
       $or: [
         {
@@ -103,8 +111,12 @@ export const getOverviewStats = async (req, res) => {
     });
     
     // Tính % tăng trưởng so với tháng trước
-    const lastMonthStart = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth() - 1, 1, 0, 0, 0, 0);
-    const lastMonthEnd = new Date(vietnamTime.getFullYear(), vietnamTime.getMonth(), 0, 23, 59, 59, 999);
+    const lastMonth = month2 - 1 === 0 ? 12 : month2 - 1;
+    const lastMonthYear = month2 - 1 === 0 ? year2 - 1 : year2;
+    const lastMonthStart = new Date(`${lastMonthYear}-${String(lastMonth).padStart(2, '0')}-01T00:00:00+07:00`);
+    
+    const lastMonthLastDay = new Date(lastMonthYear, lastMonth, 0).getDate();
+    const lastMonthEnd = new Date(`${lastMonthYear}-${String(lastMonth).padStart(2, '0')}-${String(lastMonthLastDay).padStart(2, '0')}T23:59:59+07:00`);
     
     const lastMonthRevenue = await Order.aggregate([
       {
@@ -124,8 +136,8 @@ export const getOverviewStats = async (req, res) => {
       // Theo khoảng thời gian được chọn (hoặc hôm nay)
       periodRevenue: periodRevenue[0]?.total || 0,
       periodOrders,
-      periodStart: startDate || new Date(start.getTime() + 7 * 60 * 60 * 1000).toISOString().split("T")[0],
-      periodEnd: endDate || new Date(end.getTime() + 7 * 60 * 60 * 1000).toISOString().split("T")[0],
+      periodStart: startDate || new Date(start).toISOString().split("T")[0],
+      periodEnd: endDate || new Date(end).toISOString().split("T")[0],
       
       // Tháng này
       monthRevenue: monthRevenue[0]?.total || 0,
@@ -157,8 +169,8 @@ export const getRevenueStats = async (req, res) => {
     let start, end, groupFormat;
 
     if (startDate && endDate) {
-      start = new Date(startDate + "T00:00:00+07:00");
-      end = new Date(endDate + "T23:59:59.999+07:00");
+      start = new Date(`${startDate}T00:00:00+07:00`);
+      end = new Date(`${endDate}T23:59:59+07:00`);
       
       const daysDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
       
@@ -182,49 +194,67 @@ export const getRevenueStats = async (req, res) => {
     } else {
       const now = new Date();
       const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
-      vietnamTime.setHours(0, 0, 0, 0);
+      const year = vietnamTime.getFullYear();
+      const month = String(vietnamTime.getMonth() + 1).padStart(2, '0');
+      const day = String(vietnamTime.getDate()).padStart(2, '0');
 
       switch (period) {
-        case "day": 
-          start = new Date(vietnamTime);
-          start.setDate(start.getDate() - 6);
-          end = new Date(vietnamTime);
-          end.setHours(23, 59, 59, 999);
+        case "day": {
+          const startDay = new Date(vietnamTime);
+          startDay.setDate(startDay.getDate() - 6);
+          const startYear = startDay.getFullYear();
+          const startMonth = String(startDay.getMonth() + 1).padStart(2, '0');
+          const startDayNum = String(startDay.getDate()).padStart(2, '0');
+          
+          start = new Date(`${startYear}-${startMonth}-${startDayNum}T00:00:00+07:00`);
+          end = new Date(`${year}-${month}-${day}T23:59:59+07:00`);
           groupFormat = {
             year: { $year: { date: "$createdAt", timezone: "+07:00" } },
             month: { $month: { date: "$createdAt", timezone: "+07:00" } },
             day: { $dayOfMonth: { date: "$createdAt", timezone: "+07:00" } },
           };
           break;
+        }
 
-        case "week": 
-          start = new Date(vietnamTime);
-          start.setDate(start.getDate() - 27);
-          end = new Date(vietnamTime);
-          end.setHours(23, 59, 59, 999);
+        case "week": {
+          const startWeek = new Date(vietnamTime);
+          startWeek.setDate(startWeek.getDate() - 27);
+          const startWeekYear = startWeek.getFullYear();
+          const startWeekMonth = String(startWeek.getMonth() + 1).padStart(2, '0');
+          const startWeekDay = String(startWeek.getDate()).padStart(2, '0');
+          
+          start = new Date(`${startWeekYear}-${startWeekMonth}-${startWeekDay}T00:00:00+07:00`);
+          end = new Date(`${year}-${month}-${day}T23:59:59+07:00`);
           groupFormat = {
             year: { $year: { date: "$createdAt", timezone: "+07:00" } },
             week: { $week: { date: "$createdAt", timezone: "+07:00" } },
           };
           break;
+        }
 
-        case "month": 
-          start = new Date(vietnamTime);
-          start.setMonth(start.getMonth() - 5);
-          start.setDate(1);
-          end = new Date(vietnamTime);
-          end.setHours(23, 59, 59, 999);
+        case "month": {
+          const startMonthDate = new Date(vietnamTime);
+          startMonthDate.setMonth(startMonthDate.getMonth() - 5);
+          startMonthDate.setDate(1);
+          const startMonthYear = startMonthDate.getFullYear();
+          const startMonthNum = String(startMonthDate.getMonth() + 1).padStart(2, '0');
+          
+          start = new Date(`${startMonthYear}-${startMonthNum}-01T00:00:00+07:00`);
+          end = new Date(`${year}-${month}-${day}T23:59:59+07:00`);
           groupFormat = {
             year: { $year: { date: "$createdAt", timezone: "+07:00" } },
             month: { $month: { date: "$createdAt", timezone: "+07:00" } },
           };
           break;
+        }
 
-        case "quarter": 
+        case "quarter": {
           const currentQuarter = Math.floor(vietnamTime.getMonth() / 3);
-          start = new Date(vietnamTime.getFullYear() - 1, currentQuarter * 3, 1, 0, 0, 0, 0);
-          end = new Date(vietnamTime);
-          end.setHours(23, 59, 59, 999);
+          const quarterYear = vietnamTime.getFullYear() - 1;
+          const quarterMonth = String(currentQuarter * 3 + 1).padStart(2, '0');
+          
+          start = new Date(`${quarterYear}-${quarterMonth}-01T00:00:00+07:00`);
+          end = new Date(`${year}-${month}-${day}T23:59:59+07:00`);
           groupFormat = {
             year: { $year: { date: "$createdAt", timezone: "+07:00" } },
             quarter: {
@@ -232,17 +262,23 @@ export const getRevenueStats = async (req, res) => {
             },
           };
           break;
+        }
 
-        default:
-          start = new Date(vietnamTime);
-          start.setDate(start.getDate() - 6);
-          end = new Date(vietnamTime);
-          end.setHours(23, 59, 59, 999);
+        default: {
+          const defaultStartDay = new Date(vietnamTime);
+          defaultStartDay.setDate(defaultStartDay.getDate() - 6);
+          const defaultStartYear = defaultStartDay.getFullYear();
+          const defaultStartMonth = String(defaultStartDay.getMonth() + 1).padStart(2, '0');
+          const defaultStartDayNum = String(defaultStartDay.getDate()).padStart(2, '0');
+          
+          start = new Date(`${defaultStartYear}-${defaultStartMonth}-${defaultStartDayNum}T00:00:00+07:00`);
+          end = new Date(`${year}-${month}-${day}T23:59:59+07:00`);
           groupFormat = {
             year: { $year: { date: "$createdAt", timezone: "+07:00" } },
             month: { $month: { date: "$createdAt", timezone: "+07:00" } },
             day: { $dayOfMonth: { date: "$createdAt", timezone: "+07:00" } },
           };
+        }
       }
     }
 
@@ -281,8 +317,8 @@ export const getTopProducts = async (req, res) => {
 
     let dateFilter = {};
     if (startDate && endDate) {
-      const start = new Date(startDate + "T00:00:00+07:00");
-      const end = new Date(endDate + "T23:59:59.999+07:00");
+      const start = new Date(`${startDate}T00:00:00+07:00`);
+      const end = new Date(`${endDate}T23:59:59+07:00`);
       dateFilter = { createdAt: { $gte: start, $lte: end } };
     }
 
@@ -316,8 +352,8 @@ export const getOrderTypeStats = async (req, res) => {
 
     let dateFilter = {};
     if (startDate && endDate) {
-      const start = new Date(startDate + "T00:00:00+07:00");
-      const end = new Date(endDate + "T23:59:59.999+07:00");
+      const start = new Date(`${startDate}T00:00:00+07:00`);
+      const end = new Date(`${endDate}T23:59:59+07:00`);
       dateFilter = { createdAt: { $gte: start, $lte: end } };
     }
 
@@ -345,8 +381,8 @@ export const getOrderStatusStats = async (req, res) => {
 
     let dateFilter = {};
     if (startDate && endDate) {
-      const start = new Date(startDate + "T00:00:00+07:00");
-      const end = new Date(endDate + "T23:59:59.999+07:00");
+      const start = new Date(`${startDate}T00:00:00+07:00`);
+      const end = new Date(`${endDate}T23:59:59+07:00`);
       dateFilter = { createdAt: { $gte: start, $lte: end } };
     }
 
