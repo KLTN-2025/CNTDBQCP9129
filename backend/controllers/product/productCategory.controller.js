@@ -42,7 +42,7 @@ export const updateCategory = async (req, res) => {
     // Kiểm tra tên trùng với category khác
     const existingCategory = await ProductCategory.findOne({
       name: name.trim(),
-      _id: { $ne: id } // bỏ qua category hiện tại
+      _id: { $ne: id } 
     });
 
     if (existingCategory) {
@@ -52,7 +52,7 @@ export const updateCategory = async (req, res) => {
     // Cập nhật
     category.name = name.trim();
     category.image = image;
-    await category.save(); // middleware pre('save') vẫn chạy => slug tạo lại
+    await category.save(); 
 
     res.status(200).json(category);
   } catch (error) {

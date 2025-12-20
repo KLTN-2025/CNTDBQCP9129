@@ -6,7 +6,7 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      unique: true, // mỗi user chỉ có 1 giỏ hàng
+      unique: true, 
     },
     items: [
       {

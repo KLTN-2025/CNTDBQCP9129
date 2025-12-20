@@ -1,4 +1,3 @@
-// routes/dashboard.route.js
 import express from 'express';
 import { 
   getOverviewStats, 

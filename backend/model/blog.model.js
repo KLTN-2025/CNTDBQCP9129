@@ -12,10 +12,8 @@ const blogSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Gộp tất cả ảnh (ảnh chính, ảnh phụ) vào 1 mảng
     images: [{ type: String, trim: true, require: true }],
 
-    // Nội dung chia 3 phần
     content: {
       intro: {
         text: { type: String, required: true, trim: true },
@@ -34,7 +32,6 @@ const blogSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Tự động tạo slug từ title
 blogSchema.pre("save", function (next) {
   if (this.isModified("title")) {
     this.slug = slugify(this.title, { lower: true, strict: true, locale: "vi" });

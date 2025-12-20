@@ -149,18 +149,15 @@ export const resetPassword = async (req, res) => {
     const { token } = req.query;
     const { newPassword } = req.body;
 
-    // Xác thực token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!newPassword || newPassword.trim().length < 8) {
       return res
         .status(400)
         .json({ message: "Mật khẩu phải có ít nhất 8 ký tự" });
     }
-    // Tìm user trong database
     const user = await User.findById(decoded.id);
     if (!user) return res.status(404).json({ message: "email không tồn tại" });
 
-    // Mã hóa mật khẩu mới
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
@@ -173,7 +170,6 @@ export const resetPassword = async (req, res) => {
 };
 
 //Xác thực tài khoản
-
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
@@ -181,7 +177,6 @@ export const verifyEmail = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { name, email, password } = decoded;
 
-    // Kiểm tra nếu user đã tồn tại
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res
@@ -189,10 +184,8 @@ export const verifyEmail = async (req, res) => {
         .json({ message: "Tài khoản đã được xác thực trước đó" });
     }
 
-    // Hash mật khẩu
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Tạo user trong database
     const user = await User.create({ name, email, password: hashedPassword });
 
     res.status(201).json({
@@ -210,19 +203,17 @@ export const verifyEmail = async (req, res) => {
 };
 export const changePassword = async (req, res) => {
   try {
-    const userId = req.user.id; // lấy từ token
+    const userId = req.user.id; 
     const { oldPassword, newPassword } = req.body;
 
     const user = await User.findById(userId);
     if (!user)
       return res.status(404).json({ message: "Không tìm thấy người dùng" });
 
-    // So sánh mật khẩu cũ
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch)
       return res.status(400).json({ message: "Mật khẩu cũ không đúng" });
 
-    // Hash mật khẩu mới và lưu lại
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();

@@ -12,8 +12,6 @@ export const chatWithGemini = async (message, menuData, bestSellers) => {
     // 1. Chuẩn bị dữ liệu menu dạng text để AI đọc
     const menuContext = menuData.map(item => {
       const isBestSeller = bestSellers.includes(item.name) ? "🌟 (Món Bán Chạy Nhất)" : "";
-      
-      // Thông tin giá
       let priceInfo = `Giá: ${item.originalPrice}đ`;
       if (item.discount > 0) {
         priceInfo = `Giá gốc: ${item.originalPrice}đ, Đang GIẢM ${item.discount}%, Giá chỉ còn: ${item.finalPrice}đ`;
@@ -22,7 +20,6 @@ export const chatWithGemini = async (message, menuData, bestSellers) => {
       return `- ${item.name} ${isBestSeller}. ${priceInfo}. Mô tả: ${item.description || "Thơm ngon đậm đà"}`;
     }).join("\n");
 
-    // 2. Thông tin quán 
     const shopInfo = `
     THÔNG TIN QUÁN "COFFEE GO":
     - Địa chỉ: 12 Bạch Đằng, quận Hải Châu, Đà Nẵng.
@@ -30,7 +27,6 @@ export const chatWithGemini = async (message, menuData, bestSellers) => {
     - Ship: Có ship bán kính 10km quanh quận Hải Châu, phí ship 20k.
     `;
 
-    // 3. Prompt
     const prompt = `
     Bạn là nhân viên phục vụ ảo thông minh, thân thiện và hài hước của quán "Coffee Go".
     
@@ -56,7 +52,6 @@ export const chatWithGemini = async (message, menuData, bestSellers) => {
     Nhân viên Coffee Go trả lời:
     `;
 
-    // 4. Gọi Gemini
     const result = await model.generateContent(prompt);
     const response = result.response.text();
     return response;

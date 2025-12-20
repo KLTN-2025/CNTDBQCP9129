@@ -33,7 +33,6 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              {/* Navigation Menu */}
               <nav className="p-4">
                 <ul className="space-y-2">
                   <li>
@@ -139,7 +138,6 @@ const ProfilePage = () => {
                 </ul>
               </nav>
 
-              {/* Breadcrumbs at bottom */}
               <div className="px-4 pb-4 pt-2 border-t border-gray-100">
                 <Breadcrumbs />
               </div>

@@ -204,7 +204,6 @@ export const createPayment = async (req, res) => {
     // Tự động hủy nếu quá hạn thanh toán
     scheduleOrderCancellation(newOrder._id);
 
-    // BƯỚC 4: TẠO VNPAY
     const txnRef = newOrder._id.toString();
 
     const vnpayResponse = await vnpay.buildPaymentUrl({
@@ -303,7 +302,7 @@ export const handleVnpayReturn = async (req, res) => {
       );
     }
 
-    // THANH TOÁN THÀNH CÔNG
+    // thanh toán thành công
     order.paymentStatus = "SUCCESS";
     order.vnp_TransactionNo = verify.vnp_TransactionNo;
     order.vnp_Amount = verify.vnp_Amount;
@@ -318,7 +317,7 @@ export const handleVnpayReturn = async (req, res) => {
       );
     }
 
-    // CLEAR CART
+    // clear cart
     await Cart.findOneAndUpdate(
       { userId: order.userId },
       { $set: { items: [] } },

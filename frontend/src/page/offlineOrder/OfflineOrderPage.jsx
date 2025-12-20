@@ -14,7 +14,6 @@ const OfflineOrderPage = () => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const {user} = useAuthStore()
-  // Load products
   useEffect(() => {
     loadProducts();
   }, []);
@@ -25,7 +24,6 @@ const OfflineOrderPage = () => {
     try {
       setLoading(true);
       const data = await productApi.getAllProducts();
-      // Chỉ lấy sản phẩm còn bán
       setProducts(data.filter((p) => p.status === true));
     } catch {
       toast.error("Lỗi khi tải danh sách món");
@@ -34,7 +32,6 @@ const OfflineOrderPage = () => {
     }
   };
   
-  // Thêm món vào giỏ
   const addToCart = (product) => {
     const existingItem = cart.find((item) => item.productId === product._id);
     
@@ -62,7 +59,6 @@ const OfflineOrderPage = () => {
     toast.success(`Đã thêm ${product.name}`);
   };
 
-  // Tăng số lượng
   const increaseQuantity = (productId) => {
     setCart(
       cart.map((item) =>
@@ -73,7 +69,6 @@ const OfflineOrderPage = () => {
     );
   };
 
-  // Giảm số lượng
   const decreaseQuantity = (productId) => {
     setCart(
       cart.map((item) =>
@@ -84,12 +79,10 @@ const OfflineOrderPage = () => {
     );
   };
 
-  // Xóa món
   const removeFromCart = (productId) => {
     setCart(cart.filter((item) => item.productId !== productId));
   };
 
-  // Update note
   const updateNote = (productId, note) => {
     setCart(
       cart.map((item) =>
@@ -98,18 +91,15 @@ const OfflineOrderPage = () => {
     );
   };
 
-  // Tính tổng
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  // Filter products
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Tạo đơn
   const handleCreateOrder = async () => {
     if(submitting){
       return
@@ -156,7 +146,6 @@ const OfflineOrderPage = () => {
 
   return (
     <div className="flex h-screen bg-gradient-to-b bg-amber-50 to-white pt-10 ">
-      {/* BÊN TRÁI - DANH SÁCH MÓN */}
       <div className="w-2/3 p-6 overflow-y-auto">
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -226,14 +215,12 @@ const OfflineOrderPage = () => {
         </div>
       </div>
 
-      {/* BÊN PHẢI - GIỎ HÀNG & THÔNG TIN ĐƠN */}
       <div className="w-1/3 bg-white shadow-xl rounded-xs p-6 overflow-y-auto mr-6">
         <div className="flex items-center gap-2 mb-6">
           <FiShoppingCart className="text-2xl text-blue-600" />
           <h2 className="text-2xl font-bold text-gray-800">Giỏ hàng</h2>
         </div>
 
-        {/* Số thẻ bàn */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Số thẻ bàn <span className="text-red-500">*</span>

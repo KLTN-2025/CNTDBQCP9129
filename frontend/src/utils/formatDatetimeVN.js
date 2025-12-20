@@ -12,6 +12,5 @@ export const formatDatetimeVN = (isoString) => {
     timeZone: "Asia/Ho_Chi_Minh" 
   };
 
-  // trả về dạng dd/mm/yyyy, hh:mm
   return date.toLocaleString("vi-VN", options);
 };

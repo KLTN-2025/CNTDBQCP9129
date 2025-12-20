@@ -26,7 +26,7 @@ export const createRecipe = async (req, res) => {
     const newRecipe = new Recipe({ productId, items });
     const savedRecipe = await newRecipe.save();
 
-    // Sau khi lưu, populate khóa phụ để trả chi tiết product/ingredient
+   
     const populatedRecipe = await Recipe.findById(savedRecipe._id)
       .populate("productId", "name price")
       .populate("items.ingredientId", "name unit");
@@ -59,7 +59,7 @@ export const updateRecipe = async (req, res) => {
     }
     const existingRecipe = await Recipe.findOne({ 
       productId, 
-      _id: { $ne: req.params.id }  // bỏ qua recipe đang update
+      _id: { $ne: req.params.id }
     });
     
     if (existingRecipe) {
@@ -76,17 +76,15 @@ export const updateRecipe = async (req, res) => {
       return toast.error("Công thức có chứa nguyên liệu trùng nhau!");
     }
 
-    // Cập nhật
     const updatedRecipe = await Recipe.findByIdAndUpdate(
       req.params.id,
       { productId, items },
-      { new: true } // trả về document mới
+      { new: true }
     );
 
     if (!updatedRecipe)
       return res.status(404).json({ message: "Không tìm thấy công thức" });
 
-    // Populate sau khi update
     const populatedRecipe = await Recipe.findById(updatedRecipe._id)
       .populate("productId", "name price")
       .populate("items.ingredientId", "name unit");
@@ -100,13 +98,11 @@ export const updateRecipe = async (req, res) => {
 // Xóa công thức
 export const deleteRecipe = async (req, res) => {
   try {
-    // Xóa công thức
     const deletedRecipe = await Recipe.findByIdAndDelete(req.params.id);
 
     if (!deletedRecipe)
       return res.status(404).json({ message: "Không tìm thấy công thức" });
 
-    // Tắt sản phẩm liên quan
     await Product.findByIdAndUpdate(deletedRecipe.productId, { status: false });
 
     res.status(200).json({ message: "Xóa công thức thành công và sản phẩm đã hết hàng" });
