@@ -151,8 +151,8 @@ export default function Ingredients() {
 
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-x-2">
-                      {(ingredient.unit === "cái" && ingredient.quantity < 100) ||
-                      (ingredient.unit !== "cái" && ingredient.quantity < 500) ? (
+                      {(ingredient.unit === "cái" && ingredient.quantity <= 100) ||
+                      (ingredient.unit !== "cái" && ingredient.quantity <= 500) ? (
                         <IoIosWarning
                           className="text-xl text-yellow-400"
                           title="Nguyên liệu sắp hết"

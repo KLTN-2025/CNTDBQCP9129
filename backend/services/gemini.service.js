@@ -37,6 +37,7 @@ Quy tắc:
 - KHÔNG chứa: đá, nóng, dừa, size
 - Nếu người dùng hỏi mô tả, hương vị, thành phần -> DESCRIBE_PRODUCT
 - Nếu người dùng họ chỉ điền mỗi tên sản phẩm thì mày gửi vào mục DESCRIBE_PRODUCT nào hỏi giá, tiền, bao nhiêu thì đưa vào ASK_PRICE
+- Nếu người dùng họ gõ tên sản phẩm không dấu thì mày cứ trả về ví dụ hợp lệ thêm dấu vào
 Ví dụ hợp lệ:
 {"intent":"ASK_PRICE","product":"latte"}
 {"intent":"ASK_PRICE","product":"Mít sấy"}
@@ -50,9 +51,6 @@ Câu hỏi: "${message}"
 
   const result = await model.generateContent(prompt);
   const raw = result.response.text();
-
-  console.log("RAW AI >>>", raw);
-
   const cleaned = raw
     .replace(/```json/gi, "")
     .replace(/```/g, "")

@@ -67,14 +67,14 @@ const AIChatBox = () => {
       {isOpenChat && (
         <div className="fixed bottom-40 right-10 w-80 h-[440px] bg-white rounded-lg shadow-2xl z-50 flex flex-col">
           {/* Header */}
-          <div className="bg-blue-600 text-white p-4 rounded-t-lg flex items-center justify-between">
+          <div className="bg-orange-600 text-white p-4 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Bot size={24} />
-              <span className="font-semibold">AI Assistant</span>
+              <span className="font-semibold">Coffee Go</span>
             </div>
             <button
               onClick={() => setIsOpenChat(false)}
-              className="hover:bg-blue-700 rounded p-1 transition-colors cursor-pointer"
+              className="hover:bg-orange-700 rounded p-1 transition-colors cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -84,7 +84,7 @@ const AIChatBox = () => {
           <div className="flex-grow overflow-y-auto p-4 space-y-3">
             {messages.length === 0 ? (
               <div className="text-center text-gray-500 mt-20">
-                <Bot size={48} className="mx-auto mb-4 text-blue-600" />
+                <Bot size={48} className="mx-auto mb-4 text-orange-600" />
                 <p>Xin chào! Tôi có thể giúp gì cho bạn?</p>
               </div>
             ) : (
@@ -97,7 +97,7 @@ const AIChatBox = () => {
                       <div
                         className={`max-w-[80%] rounded-lg p-3 whitespace-pre-line ${
                           msg.isUser
-                            ? "bg-blue-600 text-white"
+                            ? "bg-orange-600 text-white"
                             : "bg-gray-200 text-gray-800"
                         }`}
                       >
@@ -112,7 +112,7 @@ const AIChatBox = () => {
                           <button
                             key={idx}
                             onClick={() => handleOptionClick(option)}
-                            className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm hover:bg-blue-200 transition-colors"
+                            className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200 transition-colors"
                           >
                             {option}
                           </button>
@@ -150,12 +150,12 @@ const AIChatBox = () => {
                 onKeyPress={(e) => e.key === "Enter" && !isLoading && handleSendMessage()}
                 placeholder="Nhập tin nhắn..."
                 disabled={isLoading}
-                className="flex-grow border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:bg-gray-100"
+                className="flex-grow border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-600 disabled:bg-gray-100"
               />
               <button
                 onClick={handleSendMessage}
                 disabled={isLoading}
-                className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white rounded-lg px-4 py-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="bg-orange-600 cursor-pointer hover:bg-orange-700 text-white rounded-lg px-4 py-2 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 <Send size={20} />
               </button>

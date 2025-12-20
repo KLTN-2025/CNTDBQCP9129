@@ -98,7 +98,6 @@ export const getOverviewStats = async (req, res) => {
 
     // Nguyên liệu sắp hết (quantity <= 500)
     const lowStockIngredients = await Ingredient.countDocuments({
-      status: true,
       $or: [
         {
           unit: "cái",
