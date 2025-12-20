@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import useAuthStore from "../../store/authStore";
 import useCartStore from "../../store/cartStore";
-const UserLogin = ({setIsOpenSidebar, sidebar = false}) => {
+const UserLogin = ({ setIsOpenSidebar, sidebar = false }) => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const { setCart } = useCartStore();
@@ -14,29 +14,41 @@ const UserLogin = ({setIsOpenSidebar, sidebar = false}) => {
     navigate("/");
   };
   return (
-    <div className="flex items-center gap-x-2 mr-10" >
-      <img src="/user.png" className="w-8 h-8 object-cover mt-1" alt="tài khoản" />
+    <div className="flex items-center gap-x-2 mr-10">
+      <img
+        src="/user.png"
+        className="w-8 h-8 object-cover mt-1"
+        alt="tài khoản"
+      />
       <div className="flex flex-col font-normal">
         <Link to="/profile">
-          <button className="text-sm hover:text-green-700 cursor-pointer font-semibold"
-           onClick={() => {
-            if(sidebar){
-              setIsOpenSidebar(false);
-            }
-           }}
+          <button
+            className="text-sm hover:text-green-700 cursor-pointer font-semibold"
+            onClick={() => {
+              if (sidebar) {
+                setIsOpenSidebar(false);
+              }
+            }}
           >
             Tài khoản
           </button>
         </Link>
 
         {!user ? (
-        <Link to={`/account/login?redirect=${location.pathname}${location.search}`}>
-          <button className="text-xs hover:text-green-700 cursor-pointer"
-           onClick={() => setIsOpenSidebar(false)}
+          <Link
+            to={`/account/login?redirect=${location.pathname}${location.search}`}
           >
-            Đăng nhập
-          </button>
-        </Link>
+            <button
+              className="text-xs hover:text-green-700 cursor-pointer"
+              onClick={() => {
+                if (sidebar) {
+                  setIsOpenSidebar(false);
+                }
+              }}
+            >
+              Đăng nhập
+            </button>
+          </Link>
         ) : (
           <button
             className="text-xs hover:text-green-700 cursor-pointer"

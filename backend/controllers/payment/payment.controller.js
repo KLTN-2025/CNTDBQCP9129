@@ -64,7 +64,7 @@ const scheduleOrderCancellation = async (orderId) => {
     } finally {
       session.endSession();
     }
-  }, 10 * 1000); // 15 phút
+  }, 1 * 60 * 1000); // 15 phút
 };
 
 export const createPayment = async (req, res) => {

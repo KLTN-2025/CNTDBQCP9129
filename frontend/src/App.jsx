@@ -102,11 +102,14 @@ function App() {
     fetchCart();
   }, [user?.id]);
 
-  const redirectTo =
-    new URLSearchParams(location.search).get("redirect") || "/profile";
+const GuestRoute = ({ children }) => {
+  const redirectTo = new URLSearchParams(location.search).get("redirect") || "/profile";
 
-  const GuestRoute = ({ children }) =>
-    user ? <Navigate to={redirectTo} replace /> : children;
+  if (!user) return children; 
+  if (user.role !== "customer") return <Navigate to="/admin" replace />;
+
+  return <Navigate to={redirectTo} replace />;
+};
 
   const GuestOnly = ({ children }) =>
     user ? <Navigate to="/profile" replace /> : children;
