@@ -1,105 +1,67 @@
-import { analyzeMessage } from "../../services/gemini.service.js";
-import { ruleBasedAnswer } from "../../services/rule.service.js";
+import { chatWithGemini } from "../../services/gemini.service.js";
 import Product from "../../model/product.model.js";
-
+import Order from "../../model/order.model.js";
+import { ruleBasedAnswer } from "../../services/rule.service.js";
 export const chatAI = async (req, res) => {
   try {
     const { message } = req.body;
-
-    // RULE-BASED (FREE)
+    if (!message || message.trim() === "") {
+      return res.status(400).json({ reply: "Bạn cần mình tư vấn gì nè? 😅" });
+    }
     const ruleReply = ruleBasedAnswer(message);
     if (ruleReply) {
       return res.json({ reply: ruleReply });
     }
+    // Lấy danh sách best seller
+    // Dựa trên lịch sử đơn hàng đã thanh toán thành công
+    const topSellingData = await Order.aggregate([
+      { $match: { paymentStatus: "SUCCESS" } },
+      { $unwind: "$items" },
+      {
+        $group: {
+          _id: "$items.productId",
+          totalSold: { $sum: "$items.quantity" },
+        },
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 5 },
+    ]);
 
-    // AI PHÂN TÍCH
-    const { intent, product } = await analyzeMessage(message);
+    // Lấy ra danh sách ID của các món bán chạy
+    const bestSellerIds = topSellingData.map((item) => item._id.toString());
 
-    // BACKEND XỬ LÝ
-    switch (intent) {
-      case "ASK_PRICE": {
-        if (!product) {
-          return res.json({
-            reply: "Bạn muốn hỏi giá món nào ạ?",
-          });
-        }
+    // lấy toàn bộ menu đang bán
+    const products = await Product.find({ status: true }).select(
+      "name price discount description _id"
+    );
 
-        // tìm các món có tên chứa product
-        const items = await Product.find({
-          name: new RegExp(product, "i"),
-        });
+    //  xử lý dữ liệu tính giá discount
+    const processedMenu = products.map((p) => {
+      const finalPrice = Math.round(p.price * (1 - (p.discount || 0) / 100));
 
-        if (!items.length) {
-          return res.json({
-            reply: "Quán chưa có món này 😥",
-          });
-        }
+      return {
+        name: p.name,
+        description: p.description,
+        originalPrice: p.price.toLocaleString("vi-VN"),
+        discount: p.discount,
+        finalPrice: finalPrice.toLocaleString("vi-VN"),
+        isBestSeller: bestSellerIds.includes(p._id.toString()),
+      };
+    });
 
-        if (items.length > 1) {
-          const list = items
-            .map((item, index) => `${index + 1}. ${item.name}`)
-            .join("\n");
+    // Tạo danh sách tên Best Seller để truyền riêng cho AI dễ nhận biết
+    const bestSellerNames = processedMenu
+      .filter((p) => p.isBestSeller)
+      .map((p) => p.name);
 
-          return res.json({
-            reply: `Quán có các món sau:\n${list}\n👉 Bạn điền tên cụ thể mình trả lời nhé`,
-            options: items.map((i) => i.name),
-          });
-        }
+    // Truyền tin nhắn + Menu đã xử lý giá + Danh sách Best Seller
+    const reply = await chatWithGemini(message, processedMenu, bestSellerNames);
 
-        return res.json({
-          reply: `${items[0].name} có giá ${items[0].price.toLocaleString()}đ`,
-        });
-      }
-
-      case "ASK_RECOMMEND":
-        return res.json({
-          reply: "Mình gợi ý Latte hoặc Bạc xỉu nha ăn kèm mít sấy hết sẩy",
-        });
-      case "DESCRIBE_PRODUCT": {
-        if (!product) {
-          return res.json({
-            reply: "Bạn muốn mình mô tả món nào ạ?",
-          });
-        }
-
-        const items = await Product.find({
-          name: new RegExp(product, "i"),
-        });
-
-        if (!items.length) {
-          return res.json({
-            reply: "Món này quán mình chưa có 😥",
-          });
-        }
-
-        // nhiều món -> cho chọn
-        if (items.length > 1) {
-          const list = items
-            .map((item, i) => `${i + 1}. ${item.name}`)
-            .join("\n");
-
-          return res.json({
-            reply: `Quán có các món sau:\n${list}\n👉 Bạn muốn mình mô tả món nào?`,
-            options: items.map((i) => i.name),
-          });
-        }
-
-        // 1 món -> mô tả
-        return res.json({
-          reply:
-            items[0].description ||
-            `${items[0].name} là món cà phê được nhiều khách yêu thích ☕`,
-        });
-      }
-      default:
-        return res.json({
-          reply: "Mình chưa hiểu câu hỏi của bạn 😅",
-        });
-    }
+    return res.json({ reply });
   } catch (err) {
-    console.error("CHAT AI ERROR >>>", err);
+    console.error("chat bot error: ", err);
     return res.json({
-      reply: "AI đang bận, bạn thử lại sau nhé 🙏",
+      reply: "Hệ thống đang bận xíu, bạn thử lại sau nhé! 🙏",
     });
   }
 };

@@ -62,7 +62,7 @@ function App() {
   const { user, logout } = useAuthStore();
   const { cart, setCart } = useCartStore();
 
-  /*TOKEN CHECK */
+  // token check
   useEffect(() => {
     if (!token) return;
 
@@ -82,7 +82,7 @@ function App() {
     }
   }, [token]);
 
-  /* CART */
+  // cart
   useEffect(() => {
     if (!user?.id) return;
 
@@ -128,7 +128,6 @@ const GuestRoute = ({ children }) => {
     return children;
   };
 
-  /* RENDER */
   return (
     <ParallaxProvider>
       <LayoutPage>

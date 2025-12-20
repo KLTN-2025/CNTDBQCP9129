@@ -1,55 +1,54 @@
+import { normalizeText } from "../utils/normalizeText.utils.js"; 
 export const ruleBasedAnswer = (message) => {
-  const text = message.toLowerCase();
-  // giờ mở cửa
+  const text = normalizeText(message);
+
   if (
-    text.includes("giờ mở cửa") ||
-    text.includes("mở mấy giờ") ||
-    text.includes("đóng mấy giờ")
+    text.includes("gio mo cua") ||
+    text.includes("mo may gio") ||
+    text.includes("dong may gio")
   ) {
-    return "Coffee Go mở cửa từ 8h đến 23h mỗi ngày. Bạn hãy đến quán trải nghiệm nhé!";
+    return "Coffee Go mở cửa từ 8h đến 23h mỗi ngày. Bạn hãy đến quán trải nghiệm nhé! ☕";
   }
-  // ship
+
   if (
-    text.includes("quán có ship") ||
-    text.includes("mày có ship") ||
-    text.includes("ship không")
+    text.includes("quan co ship") ||
+    text.includes("co ship") ||
+    text.includes("ship khong")
   ) {
-    return "Coffee Go có ship ạ bán kính 10km quanh khu vực quận Hải Châu ạ. Phí ship là 20k nha";
+    return "Coffee Go có ship trong bán kính 10km quanh quận Hải Châu, phí ship 20k nha 🚚";
   }
-  // khuyến mãi
+
   if (
-    text.includes("Khuyến mãi") ||
+    text.includes("khuyen mai") ||
     text.includes("sale") ||
-    text.includes("giảm giá")
+    text.includes("giam gia")
   ) {
-    return "Coffee Go đang có những voucher hấp dẫn bạn lấy mã ở mục thực đơn nha";
-  }
-  // tuyển dụng
-  if (
-    text.includes("nhân viên") ||
-    text.includes("tuyển dụng") ||
-    text.includes("việc làm")
-  ) {
-    return "Coffee Go hiện tại chưa tuyển người. Mọi thông tin chúng tôi sẽ cập nhật ở trang tin tức";
+    return "Coffee Go đang có nhiều voucher hấp dẫn, bạn xem ở mục Thực đơn nha 🎁";
   }
 
-  // địa chỉ
   if (
-    text.includes("địa chỉ") ||
-    text.includes("ở đâu") ||
-    text.includes("chỗ nào")
+    text.includes("tuyen dung") ||
+    text.includes("nhan vien") ||
+    text.includes("viec lam")
   ) {
-    return "Coffee Go ở 12 Bạch Đằng, quận Hải Châu, thành phố Đà Nẵng";
-  }
-  // chào hỏi
-  if (["hi", "hello", "xin chào", "xin chao"].includes(text)) {
-    return "Chào bạn 👋 Mình có thể giúp gì cho bạn?";
-  }
-  // tạm biệt
-  if (["cảm ơn", "ok", "oke"].includes(text)) {
-    return "Tạm biệt. Bạn thắc mắc gì cứ hỏi mình nhé!?";
+    return "Hiện tại Coffee Go chưa tuyển dụng, tụi mình sẽ cập nhật ở trang Tin tức nhé 🙏";
   }
 
-  // không match
+  if (
+    text.includes("dia chi") ||
+    text.includes("o dau") ||
+    text.includes("cho nao")
+  ) {
+    return "Coffee Go ở 12 Bạch Đằng, quận Hải Châu, Đà Nẵng 📍";
+  }
+
+  if (["hi", "hello", "xin chao"].includes(text)) {
+    return "Chào bạn 👋 Coffee Go có thể giúp gì cho bạn nè?";
+  }
+
+  if (["cam on", "ok", "oke"].includes(text)) {
+    return "Rất vui được hỗ trợ bạn ☕ Có gì cần cứ quay lại hỏi mình nhé!";
+  }
+
   return null;
 };
