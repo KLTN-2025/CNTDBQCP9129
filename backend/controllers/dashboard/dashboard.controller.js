@@ -9,8 +9,6 @@ export const getOverviewStats = async (req, res) => {
     const { startDate, endDate } = req.query;
     
     let start, end;
-    
-    // LUÔN cần startDate và endDate từ client
     if (startDate && endDate) {
       start = new Date(`${startDate}T00:00:00+07:00`);
       end = new Date(`${endDate}T23:59:59+07:00`);
@@ -110,7 +108,6 @@ export const getOverviewStats = async (req, res) => {
       ],
     });
     
-    // Tính % tăng trưởng so với tháng trước
     const lastMonth = month2 - 1 === 0 ? 12 : month2 - 1;
     const lastMonthYear = month2 - 1 === 0 ? year2 - 1 : year2;
     const lastMonthStart = new Date(`${lastMonthYear}-${String(lastMonth).padStart(2, '0')}-01T00:00:00+07:00`);

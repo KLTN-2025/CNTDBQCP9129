@@ -4,14 +4,13 @@ export const watchReservations = (io) => {
   try {
     const changeStream = Reservation.watch();
     changeStream.on("change", async (change) => {
-      console.log("Reservation thay đổi:", change.operationType);
       const reservationId = change.documentKey?._id;
       const reservation = reservationId
         ? await Reservation.findById(reservationId)
         : null;
 
       io.to("admin_room").emit("reservation_changed", {
-        type: change.operationType, // insert | update | delete
+        type: change.operationType,
         reservationId,
         data: reservation,          // full document
         updatedFields: change.updateDescription?.updatedFields,

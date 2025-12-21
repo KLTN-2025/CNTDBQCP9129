@@ -9,7 +9,6 @@ export const watchOrders = (io) => {
 
       const orderId = change.documentKey?._id;
 
-      // 🔥 Query lại đơn hàng + populate CHỈ các field yêu cầu
       const populatedOrder = await Order.findById(orderId)
         .populate("userId", "name email role")
         .populate("voucherId", "code");
@@ -17,7 +16,7 @@ export const watchOrders = (io) => {
       io.to('admin_room').emit('order_changed', {
         type: change.operationType,
         orderId,
-        data: populatedOrder,               // ⬅️ đã format giống API getOrders
+        data: populatedOrder,               
         updatedFields: change.updateDescription?.updatedFields,
         timestamp: new Date()
       });

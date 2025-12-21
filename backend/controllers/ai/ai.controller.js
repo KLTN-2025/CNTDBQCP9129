@@ -12,7 +12,6 @@ export const chatAI = async (req, res) => {
     if (ruleReply) {
       return res.json({ reply: ruleReply });
     }
-    // Lấy danh sách best seller
     // Dựa trên lịch sử đơn hàng đã thanh toán thành công
     const topSellingData = await Order.aggregate([
       { $match: { paymentStatus: "SUCCESS" } },
@@ -35,7 +34,6 @@ export const chatAI = async (req, res) => {
       "name price discount description _id"
     );
 
-    //  xử lý dữ liệu tính giá discount
     const processedMenu = products.map((p) => {
       const finalPrice = Math.round(p.price * (1 - (p.discount || 0) / 100));
 

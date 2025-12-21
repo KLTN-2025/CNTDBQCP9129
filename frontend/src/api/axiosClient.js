@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:5000/api", // URL gốc của backend
+  baseURL: "http://localhost:5000/api", 
   headers: {
     "Content-Type": "application/json",
   },
@@ -19,15 +19,12 @@ axiosClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-//  Interceptor RESPONSE
 // Xử lý phản hồi hoặc lỗi toàn cục
 axiosClient.interceptors.response.use(
   (response) => {
-    return response; // trả về dữ liệu nếu thành công
+    return response; 
   },
   (error) => {
-    // nếu backend trả lỗi 401 (token hết hạn)
     if (error.response && error.response.status === 401) {
       console.warn("Token hết hạn hoặc không hợp lệ, vui lòng đăng nhập lại.");
       localStorage.removeItem("token");

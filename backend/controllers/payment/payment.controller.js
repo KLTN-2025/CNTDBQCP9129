@@ -34,7 +34,6 @@ const scheduleOrderCancellation = async (orderId) => {
       const order = await Order.findById(orderId).session(session);
 
       if (order && order.paymentStatus === "PENDING") {
-        // HOÀN LẠI NGUYÊN LIỆU THEO CÔNG THỨC
         for (const item of order.items) {
           const recipe = await Recipe.findOne({
             productId: item.productId,
@@ -64,7 +63,7 @@ const scheduleOrderCancellation = async (orderId) => {
     } finally {
       session.endSession();
     }
-  }, 1 * 60 * 1000); // 15 phút
+  }, 1 * 60 * 1000);
 };
 
 export const createPayment = async (req, res) => {
@@ -198,10 +197,7 @@ export const createPayment = async (req, res) => {
     newOrder.vnp_TxnRef = newOrder._id.toString();
     await newOrder.save({ session });
 
-    // COMMIT
     await session.commitTransaction();
-
-    // Tự động hủy nếu quá hạn thanh toán
     scheduleOrderCancellation(newOrder._id);
 
     const txnRef = newOrder._id.toString();
@@ -223,7 +219,6 @@ export const createPayment = async (req, res) => {
     });
   } catch (err) {
     await session.abortTransaction();
-    console.error("CREATE PAYMENT ERROR:", err);
     res.status(500).json({
       message: "Tạo thanh toán thất bại",
       error: err.message,
@@ -260,8 +255,6 @@ export const handleVnpayReturn = async (req, res) => {
     }
 
     const order = await Order.findById(orderId).session(session);
-
-    // Không tìm thấy đơn hàng
     if (!order) {
       await session.abortTransaction();
       return res.redirect(
@@ -332,7 +325,6 @@ export const handleVnpayReturn = async (req, res) => {
     );
   } catch (err) {
     await session.abortTransaction();
-    console.error("VNPAY CALLBACK ERROR:", err);
     return res.redirect(
       `http://localhost:5173/payment-result?status=error&message=${encodeURIComponent(
         "Xử lý callback thất bại"

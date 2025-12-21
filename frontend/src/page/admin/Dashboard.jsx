@@ -357,28 +357,6 @@ export default function Dashboard() {
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-800">Biểu đồ doanh thu</h2>
-          {!isFilterApplied && (
-            <div className="flex gap-2">
-              {[
-                { key: "day", label: "Ngày" },
-                { key: "week", label: "Tuần" },
-                { key: "month", label: "Tháng" },
-                { key: "quarter", label: "Quý" },
-              ].map((btn) => (
-                <button
-                  key={btn.key}
-                  onClick={() => handlePeriodChange(btn.key)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    period === btn.key
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {btn.label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
         {revenueChartData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
