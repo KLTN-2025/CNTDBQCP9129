@@ -152,6 +152,7 @@ const CheckOut = () => {
         userId: user.id,
       };
       const response = await paymentApi.createPayment(orderData);
+      console.log("FIX VNPAY");
       if (response.success && response.vnpUrl) {
         window.location.href = response.vnpUrl;
       }
