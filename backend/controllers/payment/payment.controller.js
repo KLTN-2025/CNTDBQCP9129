@@ -232,39 +232,40 @@ export const handleVnpayReturn = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
+  const FRONTEND_URL = process.env.FRONTEND_URL;
+
   try {
     const verify = vnpay.verifyReturnUrl(req.query);
 
     if (!verify.isVerified) {
       await session.abortTransaction();
       return res.redirect(
-        `http://localhost:5173/payment-result?status=error&code=97&message=${encodeURIComponent(
+        `${FRONTEND_URL}/payment-result?status=error&code=97&message=${encodeURIComponent(
           "Chữ ký không hợp lệ"
         )}`
       );
     }
-    const orderId = verify.vnp_TxnRef;
-    const orderCancle = await Order.findById(orderId).session(session);
 
-    // Check order đã bị hủy hay chưa
-    if (orderCancle.status === "CANCELLED") {
-      await session.abortTransaction();
-      return res.redirect(
-        `http://localhost:5173/payment-result?&orderId=${orderCancle._id}`
-      );
-    }
+    const orderId = verify.vnp_TxnRef;
 
     const order = await Order.findById(orderId).session(session);
+
     if (!order) {
       await session.abortTransaction();
       return res.redirect(
-        `http://localhost:5173/payment-result?status=error&code=01&message=${encodeURIComponent(
+        `${FRONTEND_URL}/payment-result?status=error&code=01&message=${encodeURIComponent(
           "Không tìm thấy đơn hàng"
         )}`
       );
     }
 
-    // Nếu thanh toán thất bại
+    if (order.status === "CANCELLED") {
+      await session.abortTransaction();
+      return res.redirect(
+        `${FRONTEND_URL}/payment-result?orderId=${order._id}`
+      );
+    }
+
     if (!verify.isSuccess) {
       for (const item of order.items) {
         const recipe = await Recipe.findOne({
@@ -291,17 +292,17 @@ export const handleVnpayReturn = async (req, res) => {
       await session.commitTransaction();
 
       return res.redirect(
-        `http://localhost:5173/payment-result?orderId=${order._id}`
+        `${FRONTEND_URL}/payment-result?orderId=${order._id}`
       );
     }
 
-    // thanh toán thành công
     order.paymentStatus = "SUCCESS";
+    order.status = "COMPLETED";
     order.vnp_TransactionNo = verify.vnp_TransactionNo;
     order.vnp_Amount = verify.vnp_Amount;
     order.vnp_PayDate = verify.vnp_PayDate;
 
-    // Cập nhật voucher nếu có
+    // Cập nhật voucher
     if (order.voucherId) {
       await Voucher.findByIdAndUpdate(
         order.voucherId,
@@ -310,7 +311,7 @@ export const handleVnpayReturn = async (req, res) => {
       );
     }
 
-    // clear cart
+    // Clear cart
     await Cart.findOneAndUpdate(
       { userId: order.userId },
       { $set: { items: [] } },
@@ -321,12 +322,14 @@ export const handleVnpayReturn = async (req, res) => {
     await session.commitTransaction();
 
     return res.redirect(
-      `http://localhost:5173/payment-result?&orderId=${order._id}`
+      `${FRONTEND_URL}/payment-result?orderId=${order._id}`
     );
   } catch (err) {
+    console.error("VNPAY RETURN ERROR:", err);
+
     await session.abortTransaction();
     return res.redirect(
-      `http://localhost:5173/payment-result?status=error&message=${encodeURIComponent(
+      `${FRONTEND_URL}/payment-result?status=error&message=${encodeURIComponent(
         "Xử lý callback thất bại"
       )}`
     );
