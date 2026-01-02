@@ -208,7 +208,7 @@ export const createPayment = async (req, res) => {
       vnp_TxnRef: txnRef,
       vnp_OrderInfo: `Thanh toan don hang ${txnRef}`,
       vnp_OrderType: ProductCode.Other,
-      vnp_ReturnUrl: "http://localhost:5000/api/payment/vnpay-return",
+      vnp_ReturnUrl: "https://coffeego-api.onrender.com/api/payment/vnpay-return",
       vnp_Locale: VnpLocale.VN,
       vnp_CreateDate: dateFormat(new Date()),
     });
@@ -232,7 +232,7 @@ export const handleVnpayReturn = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  const FRONTEND_URL = process.env.FRONTEND_URL;
+  const FRONTEND_URL = "https://coffeego.vercel.app";
 
   try {
     const verify = vnpay.verifyReturnUrl(req.query);
