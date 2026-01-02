@@ -34,7 +34,6 @@ const io = new Server(server, {
   },
 });
 
-// Middleware để inject io vào req
 app.use((req, res, next) => {
   req.io = io;
   next();
@@ -80,5 +79,4 @@ server.listen(PORT, async () => {
   await connectDB();
   watchOrders(io); 
   watchReservations(io);
-  console.log(`Server started at http://localhost:${PORT}`);
 });

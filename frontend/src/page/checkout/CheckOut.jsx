@@ -146,7 +146,7 @@ const CheckOut = () => {
           name: data.name,
           phone: data.phoneNumber,
           note: data.deliveryNote || "",
-          deliveryTime: selectedTime, // THÊM DÒNG NÀY
+          deliveryTime: selectedTime, 
         },
         voucher: voucherUsed,
         userId: user.id,
