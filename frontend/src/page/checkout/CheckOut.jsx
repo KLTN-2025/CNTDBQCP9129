@@ -134,6 +134,7 @@ const CheckOut = () => {
   };
 
   const handleClickOrder = async (data) => {
+      console.error("Lỗi khi đặt hàng:", error);
     try {
       const orderData = {
         cartItems: cart.map((item) => ({
@@ -157,7 +158,6 @@ const CheckOut = () => {
         window.location.href = response.vnpUrl;
       }
     } catch (error) {
-      console.error("Lỗi khi đặt hàng:", error);
       toast.error(error.response?.data?.message || "Đặt hàng thất bại!");
     }
   };
